@@ -14,19 +14,23 @@ BagCursor = { -- Starts at 1
 }
 
 ItemPocket = {
-    numAddr = 0xD892
+    addr = 0xD892,
+    size = 1
 }
 
 BallPocket = {
-    numAddr = 0xD8D7
+    addr = 0xD8D7,
+    size = 1
 }
 
 KeyPocket = {
-    numAddr = 0xD8BC
+    addr = 0xD8BC,
+    size = 1
 }
 
 TMHMPocket = {
-    numAddr = 0xD859
+    addr = 0xD859,
+    size = 1
 }
 
 BattleItem = {
@@ -47,6 +51,11 @@ BallPriority = {
     Items.POKE_BALL
 }
 
+SelectedItem = {
+    addr = 0xD95C,
+    size = 1
+}
+
 function Bag:navigateToItem(pocket, item)
     --[[
         Moves the bag cursor to the specified item
@@ -59,6 +68,9 @@ function Bag:navigateToItem(pocket, item)
         location = tab[1]
     elseif pocket == BagPocket.BALLS then
         tab = BallPocket:containsItem(item)
+        location = tab[1]
+    elseif pocket == BagPocket.KEY_ITEMS then
+        tab = KeyPocket:containsItem(item)
         location = tab[1]
     end
 
@@ -94,6 +106,7 @@ function Bag:useItem(pocket, item)
     currentLocation = Memory:readFromTable(BagCursor)
     Common:navigateMenu(currentLocation, BattleItem.USE)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
+    return true
 end
 
 function Bag:useBestBall()
@@ -132,21 +145,50 @@ function Bag:doesPocketContain(pocket, item)
 
         Returns: Tuple:
             - Location of item in the bag, 0 if not found
-            - Quantity of item, 0 if not found
+            - Quantity of item, 0 if not found or same as location addr if key item
     ]]
-    pocketAddr = pocket.numAddr
-    numOfItemsInPocket = Memory:readbyte(pocketAddr)
+    if pocket == BagPocket.ITEMS then
+        pocketTable = ItemPocket
+    elseif pocket == BagPocket.BALLS then
+        pocketTable = BallPocket
+    elseif pocket == BagPocket.KEY_ITEMS then
+        pocketTable = KeyPocket
+    elseif pocket == BagPocket.TM_HM then
+        pocketTable = TMHMPocket
+    end
+
+    numOfItemsInPocket = Memory:readFromTable(pocketTable)
     for i = 1, numOfItemsInPocket, 1
     do
-        itemAddr = pocketAddr + (2 * i - 1)
-        quatityAddr = pocketAddr + (2 * i)
+        if Common:contains({BagPocket.ITEMS, BagPocket.BALLS}, pocket) then
+            itemAddr =  Bag:_calculateItemBallAddress(pocketTable.addr, i)
+            quantityAddr = itemAddr + 1
+        elseif pocket == BagPocket.KEY_ITEMS then
+            itemAddr = Bag:_calculateKeyItemAddress(pocketTable.addr, i)
+            quantityAddr = itemAddr
+        end
 
         currentItem = Memory:readbyte(itemAddr)
         if currentItem == item then
-            return {i, Memory:readbyte(quatityAddr)}
+            return {i, Memory:readbyte(quantityAddr)}
         end
     end
     return {0, 0}
+end
+
+function Bag:_calculateItemBallAddress(startingAddress, index)
+    return startingAddress + 2 * index - 1
+end
+
+function Bag:_calculateKeyItemAddress(startingAddress, index)
+    return startingAddress + index
+end
+
+function Bag:openPack()
+    Input:pressButtons{buttonKeys={Buttons.START}, duration=Duration.PRESS}
+    Common:navigateMenuFromAddress(MenuCursor.addr, 3)
+    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
+    return Bag:isOpen()
 end
 
 function Bag:isOpen()
@@ -158,12 +200,20 @@ function Bag:isOpen()
     return Memory:readFromTable(BagOpen) == BagOpen.OPEN
 end
 
+function Bag:getSelectedItem()
+    return Memory:readFromTable(SelectedItem)
+end
+
 function ItemPocket:containsItem(item)
-    return Bag:doesPocketContain(ItemPocket, item)
+    return Bag:doesPocketContain(BagPocket.ITEMS, item)
 end
 
 function BallPocket:containsItem(item)
-    return Bag:doesPocketContain(BallPocket, item)
+    return Bag:doesPocketContain(BagPocket.BALLS, item)
+end
+
+function KeyPocket:containsItem(item)
+    return Bag:doesPocketContain(BagPocket.KEY_ITEMS, item)
 end
 
 function BallPocket:hasPokeballs()

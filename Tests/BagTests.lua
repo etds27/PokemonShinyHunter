@@ -26,6 +26,19 @@ function BagTest:testBagDoesntContainItem()
     tab = ItemPocket:containsItem(Items.THUNDER_STONE)
     return tab[1] == 0 and tab[2] == 0
 end
+
+function BagTest:testBagContainsKeyItem()
+    savestate.load(TestStates.FISH_ON_LINE)
+    tab = KeyPocket:containsItem(Items.OLD_ROD)
+    return tab[1] == 2
+end
+
+function BagTest:testBagDoesntContainItem()
+    savestate.load(TestStates.FISH_OFF_LINE)
+    tab = KeyPocket:containsItem(Items.SILVER_WING)
+    return tab[1] == 0
+end
+
 function BagTest:testNavigateToPokeball()
     savestate.load(BagTest.SAVE_STATE_PATH)
     return Bag:navigateToItem(BagPocket.BALLS, Items.POKE_BALL)
@@ -39,6 +52,12 @@ end
 function BagTest:testUseBestBall()
     savestate.load(TestStates.ALL_BALLS)
     return Bag:useBestBall()
+end
+
+function BagTest:testUseFishingRod()
+    savestate.load(TestStates.PRE_FISHING)
+    Bag:openPack()
+    return Bag:useItem(BagPocket.KEY_ITEMS, Items.OLD_ROD)
 end
 
 function BagTest:testHasPokeballs()
@@ -63,7 +82,7 @@ end
 
 function BagTest:testIsOpen()
     states = {"States\\BagTests.State",
-              "States\\PostCatchTests.State",
+              "States\\PostCatchTests.State", 
               "States\\StartOfBattle.State"}
     values = {true,
               false,
@@ -79,11 +98,16 @@ function BagTest:testIsOpen()
     return true
 end
 
---print("BagTest:testBagContainsBall()", BagTest:testBagContainsBall())
---print("BagTest:testBagDoesntContainBall()", BagTest:testBagDoesntContainBall())
---print("BagTest:testBagContainsItem()", BagTest:testBagContainsItem())
---print("BagTest:testBagDoesntContainItem()", BagTest:testBagDoesntContainItem())
---print("BagTest:testNavigateToPokeball()", BagTest:testNavigateToPokeball())
---print("BagTest:testNavigateToItem()", BagTest:testNavigateToItem())
---print("BagTest:testIsOpen()", BagTest:testIsOpen())
+Log.loggingLevel = LogLevels.INFO
+GameSettings.initialize()
+print("BagTest:testBagContainsBall()", BagTest:testBagContainsBall())
+print("BagTest:testBagDoesntContainBall()", BagTest:testBagDoesntContainBall())
+print("BagTest:testBagContainsItem()", BagTest:testBagContainsItem())
+print("BagTest:testBagDoesntContainItem()", BagTest:testBagDoesntContainItem())
+print("BagTest:testBagContainsKeyItem()", BagTest:testBagContainsKeyItem())
+print("BagTest:testBagDoesntContainItem()", BagTest:testBagDoesntContainItem())
+print("BagTest:testNavigateToPokeball()", BagTest:testNavigateToPokeball())
+print("BagTest:testNavigateToItem()", BagTest:testNavigateToItem())
+print("BagTest:testIsOpen()", BagTest:testIsOpen())
 print("BagTest:testUseBestBall()", BagTest:testUseBestBall())
+print("BagTest:testUseFishingRod()", BagTest:testUseFishingRod())

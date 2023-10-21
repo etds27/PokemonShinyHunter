@@ -9,6 +9,9 @@ TestStates = {
     BOX_1_6 = "States\\Box1_6.State",
     BOXUI_OVERWORLD = "States\\PCOverworldBox3.State",
     STARTER_CYNDAQUIL = "States\\StarterResetCyndaquil.State",
-    STARTER_TOTADILE = "States\\StarterResetTotadile.State",
-    STARTER_CHIKORITA = "States\\StarterResetChikorita.State"
+    STARTER_TOTODILE = "States\\StarterResetTotodile.State",
+    STARTER_CHIKORITA = "States\\StarterResetChikorita.State",
+    FISH_ON_LINE = "States\\FishOnLine.State",
+    FISH_OFF_LINE = "States\\FishOffLine.State",
+    PRE_FISHING = "States\\PreFishing.State"
 }

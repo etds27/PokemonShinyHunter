@@ -1,15 +1,17 @@
 BotModes = {
-    WILD_POKEMON = 1,
+    WILD_GRASS = 1,
     STARTER = 2,
+    FISHING = 3,
 }
 
 Bot = {
-    mode = BotModes.STARTER,
+    mode = BotModes.FISHING,
     SEARCH_SPIN_MAXIMUM = 100,
+    FISH_MAXIMUM = 50
 }
 
 function Bot:run() 
-    if Bot.mode == BotModes.WILD_POKEMON then
+    if Common:contains({BotModes.WILD_GRASS, BotModes.FISHING}, Bot.mode) then
         Bot:runModeWildPokemon()
     elseif Bot.mode == BotModes.STARTER then
         Bot:runModeStarterPokemon()
@@ -19,7 +21,11 @@ end
 function Bot:runModeWildPokemon()
     while true
     do
-        Bot:searchForWildPokemon()
+        if Bot.mode == BotModes.WILD_GRASS then
+            Bot:searchForWildPokemon()
+        elseif Bot.mode == BotModes.FISHING then
+            Bot:fishForWildPokemon()
+        end
         wildPokemon = PokemonMemory:getPokemonTable(MemoryPokemonType.WILD, GameSettings.wildpokemon)
 
         Log:info("Is shiny: " .. tostring(PokemonMemory:isShiny(wildPokemon)))
@@ -78,6 +84,24 @@ function Bot:runModeStarterPokemon()
     end
 
     Log:info("Found shiny starter after: " .. tostring(resets) .. " resets")
+end
+
+function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
+    isRodSelected = Common:contains(Rods, Bag:getSelectedItem())
+    i = 0
+    while i < Bot.FISH_MAXIMUM
+    do
+        if isRodSelected then
+            Input:pressButtons{buttonKeys={Buttons.SELECT}, duration=Duration.TAP, waitFrames=0}
+        else
+            Bag:openPack()
+            Bag:useItem(BagPocket.KEY_ITEMS, Items.OLD_ROD)
+        end
+        if Fishing:fish() then
+            break
+        end
+        i = i + 1
+    end
 end
 
 function Bot:searchForWildPokemon() 
