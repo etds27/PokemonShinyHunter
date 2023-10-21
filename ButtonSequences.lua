@@ -40,31 +40,32 @@ ButtonSequences = {
 
 CustomSequences = {}
 function CustomSequences:starterEncounter() 
+
     -- Initiate diaglog with pokeball
     Input:pressButtons{buttonKeys={Buttons.A}, 
                        duration=20,
-                       waitFrames=80}
+                       waitFrames=100}
     -- Dismiss Picture
     -- You'll take ---, the
     Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=76,
-                       waitFrames=4}
+                       duration=80,
+                       waitFrames=8}
     -- --- Pokemon
     -- Gets to the Yes/No prompt
     Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=29,
-                       waitFrames=4}
+                       duration=44,
+                       waitFrames=8}
     -- I think thats a great
     Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=51,
-                       waitFrames=4}
+                       duration=56,
+                       waitFrames=8}
     -- Pokemon too!
     Input:pressButtons{buttonKeys={Buttons.A},
                        duration=28,
                        waitFrames=4}
     -- Trainer received ---
     Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=220,
+                       duration=250,
                        waitFrames=4}
     -- Do you want to give a name
     Input:pressButtons{buttonKeys={Buttons.B},
@@ -78,7 +79,7 @@ function CustomSequences:starterEncounter()
     -- Walk to Prof Elm
     -- MR.POKEMON lives a little bit beyond
     Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=150,
+                       duration=240,
                        waitFrames=4}
     -- Cherrygrove the next city over
     Input:pressButtons{buttonKeys={Buttons.B},
@@ -122,5 +123,9 @@ function CustomSequences:starterEncounter()
     -- Im counting on you!
     Input:pressButtons{buttonKeys={Buttons.B},
                        duration=85,
+                       waitFrames=10}
+    -- Im counting on you!
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=10,
                        waitFrames=10}
 end
