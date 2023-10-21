@@ -91,14 +91,14 @@ WildPokemonOffsets = {
     spDefenseStat = {0x1C, 2},
 }
 
-function PokemonMemory:getTrainerPokemonTable(startingAddress) 
+function PokemonMemory:getTrainerPokemonTable(startingAddress, memdomain) 
     pokemonTable = {
         address = startingAddress
     }
     for key, value in pairs(TrainerPokemonOffsets) do
         offset = value[1]
         size = value[2]
-        memValue = Memory:read(startingAddress + offset, size)
+        memValue = Memory:read(startingAddress + offset, size, memdomain)
         pokemonTable[key] = memValue
 
         --[[

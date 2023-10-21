@@ -19,6 +19,7 @@ function Bot:runModeWildPokemon()
         Bot:searchForWildPokemon()
         wildPokemon = PokemonMemory:getWildPokemonTable(GameSettings.wildpokemon)
 
+        Log:info("Is shiny: " .. tostring(PokemonMemory:isShiny(wildPokemon)))
         if PokemonMemory:isShiny(wildPokemon) then
             ret = 0
             i = 0

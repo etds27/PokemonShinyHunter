@@ -1,13 +1,24 @@
-Memory = {}
+Memory = {
+	ROM = 0x0,
+	VRAM = 0x80,
+	CARTRAM = 0xA0,
+	WRAM = 0xC0,
+	OAM = 0xFE,
+	SYS_BUS = 0xFF
+}
 
 -- Pokemon Crystal Memory Accessor
-function Memory:read(addr, size)
+function Memory:read(addr, size, memdomain)
 	mem = ""
-    memdomain = (addr >> 8)
+	if memdomain == nil then
+    	memdomain = (addr >> 8)
+	end
 	if memdomain == 0x0 then
 		mem = "ROM"
 	elseif memdomain == 0x80 then
 		mem = "VRAM"
+	elseif memdomain == 0xA0 then -- Domain is A000 - BFFF. But has 8 2 KiB swappable partitions
+		mem = "CartRAM"
 	elseif memdomain >= 0xC0 and memdomain <= 0x13F then
 		mem = "WRAM"
 		addr = addr - 0xC000

@@ -253,4 +253,4 @@ l = ["Bulbasaur",
 print(l)
 
 for i, item in enumerate(l):
-    print(f"{item} = {i + 1},")
+    print(f"{item.upper()} = {i + 1},")
