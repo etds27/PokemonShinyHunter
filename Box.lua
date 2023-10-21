@@ -3,7 +3,14 @@ Box = {
     firstHalfAddr = 0x4000, -- I think this RAM partition starts at 0xA000
     secondHalfAddr = 0x6000,
     size = 1,
-    headerSize = 22 
+    headerSize = 22,
+    pokemonSize = 32,
+    numBoxes = 14,
+    maxBoxSize = 20,
+}
+
+BoxUI = {
+
 }
 
 CurrentBoxNumber = {
@@ -24,6 +31,14 @@ function Box:getCurrentBoxNumber()
             - Box number (Indexed at 1)
     ]]
     return Memory:readFromTable(CurrentBoxNumber) + 1
+end
+function Box:getNumberOfPokemonInBox(boxNumber)
+    startingAddress = Box:getBoxStartingAddress(boxNumber) 
+    return Memory:read(startingAddress, size, Memory.CARTRAM)
+end
+
+function Box:getNumberOfPokemonInCurrentBox()
+    return Box:getNumberOfPokemonInBox(Box:getCurrentBoxNumber()) 
 end
 
 function Box:getBoxStartingAddress(boxNumber) 
@@ -52,7 +67,7 @@ function Box:pokemonLocation(startingAddress, pokemonPosition)
             - startingAddress: The starting address of the box the pokemon is in
             - pokemonPosition: The index of the pokemon (Start at 1)
     ]]
-    return startingAddress + Box.headerSize + 32 * (pokemonPosition - 1)
+    return startingAddress + Box.headerSize + Box.pokemonSize * (pokemonPosition - 1)
 end
 
 function Box:getBox(boxNumber)
@@ -64,18 +79,151 @@ function Box:getBox(boxNumber)
     -- First Byte is always the number of Pokemon in the box
     box = {}
     startingAddress = Box:getBoxStartingAddress(boxNumber) 
-    print(startingAddress)
-    numPokemon = Memory:read(startingAddress, size, Memory.CARTRAM)
-    print(numPokemon)
+    numPokemon = Box:getNumberOfPokemonInBox(boxNumber)
     for i = 1, numPokemon 
     do
-        
         pokemonAddress =  Box:pokemonLocation(startingAddress, i)
-        print(pokemonAddress, i)
-        pokemonTable = PokemonMemory:getTrainerPokemonTable(pokemonAddress, Memory.CARTRAM)
+        pokemonTable = PokemonMemory:getPokemonTable(MemoryPokemonType.BOX, 
+                                                     pokemonAddress, 
+                                                     Memory.CARTRAM)
         table.insert(box, pokemonTable)
     end
     return box
+end
+
+function Box:getCurrentBox()
+    return Box:getBox(Box:getCurrentBoxNumber())
+end
+
+function Box:getAllPokemonInPC()
+    pokemon = {}
+    for i = 1, Box.numBoxes
+    do
+        currentBox = Box:getBox(i)
+        for i, pokemonTable in ipairs(currentBox)
+        do
+            table.insert(pokemon, pokemonTable)
+        end
+    end
+    return pokemon
+end
+
+function Box:isBoxFull(boxNumber)
+    --[[
+        Determine if the specified box is full
+    ]]
+    return Box:getNumberOfPokemonInBox(boxNumber) == Box.maxBoxSize
+end
+
+function Box:isCurrentBoxFull()
+    --[[
+        Determine if the current box is full
+    ]]
+    return Box:getNumberOfPokemonInCurrentBox() == Box.maxBoxSize
+end
+
+function BoxUI:openPC()
+    --[[
+        Assumes you are standing in front of the PC and 
+        will bring you to the first menu
+    ]]
+end
+
+PCMainMenu = {
+    BILL = 1,
+    TRAINER = 2,
+    PROF_OAK = 3,
+    TURN_OFF = 4
+}
+
+PCBillsMenu = {
+    WITHDRAW = 1,
+    DEPOSIT = 2,
+    CHANGE_BOX = 3,
+    MOVE_PKMN = 4
+}
+
+PCBoxCursor = {
+    addr = 0xD106,
+    size = 1,
+    CANCEL = 255
+}
+
+PCBoxEdit = {
+    addr = MenuCursor.addr,
+    size = MenuCursor.size,
+    SWITCH = 1,
+    NAME = 2,
+    PRINT = 3,
+    QUIT = 4,
+}
+
+function BoxUI:changeBox(newBox)
+    --[[
+        Performs the entire changing box flow from starting up the pc to closing out
+    ]]
+    if Box:getCurrentBoxNumber() == newBox then
+        Log:info("Box is already set to " .. tostring(newBox))
+        return true
+    end
+
+    BoxUI:bootUpPC()
+    BoxUI:selectBillsPC()
+    BoxUI:selectChangeBox()
+    BoxUI:navigateToBox(newBox)
+    BoxUI:switchBox(boxNumber)
+    BoxUI:exitPC()
+    return Box:getCurrentBoxNumber() == newBox
+end
+
+function BoxUI:bootUpPC()
+    --[[
+        Go from overworld to main page of PC
+        No verification
+    ]]
+    Input:performButtonSequence(ButtonSequences.OPEN_TO_PC_MENU)
+end
+
+function BoxUI:selectBillsPC()
+    --[[
+        Go from main page of PC to Bills PC
+        No verification
+    ]]
+    Common:navigateMenuFromAddress(MenuCursor.addr, PCMainMenu.BILL)
+    Input:performButtonSequence(ButtonSequences.PC_MENU_TO_BILLS)
+end
+
+function BoxUI:selectChangeBox()
+    --[[
+        Go from Bills PC to Change Box Menu
+        No verification
+    ]]
+    Common:navigateMenuFromAddress(MenuCursor.addr, PCBillsMenu.CHANGE_BOX)
+    Input:pressButtons{buttonKeys={Buttons.A}}
+end
+
+function BoxUI:navigateToBox(boxNumber)
+    --[[
+        Go from Box select screen to selecting the desired box
+        No verification
+    ]]
+    Common:navigateMenuFromAddress(PCBoxCursor.addr, boxNumber)
+    Input:pressButtons{buttonKeys={Buttons.A}}
+end
+
+function BoxUI:switchBox(boxNumber)
+    --[[
+        Go from selected box screen to completing the box change
+        No verification
+    ]]
+    Common:navigateMenuFromAddress(PCBoxEdit.addr,  PCBoxEdit.SWITCH)
+    Input:pressButtons{buttonKeys={Buttons.A}}
+    Input:pressButtons{buttonKeys={Buttons.A}}
+    Input:performButtonSequence(ButtonSequences.SAVE_GAME)
+end
+
+function BoxUI:exitPC()
+    Input:performButtonSequence(ButtonSequences.EXIT_PC)
 end
 
 -- Box Structure
@@ -106,6 +254,7 @@ Box 13 - 0x7590
 Box 14 - 0x79E0
 ]]
 
-print(Box:getCurrentBoxNumber())
-print(Box:getBox(1)[1])
-print(Box:getBox(1)[2])
+-- print(Box:getCurrentBoxNumber())
+-- print(Box:getBox(1)[1])
+-- print(Box:getBox(1)[2])
+-- BoxUI:changeBox(3)

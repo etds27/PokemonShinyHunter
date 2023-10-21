@@ -50,3 +50,24 @@ function Common:navigateMenu(currentLocation, endLocation)
         Input:pressButtons{buttonKeys={button}, duration=Duration.MENU_TAP}
     end
 end
+
+function Common:navigateMenuFromAddress(cursorAddress, endLocation)
+    --[[
+        Navigates a menu to the desired index
+
+        Arguments:
+            - cursorAddress: 1 Byte address where the cursor position is held
+            - endLocation: End value for the cursor address
+    ]]
+    currentLocation = Memory:read(cursorAddress, 1)
+    return Common:navigateMenu(currentLocation, endLocation)
+end
+
+function Common:tableLength(table)
+    i = 0
+    for _ in pairs(table)
+    do
+        i = i + 1
+    end
+    return i
+end

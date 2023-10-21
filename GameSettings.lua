@@ -15,6 +15,12 @@ GameSettings = {
 	roamerpokemonoffset = 0,
 	menuCursor = 0,
 	bagCursor = 0,
+	frameCounter = 0
+}
+
+MenuCursor = {
+	addr = 0,
+	size = 0,
 }
 
 GameSettings.VERSIONS = {
@@ -77,6 +83,11 @@ function GameSettings.initialize()
 		GameSettings.menuCursor = 0xCFA9
 		GameSettings.bagCursor = 0xCF65
 		GameSettings.battleCursor = 0xCFA8 -- 2 Bytes
+		GameSettings.frameCounter = 0xD4C8
+		MenuCursor = {
+			addr = 0xCFA9,
+			size = 1
+		}
 	else
 		GameSettings.game = 0
 		GameSettings.gamename = "Unsupported game"
@@ -104,3 +115,4 @@ function GameSettings.initialize()
 	console.log("Detected game: " .. GameSettings.gamename)
 
 end
+GameSettings.initialize()

@@ -67,6 +67,31 @@ TrainerPokemonOffsets = {
     spDefenseStat = {0x2E, 2},
 }
 
+BoxPokemonOffsets = {
+    species = {0x00, 1},
+    heldItem = {0x01, 1},
+    move1 = {0x02, 1},
+    move2 = {0x03, 1},
+    move3 = {0x04, 1},
+    move4 = {0x05, 1},
+    trainerId = {0x06, 2},
+    expPoints = {0x08, 3},
+    hpEv = {0x0B, 2},
+    attackEv = {0x0D, 2},
+    defenseEv = {0x0F, 2},
+    speedEv = {0x11, 2},
+    specialEv = {0x13, 2},
+    ivData = {0x15, 2},
+    movePp1 = {0x17, 1},
+    movePp2 = {0x18, 1},
+    movePp3 = {0x19, 1},
+    movePp4 = {0x1A, 1},
+    friendship = {0x1B, 1},
+    pokerus = {0x1C, 1},
+    caughtData = {0x1D, 2},
+    level = {0x1F, 1}  
+}
+
 WildPokemonOffsets = {
     species = {0x00, 1},
     heldItem = {0x01, 1},
@@ -91,48 +116,30 @@ WildPokemonOffsets = {
     spDefenseStat = {0x1C, 2},
 }
 
-function PokemonMemory:getTrainerPokemonTable(startingAddress, memdomain) 
+MemoryPokemonType = {
+    TRAINER = TrainerPokemonOffsets,
+    WILD = WildPokemonOffsets,
+    BOX = BoxPokemonOffsets
+}
+
+function PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
     pokemonTable = {
         address = startingAddress
     }
-    for key, value in pairs(TrainerPokemonOffsets) do
+    for key, value in pairs(pokemonType) do
         offset = value[1]
         size = value[2]
         memValue = Memory:read(startingAddress + offset, size, memdomain)
         pokemonTable[key] = memValue
-
         --[[
         print("Key " .. key)
-        print("StartingAddess " ..  string.format("%x", startingAddress))
+        -- print("StartingAddess " ..  string.format("%x", startingAddress))
         print("Offset " .. value[1])
         print("Address " .. string.format("%x", startingAddress + offset))
         print("Size " .. value[2])
         print("MemValue " .. memValue)
-        ]]
-    end
-    PokemonMemory:determineIvs(pokemonTable)
-    return pokemonTable
-end
-
-function PokemonMemory:getWildPokemonTable(startingAddress) 
-    pokemonTable = {
-        address = startingAddress
-    }
-
-    for key, value in pairs(WildPokemonOffsets) do
-        offset = value[1]
-        size = value[2]
-        memValue = Memory:read(startingAddress + offset, size)
-        pokemonTable[key] = memValue
-
-        --[[
-        print("Key " .. key)
-        print("StartingAddess " ..  string.format("%x", startingAddress))
-        print("Offset " .. value[1])
-        print("Address " .. string.format("%x", startingAddress + offset))
-        print("Size " .. value[2])
-        print("MemValue " .. memValue)
-        ]]
+        -- print("-----------")
+        --]]
     end
     PokemonMemory:determineIvs(pokemonTable)
     return pokemonTable
