@@ -9,6 +9,20 @@ Memory = {
 
 -- Pokemon Crystal Memory Accessor
 function Memory:read(addr, size, memdomain)
+	--[[
+		Access data from the game's memory
+
+		In most cases, you are good to pass in the memory address and the memdomain 
+		can be determined by the MSB of the address. This isn't always the case with
+		CartRAM and WRAM which have 2KiB swappable partitions that may contain addresses
+		that exceed their usual bounds. In this case, then the memdomain will need to be 
+		set through the arguments
+
+		Arguments:
+			- addr: Global addr to read from
+			- size: Number of bytes to read
+			- memdomain (optional): The memory domain to read from
+	]]
 	mem = ""
 	if memdomain == nil then
     	memdomain = (addr >> 8)
@@ -19,9 +33,8 @@ function Memory:read(addr, size, memdomain)
 		mem = "VRAM"
 	elseif memdomain == 0xA0 then -- Domain is A000 - BFFF. But has 8 2 KiB swappable partitions
 		mem = "CartRAM"
-	elseif memdomain >= 0xC0 and memdomain <= 0x13F then
+	elseif memdomain == 0xC0 then
 		mem = "WRAM"
-		addr = addr - 0xC000
 	elseif memdomain == 0xFE then
 		mem = "OAM"
     elseif memdomain == 0xFF then
@@ -46,6 +59,7 @@ function Memory:readFromTable(args)
 		Arguments:
 			- addr: Address to read from
 			- size: Number of bytes to read
+			- memdomain (optional): The memory domain to read from
 	]]
 	if args.addr == nil then
 		Log:error("No property 'addr' in table")
@@ -60,7 +74,9 @@ function Memory:readFromTable(args)
 	else
 		size = args.size
 	end
-	return Memory:read(addr, size)
+
+	memdomain = args.memdomain
+	return Memory:read(addr, size, memdomain)
 end
 
 function Memory:readdword(addr)
