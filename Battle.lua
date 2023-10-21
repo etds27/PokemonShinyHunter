@@ -1,5 +1,17 @@
 Battle = {}
 
+--[[
+    Resets to 0 when user's turn starts
+]]
+Catch = {
+    addr = 0x11416,
+    size = 1,
+    waitFrames = 700, -- 600 in testing
+    RESET = 0,
+    CAUGHT = 1,
+    MISSED = 2
+}
+
 -- When this value is 0, we are at the start of a battle
 PokemonTurnCounter = {
     addr = 0xC6DD,
@@ -42,7 +54,6 @@ function Battle:attackByIndex(moveIndex)
 
     if currentMove == nil then Log.error("Unable to find current move index") end
     Log:info("Current Move: " .. currentMove .. " |  Move Index: " .. moveIndex)
-    print("Current Move: " .. currentMove .. " |  Move Index: " .. moveIndex)
 
     if currentMove > moveIndex then
         Input:repeatedlyPressButton{buttonKeys = {Buttons.UP}, 
@@ -64,11 +75,11 @@ function Battle:runFromPokemon()
         Run from the current pokemon battle
         This assumes that the battle menu has or is loading
     ]]
-
     Battle:waitForBattleMenu(100)
     Input:performButtonSequence(ButtonSequences.BATTLE_RUN)
-    Common:waitFrames(120)
+    Input:pressButtons{buttonKeys={Buttons.B}, duration=80, waitFrames=1}
     Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.TAP}
+    Common:waitFrames(60) -- Wait for overworld
 end
 
 function Battle:openPack()
@@ -87,6 +98,28 @@ function Battle:waitForBattleMenu(bIterations)
     end
 
     return i < bIterations
+end
+
+function Battle:getCatchStatus()
+    --[[
+        Determine if the pokemon was caught
+
+        This will continously poll the catch status memory until it changes from
+        a reset state or the maximum frame count is reached
+
+        Returns:
+            - 0: Catch status wasn't updated
+            - 1: Pokemon was caught
+            - 2: Pokemon was not caught
+    ]]
+    i = 0
+
+    while Memory:readFromTable(Catch) == Catch.RESET and i < Catch.waitFrames
+    do
+        emu.frameadvance()
+    end
+
+    return Memory:readFromTable(Catch)
 end
 
 -- GameSettings.initialize()

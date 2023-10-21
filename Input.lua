@@ -30,7 +30,7 @@ function Input:pressButtons(args)
         - duration: Int to determine how long to press the buttons for
         - releaseStart: Bool to release all keys before pressing the buttons
         - releaseEnd: Bool to release all keys after they have been pressed
-        - waitFrames: Number of frames to wait after the action to respolve animations
+        - waitFrames: Number of frames to wait after the action to resolve animations
     --]]
     -- Log:debug("Input:pressButtons init")
     input = joypad.get()

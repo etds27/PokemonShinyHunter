@@ -1,24 +1,52 @@
+BotModes = {
+    WILD_POKEMON = 1,
+}
 
 Bot = {
-    SEARCH_SPIN_MAXIMUM = 100
+    mode = BotModes.WILD_POKEMON,
+    SEARCH_SPIN_MAXIMUM = 100,
 }
 
 function Bot:run() 
+    if Bot.mode == BotModes.WILD_POKEMON then
+        Bot:runModeWildPokemon()
+    end
+end
+
+function Bot:runModeWildPokemon()
     while true
     do
         Bot:searchForWildPokemon()
         wildPokemon = PokemonMemory:getWildPokemonTable(GameSettings.wildpokemon)
 
-        if not PokemonMemory:isShiny(wildPokemon) then
+        if PokemonMemory:isShiny(wildPokemon) then
+            ret = 0
+            i = 0
+            while BallPocket:hasPokeballs() and i < 10
+            do
             Battle:openPack()
             Bag:useBestBall()
-            Bot:waitForHuman() 
+            ret = Battle:getCatchStatus()
+            if ret == 1 then -- SHINY WAS CAUGHT!
+                PostCatch:continueUntilOverworld()
+                break
+            else
+
+            end
+            i = i + 1
+            end 
+
+            if ret == 1 then
+                Log:info("You caught the shiny pokemon!")
+            else
+                Log:info("You did not catch the shiny pokemon")
+            end
+            -- Bot:waitForHuman() 
         else
             Battle:runFromPokemon()
         end        
     end
 end
-
 
 function Bot:searchForWildPokemon() 
     i = 0
@@ -45,7 +73,6 @@ function Bot:searchForWildPokemon()
 end
 
 function Bot:waitForHuman() 
-    exit()
     while true
     do
         emu.yield()

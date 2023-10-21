@@ -8,7 +8,7 @@ function Memory:read(addr, size)
 		mem = "ROM"
 	elseif memdomain == 0x80 then
 		mem = "VRAM"
-	elseif memdomain >= 0xC0 and memdomain <= 0xDF then
+	elseif memdomain >= 0xC0 and memdomain <= 0x13F then
 		mem = "WRAM"
 		addr = addr - 0xC000
 	elseif memdomain == 0xFE then

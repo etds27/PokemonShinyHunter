@@ -34,6 +34,12 @@ BattleItem = {
     QUIT = 2,
 }
 
+BagOpen = {
+    addr = 0xCFCC,
+    size = 1,
+    OPEN = 19,
+}
+
 BallPriority = {
     Items.MASTER_BALL,
     Items.ULTRA_BALL,
@@ -84,10 +90,10 @@ function Bag:useItem(pocket, item)
     if not Bag:navigateToItem(pocket, item) then
         return false
     end
-    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.TAP}
+    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
     currentLocation = Memory:readFromTable(BagCursor)
     Common:navigateMenu(currentLocation, BattleItem.USE)
-    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.TAP}
+    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
 end
 
 function Bag:useBestBall()
@@ -143,6 +149,15 @@ function Bag:doesPocketContain(pocket, item)
     return {0, 0}
 end
 
+function Bag:isOpen()
+    --[[
+        Determine if the bag is currently open
+        I'm a little iffy on if this is the right address
+        but it worked across like 5-6 different states
+    ]]
+    return Memory:readFromTable(BagOpen) == BagOpen.OPEN
+end
+
 function ItemPocket:containsItem(item)
     return Bag:doesPocketContain(ItemPocket, item)
 end
@@ -151,3 +166,19 @@ function BallPocket:containsItem(item)
     return Bag:doesPocketContain(BallPocket, item)
 end
 
+function BallPocket:hasPokeballs()
+    --[[
+        Determine if the user has any pokeballs left
+
+        Returns:
+            - true if there are any amount of any type of pokeball
+    ]]
+    for i, ball in ipairs(BallPriority)
+    do
+        tab = BallPocket:containsItem(ball)
+        if tab[1] ~= 0 then
+            return true
+        end
+    end
+    return false
+end

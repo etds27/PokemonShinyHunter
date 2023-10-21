@@ -6,7 +6,7 @@ LogLevels = {
 }
 
 Log = {
-    loggingLevel = LogLevels.DEBUG
+    loggingLevel = LogLevels.INFO
 }
 
 
