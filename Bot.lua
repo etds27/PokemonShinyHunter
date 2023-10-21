@@ -1,15 +1,18 @@
 BotModes = {
     WILD_POKEMON = 1,
+    STARTER = 2,
 }
 
 Bot = {
-    mode = BotModes.WILD_POKEMON,
+    mode = BotModes.STARTER,
     SEARCH_SPIN_MAXIMUM = 100,
 }
 
 function Bot:run() 
     if Bot.mode == BotModes.WILD_POKEMON then
         Bot:runModeWildPokemon()
+    elseif Bot.mode == BotModes.STARTER then
+        Bot:runModeStarterPokemon()
     end
 end
 
@@ -17,10 +20,10 @@ function Bot:runModeWildPokemon()
     while true
     do
         Bot:searchForWildPokemon()
-        wildPokemon = PokemonMemory:getWildPokemonTable(GameSettings.wildpokemon)
+        wildPokemon = PokemonMemory:getPokemonTable(MemoryPokemonType.WILD, GameSettings.wildpokemon)
 
         Log:info("Is shiny: " .. tostring(PokemonMemory:isShiny(wildPokemon)))
-        if PokemonMemory:isShiny(wildPokemon) then
+        if wildPokemon.isShiny then
             ret = 0
             i = 0
             while BallPocket:hasPokeballs() and i < 10
@@ -47,6 +50,34 @@ function Bot:runModeWildPokemon()
             Battle:runFromPokemon()
         end        
     end
+end
+
+function Bot:runModeStarterPokemon()
+    --[[
+        Assumes that we are standing in front of the starter pokeball that we want
+    ]]
+    starterSaveState = "BotStates\\StarterResetState.State"
+    savestate.save(starterSaveState)
+    resets = 1
+    while true
+    do
+        Log:info("Reset number: " .. tostring(resets))
+        savestate.load(starterSaveState)
+        -- Need to advance the game one frame each reset so that 
+        -- the random seed can update and Pokemon values will be 
+        -- different
+        emu.frameadvance()
+        savestate.save(starterSaveState)
+        CustomSequences:starterEncounter()
+        starter = PokemonMemory:getPokemonTable(MemoryPokemonType.TRAINER, GameSettings.partypokemon[1])
+        
+        if starter.isShiny then
+            break
+        end
+        resets = resets + 1
+    end
+
+    Log:info("Found shiny starter after: " .. tostring(resets) .. " resets")
 end
 
 function Bot:searchForWildPokemon() 

@@ -142,6 +142,7 @@ function PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
         --]]
     end
     PokemonMemory:determineIvs(pokemonTable)
+    pokemonTable.isShiny = PokemonMemory:isShiny(pokemonTable)
     return pokemonTable
 end
 

@@ -31,4 +31,96 @@ ButtonSequences = {
                  waitFrames=60,
                  waitEnd=450, -- Wait for save to finish
                  },
+
+    -- Static Encounters
+    STARTERS = {buttonSequence={{Buttons.A}, Buttons.A},
+                duration=Duration.LONG_PRESS,
+                waitFrames=80}
 }
+
+CustomSequences = {}
+function CustomSequences:starterEncounter() 
+    -- Initiate diaglog with pokeball
+    Input:pressButtons{buttonKeys={Buttons.A}, 
+                       duration=20,
+                       waitFrames=80}
+    -- Dismiss Picture
+    -- You'll take ---, the
+    Input:pressButtons{buttonKeys={Buttons.A},
+                       duration=76,
+                       waitFrames=4}
+    -- --- Pokemon
+    -- Gets to the Yes/No prompt
+    Input:pressButtons{buttonKeys={Buttons.A},
+                       duration=29,
+                       waitFrames=4}
+    -- I think thats a great
+    Input:pressButtons{buttonKeys={Buttons.A},
+                       duration=51,
+                       waitFrames=4}
+    -- Pokemon too!
+    Input:pressButtons{buttonKeys={Buttons.A},
+                       duration=28,
+                       waitFrames=4}
+    -- Trainer received ---
+    Input:pressButtons{buttonKeys={Buttons.A},
+                       duration=220,
+                       waitFrames=4}
+    -- Do you want to give a name
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=42,
+                       waitFrames=4}
+    -- --- you received?
+    -- Gets to Yes/No prompt
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=25,
+                       waitFrames=4}
+    -- Walk to Prof Elm
+    -- MR.POKEMON lives a little bit beyond
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=150,
+                       waitFrames=4}
+    -- Cherrygrove the next city over
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=57,
+                       waitFrames=4}
+    -- It's almost a direct route
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=47,
+                       waitFrames=4}
+    -- so you can't miss it
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=48,
+                       waitFrames=4}
+    -- Heres my phone
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=54,
+                       waitFrames=4}
+    -- Call me if anything comes up
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=60,
+                       waitFrames=10}
+
+    -- Trainer got Elm's phone number
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=280,
+                       waitFrames=10}
+    -- Elm looks around
+    -- If your pokemon is hurt
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=96,
+                       waitFrames=4}
+
+    -- heal it with this machine
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=48,
+                       waitFrames=4}
+    -- Feel free to use it any time
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=50,
+                       waitFrames=10}
+    -- Im counting on you!
+    Input:pressButtons{buttonKeys={Buttons.B},
+                       duration=85,
+                       waitFrames=10}
+end
