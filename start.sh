@@ -1,5 +1,5 @@
 HOST=127.0.0.1
-PORT=57373
+PORT=57374
 
 python3 Python/server.py $HOST $PORT &
 sleep 1

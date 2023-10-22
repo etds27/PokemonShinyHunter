@@ -5,7 +5,7 @@ require "Memory"
 Trainer = {}
 
 TrainerID = {
-    addr = 0xD114,
+    addr = 0xD47B,
     size = 2
 }
 
@@ -21,6 +21,11 @@ TrainerPlayTime = {
     size = 1
 }
 
+TrainerName = {
+    addr = 0xD47D,
+    maxLength = 7,
+}
+
 function Trainer:getTrainerID()
     return Memory:readFromTable(TrainerID)
 end
@@ -34,4 +39,8 @@ function Trainer:getPlayTime()
     min = Memory:read(TrainerPlayTime.minAddr, TrainerPlayTime.size)
     sec = Memory:read(TrainerPlayTime.secAddr, TrainerPlayTime.size)
     return {hr, min, sec}
+end
+
+function Trainer:getName()
+    return Text:readTextAtAddress(TrainerName.addr, maxLength)
 end

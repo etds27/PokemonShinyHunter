@@ -15,7 +15,6 @@ class CollectionManager:
         file_manager.save_file(self.bot_id, filename=self.filename, data=self.encounters)
 
     def update_collection(self, event_json):
-        print(event_json)
         logging.info(f"Updating collection with {len(event_json['content'])} pokemon")
         self.collection = event_json["content"]
 

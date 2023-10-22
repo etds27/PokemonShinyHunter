@@ -19,7 +19,7 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.WILD_GRASS,
+    mode = BotModes.STARTER,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
     SAVESTATE_PATH = "BotStates\\ShinyStates\\"
