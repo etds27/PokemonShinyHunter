@@ -1,4 +1,3 @@
-import io
 import logging
 import file_manager
 
@@ -18,7 +17,7 @@ class EncounterManager:
     ]
 
     def __init__(self, bot_id) -> None:
-        self.bot_id = bot_id
+        self.bot_id = str(bot_id)
         self.filename = f"shb_{self.bot_id}_encounter_tables.json"
         self.encounters = {
             "total_encounters": 0,
@@ -31,10 +30,10 @@ class EncounterManager:
         self.initialize_encounter_table
 
     def initialize_encounter_table(self):
-        self.encounters = file_manager.load_file(self.filename)
+        self.encounters = file_manager.load_file(self.bot_id, self.filename)
 
     def save_encounter_table(self):
-        file_manager.save_file(filename=self.filename, data=self.encounters)
+        file_manager.save_file(self.bot_id, filename=self.filename, data=self.encounters)
 
 
     def manage_new_encounter(self, encounter_json):

@@ -34,7 +34,7 @@ function Box:getCurrentBoxNumber()
 end
 function Box:getNumberOfPokemonInBox(boxNumber)
     startingAddress = Box:getBoxStartingAddress(boxNumber) 
-    return Memory:read(startingAddress, size, Memory.CARTRAM)
+    return Memory:read(startingAddress, size, Memory.CARTRAM) % 255 -- Value may be 255
 end
 
 function Box:getNumberOfPokemonInCurrentBox()
@@ -120,13 +120,6 @@ function Box:isCurrentBoxFull()
         Determine if the current box is full
     ]]
     return Box:getNumberOfPokemonInCurrentBox() == Box.maxBoxSize
-end
-
-function BoxUI:openPC()
-    --[[
-        Assumes you are standing in front of the PC and 
-        will bring you to the first menu
-    ]]
 end
 
 PCMainMenu = {
@@ -258,3 +251,4 @@ Box 14 - 0x79E0
 -- print(Box:getBox(1)[1])
 -- print(Box:getBox(1)[2])
 -- BoxUI:changeBox(3)
+ -- Box:getAllPokemonInPC()

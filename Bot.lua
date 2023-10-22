@@ -1,3 +1,17 @@
+require "Bag"
+require "Box"
+require "ButtonSequences"
+require "Collection"
+require "Common"
+require "Fishing"
+require "GameSettings"
+require "Input"
+require "Log"
+require "PokemonMemory"
+require "PokemonSocket"
+require "Positioning"
+require "PostCatch"
+
 BotModes = {
     WILD_GRASS = 1,
     STARTER = 2,
@@ -5,7 +19,7 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.STARTER,
+    mode = BotModes.WILD_GRASS,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
     SAVESTATE_PATH = "BotStates\\ShinyStates\\"
@@ -85,7 +99,7 @@ function Bot:runModeStarterPokemon()
         savestate.save(starterSavestate)
         CustomSequences:starterEncounter()
         starter = PokemonMemory:getPokemonTable(MemoryPokemonType.TRAINER, GameSettings.partypokemon[1])
-        starter.caught
+        starter.caught = true
         Bot:handleEncounter(starter)
         if starter.isShiny then
             break
@@ -141,10 +155,21 @@ end
 
 function Bot:handleEncounter(pokemonTable)
     PokemonSocket:logEncounter(pokemonTable)
-    if pokemonTable.caught then
+    if pokemonTable.isShiny then
+        Bot:handleShiny()
+    end
+end
 
-        savestatePath = Bot.SAVESTATE_PATH .. "shiny_save_"  .. tostring(os.clock())
-        svestate.save(savestatePath)
+function Bot:handleShiny(pokemonTable)
+    --[[
+        Responsible for handling whatever needs to be done after catching a shiny
+    ]]
+    if pokemonTable.caught then
+        savestatePath = Bot.SAVESTATE_PATH .. "shiny_save_"  .. tostring(os.clock() .. ".State")
+        savestate.save(savestatePath)
+
+        pokemon = Collection:getAllShinyPokemon()
+        PokemonSocket:logCollection(pokemon)
     end
 end
 

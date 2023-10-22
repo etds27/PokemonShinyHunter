@@ -74,3 +74,4 @@ end
 
 function Common:currentTime()
     return os.clock()
+end

@@ -12,4 +12,60 @@ function Collection:getAllShinyPokemon()
     boxPokemon = Box:getAllPokemonInPC()
     partyPokemon = Party:getAllPokemonInParty()
     speciesTable = {}
+
+    for i, pokemonTable in ipairs(boxPokemon)
+    do
+        if pokemonTable.isShiny then
+            table.insert(speciesTable, pokemonTable)
+        end
+    end
+
+    for i, pokemonTable in ipairs(partyPokemon)
+    do
+        if pokemonTable.isShiny then
+            table.insert(speciesTable, pokemonTable)
+        end
+    end
+    return speciesTable
 end
+
+function Collection:isNewShinyPokemon(species, pokemonData)
+    --[[
+        Determine if the pokemon found is a new shiny
+    ]]
+
+    if pokemonData == nil then
+        pokemonData = Collection:getAllShinyPokemon()
+    end
+
+    for i, currentPokemon in ipairs(pokemonData)
+    do
+        if currentPokemon.species == species and currentPokemon.isShiny then
+            return false
+        end
+    end
+    return true
+end
+
+function Collection:isShinyPokemonNeeded(species, pokemonData)
+    --[[
+        Determine if we already have the needed amount of pokemon to complete the evolutionary line
+    ]]
+    if pokemonData == nil then
+        pokemonData = Collection:getAllShinyPokemon()
+    end
+
+    reqCount = PokemonReqs[species]
+    currentCount = 0
+
+    for i, currentPokemon in ipairs(pokemonData)
+    do
+        if currentPokemon.species == species and currentPokemon.isShiny then
+            currentCount = currentCount + 1
+        end
+    end
+    return currentCount < reqCount
+end
+
+
+-- print(Collection:getAllShinyPokemon())

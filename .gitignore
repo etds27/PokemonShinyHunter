@@ -1,3 +1,4 @@
 test.py
 *.pyc
-Data/*.json
+Data/*
+WorkingStates/*
