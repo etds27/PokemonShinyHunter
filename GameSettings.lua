@@ -1,3 +1,5 @@
+require "Memory"
+
 GameSettings = {
 	game = 0,
 	gamename = "",

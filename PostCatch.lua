@@ -1,3 +1,9 @@
+require "Common"
+require "Log"
+require "Memory"
+require "Input"
+require "Positioning"
+
 PostCatch = {
     iterations = 20
 }

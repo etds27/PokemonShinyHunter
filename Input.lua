@@ -1,3 +1,6 @@
+require "Common"
+require "Log"
+
 Input = {}
 
 Buttons = {

@@ -1,3 +1,9 @@
+require "Common"
+require "Log"
+require "Memory"
+require "PokemonMemory"
+require "Input"
+
 Box = {
     addr = 0xDB72, -- For current loaded box
     firstHalfAddr = 0x4000, -- I think this RAM partition starts at 0xA000

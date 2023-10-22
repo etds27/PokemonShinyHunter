@@ -1,3 +1,8 @@
+require "Common"
+require "Log"
+require "Memory"
+require "PokemonMemory"
+
 Party = {
     addr = 0xDCD7, -- num of pokemon address
     size = 1, 

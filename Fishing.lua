@@ -1,3 +1,9 @@
+
+require "Common"
+require "Log"
+require "Memory"
+require "Input"
+
 Fishing = {
     addr = 0xD1EF,
     size = 1,

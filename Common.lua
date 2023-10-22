@@ -1,3 +1,7 @@
+-- require "Log"
+-- require "Memory"
+-- require "Input"
+
 Common = {}
 
 function Common:waitFrames(number)

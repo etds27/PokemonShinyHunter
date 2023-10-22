@@ -1,3 +1,7 @@
+require "Common"
+require "Log"
+require "Memory"
+
 Trainer = {}
 
 TrainerID = {

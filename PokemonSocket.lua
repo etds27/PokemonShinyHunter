@@ -1,3 +1,5 @@
+json = require "json"
+
 PokemonSocket = {
     host = "127.0.0.1",
     port = 57373,
@@ -9,8 +11,6 @@ EventTypes = {
     TEAM = "team",
     COLLECTION = "collection",
 }
-
-json = require "json"
 
 function PokemonSocket:sendTable(tab, eventType)
     trainerId = Trainer:getTrainerID()

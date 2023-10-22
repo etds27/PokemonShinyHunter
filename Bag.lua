@@ -1,3 +1,8 @@
+require "Common"
+require "Log"
+require "Memory"
+require "Input"
+
 Bag = {}
 BagPocket = {
     addr = 0xCF65,

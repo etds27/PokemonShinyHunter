@@ -1,5 +1,13 @@
 -- The purpose of this object is to provide functinoality for getting
 -- all pokemon obtained so far and comparing to the requirements
+
+require "Box"
+require "Common"
+require "Log"
+require "Memory"
+require "Party"
+require "PokemonMemory"
+
 Collection = {}
 
 function Collection:getAllShinyPokemon()

@@ -1,3 +1,7 @@
+require "Log"
+require "Input"
+
+
 ButtonSequences = {
     -- Battle sequences
     BATTLE_RUN = {buttonSequence={{Buttons.DOWN}, {Buttons.RIGHT}, {Buttons.A}}, waitFrames=5},
