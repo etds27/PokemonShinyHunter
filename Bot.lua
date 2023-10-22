@@ -46,18 +46,22 @@ function Bot:runModeWildPokemon()
             end
             i = i + 1
             end 
-            
+
             encounters = 1
 
             if ret == 1 then
+                wildPokemon.caught = true
                 Log:info("You caught the shiny pokemon!")
             else
+                wildPokemon.caught = false
                 Log:info("You did not catch the shiny pokemon")
             end
             -- Bot:waitForHuman() 
         else
+            wildPokemon.caught = false
             Battle:runFromPokemon()
-        end        
+        end
+        PokemonSocket:logEncounter(wildPokemon)
         encounters = encounters + 1
     end
 end
@@ -130,6 +134,7 @@ function Bot:searchForWildPokemon()
         Log:warning("Unable to find pokemon after " .. Bot.SEARCH_SPIN_MAXIMUM .. " spins")
         Bot:waitForHuman()
     end
+    -- Common:waitFrames(120)
 end
 
 function Bot:waitForHuman() 

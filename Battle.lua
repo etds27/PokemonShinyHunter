@@ -4,7 +4,7 @@ Battle = {}
     Resets to 0 when user's turn starts
 ]]
 Catch = {
-    addr = 0x5416,
+    addr = 0x11416,
     size = 1,
     memdomain = Memory.WRAM,
     waitFrames = 700, -- 600 in testing

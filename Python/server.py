@@ -1,3 +1,7 @@
+import pprint
+import event_handler
+import json
+import re
 import socket
 import signal
 
@@ -10,6 +14,7 @@ def close_script(s):
     s.close()
     exit()
 
+event_handler = event_handler.EventHandler()
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -23,11 +28,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print(f"Connected by {addr}")
         while True:
             data = conn.recv(1024)
-            print(f"Received data {data}")
+
+            data_str = data.decode("utf-8")
+            stripped_data = re.sub("^[\d]+ ", "" , data.decode("utf-8"))
+            event_json = json.loads(stripped_data)
+            event_handler.handle_event(event_json)
+
             if not data:
                 break
-            message = f"{len(data)} {data}"
-            print(message)
-            conn.send(message.encode())
-
-            print(data)

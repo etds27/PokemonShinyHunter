@@ -131,15 +131,13 @@ function PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
         size = value[2]
         memValue = Memory:read(startingAddress + offset, size, memdomain)
         pokemonTable[key] = memValue
-        --[[
-        print("Key " .. key)
+        -- print("Key " .. key)
         -- print("StartingAddess " ..  string.format("%x", startingAddress))
-        print("Offset " .. value[1])
-        print("Address " .. string.format("%x", startingAddress + offset))
-        print("Size " .. value[2])
-        print("MemValue " .. memValue)
+        -- print("Offset " .. value[1])
+        -- print("Address " .. string.format("%x", startingAddress + offset))
+        -- print("Size " .. value[2])
+        -- print("MemValue " .. memValue)
         -- print("-----------")
-        --]]
     end
     PokemonMemory:determineIvs(pokemonTable)
     pokemonTable.isShiny = PokemonMemory:isShiny(pokemonTable)

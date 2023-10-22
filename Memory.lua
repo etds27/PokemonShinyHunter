@@ -33,8 +33,9 @@ function Memory:read(addr, size, memdomain)
 		mem = "VRAM"
 	elseif memdomain == 0xA0 then -- Domain is A000 - BFFF. But has 8 2 KiB swappable partitions
 		mem = "CartRAM"
-	elseif memdomain == 0xC0 then
+	elseif memdomain >= 0xC0 and memdomain <= 0xDF then
 		mem = "WRAM"
+		addr = addr - 0xC000
 	elseif memdomain == 0xFE then
 		mem = "OAM"
     elseif memdomain == 0xFF then
