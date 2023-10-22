@@ -5,7 +5,7 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.FISHING,
+    mode = BotModes.WILD_GRASS,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50
 }
@@ -19,6 +19,7 @@ function Bot:run()
 end
 
 function Bot:runModeWildPokemon()
+    encounters = 1
     while true
     do
         if Bot.mode == BotModes.WILD_GRASS then
@@ -28,7 +29,7 @@ function Bot:runModeWildPokemon()
         end
         wildPokemon = PokemonMemory:getPokemonTable(MemoryPokemonType.WILD, GameSettings.wildpokemon)
 
-        Log:info("Is shiny: " .. tostring(PokemonMemory:isShiny(wildPokemon)))
+        Log:info(tostring(encounters) .." is shiny: " .. tostring(PokemonMemory:isShiny(wildPokemon)))
         if wildPokemon.isShiny then
             ret = 0
             i = 0
@@ -45,6 +46,8 @@ function Bot:runModeWildPokemon()
             end
             i = i + 1
             end 
+            
+            encounters = 1
 
             if ret == 1 then
                 Log:info("You caught the shiny pokemon!")
@@ -55,6 +58,7 @@ function Bot:runModeWildPokemon()
         else
             Battle:runFromPokemon()
         end        
+        encounters = encounters + 1
     end
 end
 
