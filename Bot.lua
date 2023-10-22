@@ -19,13 +19,13 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.STARTER,
+    mode = BotModes.WILD_GRASS,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
-    SAVESTATE_PATH = "BotStates\\ShinyStates\\"
 }
 
 function Bot:run() 
+    Bot:initializeBot()
     if Common:contains({BotModes.WILD_GRASS, BotModes.FISHING}, Bot.mode) then
         Bot:runModeWildPokemon()
     elseif Bot.mode == BotModes.STARTER then
@@ -85,7 +85,7 @@ function Bot:runModeStarterPokemon()
     --[[
         Assumes that we are standing in front of the starter pokeball that we want
     ]]
-    starterSavestate = "BotStates\\StarterResetState.State"
+    starterSavestate = Bot.BOT_STATE_PATH .. "StarterResetState.State"
     savestate.save(starterSavestate)
     resets = 1
     while true
@@ -171,6 +171,13 @@ function Bot:handleShiny(pokemonTable)
         pokemon = Collection:getAllShinyPokemon()
         PokemonSocket:logCollection(pokemon)
     end
+end
+
+function Bot:initializeBot()
+    Bot.BOT_STATE_PATH = "BotStates\\" .. tostring(Trainer:getTrainerID()) .. "\\"
+    Bot.SAVESTATE_PATH = Bot.BOT_STATE_PATH .. "ShinyStates\\"
+    os.execute("mkdir " .. Bot.BOT_STATE_PATH)
+    os.execute("mkdir " .. Bot.SAVESTATE_PATH)
 end
 
 function Bot:waitForHuman() 

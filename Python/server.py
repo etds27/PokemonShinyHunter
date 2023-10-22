@@ -6,8 +6,14 @@ import socket
 import signal
 import argparse
 
-HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
-PORT = 57373  # Port to listen on (non-privileged ports are > 1023)
+parser = argparse.ArgumentParser()
+
+parser.add_argument("host", type=str, help="Enter host IP (usually 127.0.0.1)")
+parser.add_argument("port", type=int, help='Port number for server')
+
+args = parser.parse_args()
+HOST = args.host  # Standard loopback interface address (localhost)
+PORT = args.port  # Port to listen on (non-privileged ports are > 1023)
 
 
 def close_script(s):

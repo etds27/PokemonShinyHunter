@@ -1,5 +1,5 @@
 set HOST="127.0.0.1"
-set PORT=57373
+set PORT=57375
 set GAME="C:\Emulators\GBC\Pokemon Crystal.gbc"
 start /b python3 "Python\server.py" %HOST% %PORT%
 timeout 1

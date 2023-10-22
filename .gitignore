@@ -2,3 +2,4 @@ test.py
 *.pyc
 Data/*
 WorkingStates/*
+BotStates/*
