@@ -71,3 +71,6 @@ function Common:tableLength(table)
     end
     return i
 end
+
+function Common:currentTime()
+    return os.clock()

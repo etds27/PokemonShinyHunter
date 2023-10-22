@@ -5,9 +5,10 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.WILD_GRASS,
+    mode = BotModes.STARTER,
     SEARCH_SPIN_MAXIMUM = 100,
-    FISH_MAXIMUM = 50
+    FISH_MAXIMUM = 50,
+    SAVESTATE_PATH = "BotStates\\ShinyStates\\"
 }
 
 function Bot:run() 
@@ -61,7 +62,7 @@ function Bot:runModeWildPokemon()
             wildPokemon.caught = false
             Battle:runFromPokemon()
         end
-        PokemonSocket:logEncounter(wildPokemon)
+        Bot:handleEncounter(wildPokemon)
         encounters = encounters + 1
     end
 end
@@ -70,21 +71,22 @@ function Bot:runModeStarterPokemon()
     --[[
         Assumes that we are standing in front of the starter pokeball that we want
     ]]
-    starterSaveState = "BotStates\\StarterResetState.State"
-    savestate.save(starterSaveState)
+    starterSavestate = "BotStates\\StarterResetState.State"
+    savestate.save(starterSavestate)
     resets = 1
     while true
     do
         Log:info("Reset number: " .. tostring(resets))
-        savestate.load(starterSaveState)
+        savestate.load(starterSavestate)
         -- Need to advance the game one frame each reset so that 
         -- the random seed can update and Pokemon values will be 
         -- different
         emu.frameadvance()
-        savestate.save(starterSaveState)
+        savestate.save(starterSavestate)
         CustomSequences:starterEncounter()
         starter = PokemonMemory:getPokemonTable(MemoryPokemonType.TRAINER, GameSettings.partypokemon[1])
-        
+        starter.caught
+        Bot:handleEncounter(starter)
         if starter.isShiny then
             break
         end
@@ -135,6 +137,15 @@ function Bot:searchForWildPokemon()
         Bot:waitForHuman()
     end
     -- Common:waitFrames(120)
+end
+
+function Bot:handleEncounter(pokemonTable)
+    PokemonSocket:logEncounter(pokemonTable)
+    if pokemonTable.caught then
+
+        savestatePath = Bot.SAVESTATE_PATH .. "shiny_save_"  .. tostring(os.clock())
+        svestate.save(savestatePath)
+    end
 end
 
 function Bot:waitForHuman() 

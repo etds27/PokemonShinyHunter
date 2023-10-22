@@ -13,5 +13,6 @@ TestStates = {
     STARTER_CHIKORITA = "States\\StarterResetChikorita.State",
     FISH_ON_LINE = "States\\FishOnLine.State",
     FISH_OFF_LINE = "States\\FishOffLine.State",
-    PRE_FISHING = "States\\PreFishing.State"
+    PRE_FISHING = "States\\PreFishing.State",
+    POKEMON_PARTY = "States\\PokemonParty.State"
 }
