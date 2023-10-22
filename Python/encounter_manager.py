@@ -50,7 +50,7 @@ class EncounterManager:
 
         logging.info(self.encounter_string(species, new_encounter_dict))
 
-        if species not in self.encounters:
+        if species not in self.encounters["species"]:
             self.create_new_encounter_species(species=species)
 
 
