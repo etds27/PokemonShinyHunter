@@ -8,7 +8,8 @@ if not os.path.exists(DATA_PATH):
     os.mkdir(DATA_PATH, mode=0o777)
 
 def load_file(bot_id, filename):
-    filepath = os.path.join(DATA_PATH, filename)
+    dest_dir = os.path.join(DATA_PATH, bot_id)
+    filepath = os.path.join(dest_dir, filename)
 
     if not os.path.exists(filepath):
         logging.warning(f"File path: '{filepath}' does not exist. Returning empty directory")

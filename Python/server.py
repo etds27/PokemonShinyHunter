@@ -1,7 +1,9 @@
 import pprint
 import event_handler
 import json
+import logging
 import re
+import select
 import socket
 import signal
 import argparse
@@ -37,9 +39,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             data = conn.recv(1024)
 
             data_str = data.decode("utf-8")
-            stripped_data = re.sub("^[\d]+ ", "" , data.decode("utf-8"))
-            event_json = json.loads(stripped_data)
-            event_handler.handle_event(event_json)
+            try:
+                stripped_data = re.sub("^[\d]+ ", "" , data.decode("utf-8"))
+                event_json = json.loads(stripped_data)
+                event_handler.handle_event(event_json)
+            except:
+                logging.error(f"Unable to parse data: {data_str}")
 
             if not data:
                 break

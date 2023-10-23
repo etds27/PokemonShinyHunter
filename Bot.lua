@@ -157,7 +157,7 @@ end
 function Bot:handleEncounter(pokemonTable)
     PokemonSocket:logEncounter(pokemonTable)
     if pokemonTable.isShiny then
-        Bot:handleShiny()
+        Bot:handleShiny(pokemonTable)
     end
 end
 
