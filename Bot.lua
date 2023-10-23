@@ -1,4 +1,5 @@
 require "Bag"
+require "Battle"
 require "Box"
 require "ButtonSequences"
 require "Collection"
@@ -19,7 +20,7 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.WILD_GRASS,
+    mode = BotModes.STARTER,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
 }
