@@ -25,26 +25,34 @@ def close_script(s):
 
 event_handler = event_handler.EventHandler()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((HOST, PORT))
-    s.listen()
-    print(f"Waiting for client")
-    conn, addr = s.accept()
-    print(f"Client accepted: {conn}:{addr}")
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setblocking(0)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((HOST, PORT))
+    server.listen()
+    inputs = [server]
 
-    with conn:
-        print(f"Connected by {addr}")
-        while True:
-            data = conn.recv(1024)
+    while inputs:
+        readable, _, _ = select.select(inputs, [], [])
 
-            data_str = data.decode("utf-8")
-            try:
-                stripped_data = re.sub("^[\d]+ ", "" , data.decode("utf-8"))
-                event_json = json.loads(stripped_data)
-                event_handler.handle_event(event_json)
-            except:
-                logging.error(f"Unable to parse data: {data_str}")
+        for s in readable:
+            if s == server: # Accept a new connection coming in
+                conn, addr = s.accept()
+                logging.info(f"Accepted new connection from: {addr}")
+                conn.setblocking(0)
+                inputs.append(conn)
+            else: # Read data from one of the connected sockets
+                data = s.recv(4096)
+                if data:
+                    data_str = data.decode("utf-8")
+                    try:
+                        # Clean up the received data and send over to the event handler
+                        stripped_data = re.sub("^[\d]+ ", "" , data.decode("utf-8"))
+                        event_json = json.loads(stripped_data)
+                        event_handler.handle_event(event_json)
+                    except:
+                        logging.error(f"Unable to parse data: {data_str}")
 
-            if not data:
-                break
+                else:
+                    logging.info(f"Removing socket {s.fileno()}")
+                    inputs.remove(s)

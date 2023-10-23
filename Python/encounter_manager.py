@@ -134,7 +134,8 @@ class EncounterManager:
 
     def encounter_string(self, species, encounter_json):
 
-        string = f"BOT#{self.bot_id}: {pokemon.pokemon_names[str(species)]} "
+        string = f"BOT#{self.bot_id}: "
+        string += f"{pokemon.pokemon_names[str(species)]:<10} "
         string += f"POW: {encounter_json['strength']:02d}, "
         string += f"PROX: {encounter_json['shiny_proximity']:02d}, "
         string += f"SHINY: {encounter_json['isShiny']}, "

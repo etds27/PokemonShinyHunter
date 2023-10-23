@@ -20,7 +20,7 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.STARTER,
+    mode = BotModes.WILD_GRASS,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
 }
