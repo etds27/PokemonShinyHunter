@@ -12,6 +12,7 @@ require "PokemonMemory"
 require "PokemonSocket"
 require "Positioning"
 require "PostCatch"
+require "Text"
 
 BotModes = {
     WILD_GRASS = 1,
@@ -20,9 +21,10 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.WILD_GRASS,
+    mode = BotModes.STARTER,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
+    botId = "NONE0000"
 }
 
 function Bot:run() 
@@ -175,10 +177,18 @@ function Bot:handleShiny(pokemonTable)
 end
 
 function Bot:initializeBot()
-    Bot.BOT_STATE_PATH = "BotStates\\" .. tostring(Trainer:getTrainerID()) .. "\\"
+    --[[
+        Needs to be ran when the game has started and has named the character
+    ]]
+    Bot.botId = Bot:getBotId()
+    Bot.BOT_STATE_PATH = "BotStates\\" .. Bot.botId .. "\\"
     Bot.SAVESTATE_PATH = Bot.BOT_STATE_PATH .. "ShinyStates\\"
     os.execute("mkdir " .. Bot.BOT_STATE_PATH)
     os.execute("mkdir " .. Bot.SAVESTATE_PATH)
+end
+
+function Bot:getBotId()
+    return Trainer:getName() .. tostring(Trainer:getTrainerID())
 end
 
 function Bot:waitForHuman() 

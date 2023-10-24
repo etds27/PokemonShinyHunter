@@ -17,7 +17,7 @@ function PokemonSocket:sendTable(tab, eventType)
     time = Trainer:getPlayTime()
 
     -- Add meta data to the package before sending over
-    package = {botId = trainerId,
+    package = {botId = Bot.botId,
                playTime = time,
                timestamp = os.time(),
                eventType = eventType,
@@ -25,7 +25,8 @@ function PokemonSocket:sendTable(tab, eventType)
 
     jsonString = json.encode(package)
     -- print(jsonString, package, eventType)
-    comm.socketServerSend(jsonString)
+    -- Data delimiter
+    comm.socketServerSend(jsonString .. "|||")
 end
 
 function PokemonSocket:logEncounter(pokemonTable)

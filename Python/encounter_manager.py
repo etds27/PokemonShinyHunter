@@ -3,8 +3,6 @@ import logging
 import file_manager
 import pokemon
 
-ENCOUNTER_MEMORY = 50  # Save the last X encounters
-
 logging.basicConfig(level=logging.INFO)
 class IV(enum.Enum):
     HP = "hpIv"
@@ -15,6 +13,7 @@ class IV(enum.Enum):
 
 class EncounterManager:
     encounter_keys = [
+        "species",
         "pokerus",
         "level",
         "attackIv",
@@ -77,6 +76,7 @@ class EncounterManager:
         if content_json["isShiny"]:
             species_dict["total_shinies_found"] += 1
             self.encounters["total_shinies_found"] += 1
+            species_dict["shiny_encounters"].append(new_encounter_dict)
 
             if "caught" in content_json and content_json["caught"]:
                 species_dict["total_shinies_caught"] += 1
@@ -91,15 +91,12 @@ class EncounterManager:
             self.encounters["last_shiny_timestamp"] = encounter_json["timestamp"]
             species_dict["last_shiny_encounter"] = species_dict["total_encounters"]
 
+
         # Log pokerus
         if "pokerus" in content_json and content_json["pokerus"]:
             species_dict["total_pokerus"] += 1
             self.encounters["total_pokerus"] += 1
-
-        # Save the raw encounter data from the bot
-        if len(species_dict["encounters"]) >= ENCOUNTER_MEMORY:
-            species_dict["encounters"].pop(0)
-        species_dict["encounters"].append(new_encounter_dict)
+            species_dict["pokerus_encounters"].append(new_encounter_dict)
 
         # Update the strongest pokemon
         if not species_dict["strongest_pokemon"] or new_encounter_dict["strength"] > species_dict["strongest_pokemon"]["strength"]:
@@ -126,14 +123,14 @@ class EncounterManager:
             "total_shinies_found": 0,
             "total_shinies_caught": 0,
             "total_pokerus": 0,
+            "shiny_encounters": [],
+            "pokerus_encounters": [],
             "last_shiny_encounter": 0,  
             "strongest_pokemon": {},
-            "weakest_pokemon": {},
-            "encounters": []
+            "weakest_pokemon": {}
         }
 
     def encounter_string(self, species, encounter_json):
-
         string = f"BOT#{self.bot_id}: "
         string += f"{pokemon.pokemon_names[str(species)]:<10} "
         string += f"POW: {encounter_json['strength']:02d}, "
