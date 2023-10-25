@@ -17,6 +17,7 @@ args = parser.parse_args()
 HOST = args.host  # Standard loopback interface address (localhost)
 PORT = args.port  # Port to listen on (non-privileged ports are > 1023)
 
+print(HOST, PORT)
 
 def close_script(s):
     logging.info("No more connections are established, terminating server")

@@ -106,6 +106,7 @@ function Input:repeatedlyPressButton(args)
     end
 
     for _ = 1, iterations do
+        print("TEST")
         Input:pressButtons(args)
     end
 
@@ -135,7 +136,6 @@ function Input:performButtonSequence(args)
         arg = Common:shallowcopy(args)
         arg.buttonSequence = nil
         arg.buttonKeys = buttonKeys
-
         Input:pressButtons(arg)
     end
 

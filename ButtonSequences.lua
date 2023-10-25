@@ -132,4 +132,14 @@ function CustomSequences:starterEncounter()
     Input:pressButtons{buttonKeys={Buttons.B},
                        duration=10,
                        waitFrames=10}
+
+    Input:pressButtons{buttonKeys={Buttons.START},
+                       duration=Duration.PRESS,
+                       waitFrames=5}
+
+    Input:repeatedlyPressButton{buttonKeys={Buttons.A},
+                                duration=Duration.PRESS,
+                                waitFrames=25,
+                                iterations=4}
+    Common:waitFrames(60)
 end

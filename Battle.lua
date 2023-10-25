@@ -1,4 +1,5 @@
 require "Common"
+require "GameSettings"
 require "Log"
 require "Memory"
 require "Input"

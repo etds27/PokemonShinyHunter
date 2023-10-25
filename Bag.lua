@@ -2,6 +2,7 @@ require "Common"
 require "Log"
 require "Memory"
 require "Input"
+require "Items"
 
 Bag = {}
 BagPocket = {

@@ -13,6 +13,7 @@ require "PokemonSocket"
 require "Positioning"
 require "PostCatch"
 require "Text"
+require "Trainer"
 
 BotModes = {
     WILD_GRASS = 1,
@@ -21,7 +22,7 @@ BotModes = {
 }
 
 Bot = {
-    mode = BotModes.STARTER,
+    mode = BotModes.WILD_GRASS,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
     botId = "NONE0000"
@@ -30,6 +31,7 @@ Bot = {
 function Bot:run() 
     Bot:initializeBot()
     if Common:contains({BotModes.WILD_GRASS, BotModes.FISHING}, Bot.mode) then
+        print(Bot.mode)
         Bot:runModeWildPokemon()
     elseif Bot.mode == BotModes.STARTER then
         Bot:runModeStarterPokemon()
@@ -38,6 +40,7 @@ end
 
 function Bot:runModeWildPokemon()
     encounters = 1
+    Bot.mode = 3
     while true
     do
         if Bot.mode == BotModes.WILD_GRASS then
@@ -118,14 +121,24 @@ function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
     i = 0
     while i < Bot.FISH_MAXIMUM
     do
+        Log:debug("Starting fishing loop")
         if isRodSelected then
-            Input:pressButtons{buttonKeys={Buttons.SELECT}, duration=Duration.TAP, waitFrames=0}
+            -- Fishing status updates in memory at around 24 frames
+            Input:pressButtons{buttonKeys={Buttons.SELECT}, duration=Duration.PRESS, waitFrames=30}
         else
             Bag:openPack()
             Bag:useItem(BagPocket.KEY_ITEMS, Items.OLD_ROD)
         end
         if Fishing:fish() then
+            Log:debug("Hooked a fish!")
             break
+        end
+
+        -- Wait to return to overworld after not hooking a fish
+        Log:debug("Waiting to return to overworld after fishing")
+        while not Positioning:inOverworld()
+        do
+            emu.frameadvance()
         end
         i = i + 1
     end

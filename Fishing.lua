@@ -24,14 +24,17 @@ function Fishing:fish()
         Returns: true if a fish was hooked, false, if it didnt fish or nothing was caught
     ]]
     catchStatus = Memory:readFromTable(Fishing)
+    Log:debug("Fishing status " .. tostring(catchStatus))
     if catchStatus == Fishing.FISH then
-        Common:waitFrames(310)
+        Common:waitFrames(305)
+        Log:debug("Dismissing 'Oh a Bite!'")
         Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.PRESS}
         Common:waitFrames(210)
         return true
     elseif catchStatus == Fishing.NO_FISH then
-        Common:waitFrames(180)
+        Common:waitFrames(175)
         Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.PRESS}
+        Common:waitFrames(20)
         Log:debug("Not a nibble")
         return false
     else
