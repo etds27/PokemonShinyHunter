@@ -150,7 +150,7 @@ function Input:performButtonSequenceUntil(args)
         Arguments:
             - buttonSequence: A table of tables where each leaf table holds the Button identifer to press
             - waitEnd: Frames to wait after all presses have been performed
-            - callback: Function to run and compare return result
+            - addrTan: Function to run and compare return result
             - expectedResult: Object to compare the callback functions return status to
             - timeout: Maximum number of times to run the callback function
             - SEE Input:pressButtons
@@ -169,19 +169,18 @@ function Input:performButtonSequenceUntil(args)
         timeout = args.timeout
     end
 
-    if args.callback == nil then
+    if args.addrTab == nil then
         Log:error("No callback function provided")
+        return false
     end
 
-    func = load(args.callback)
+    addrTab = args.addrTab
 
     while i < timeout do
-        Input:performButtonSequence{args}
-        if func() == expectedResult then
-            -- Wait for X frames after pressing buttons
-            Common:waitFrames(waitEnd)
+        if Memory:readFromTable() == expectedResult then
             return true
         end
+        Input:performButtonSequence{args}
     end
 
     return false
