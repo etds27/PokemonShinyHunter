@@ -6,38 +6,19 @@ require "Input"
 
 Battle = {}
 
---[[
-    Resets to 0 when user's turn starts
-]]
-Catch = {
-    addr = 0x11416,
-    size = 1,
-    memdomain = Memory.WRAM,
-    waitFrames = 700, -- 600 in testing
-    RESET = 0,
-    CAUGHT = 1,
-    MISSED = 2
-}
-
+-- Abstract tables
+local Model = {}
+Model.Catch = {}
 -- When this value is 0, we are at the start of a battle
-PokemonTurnCounter = {
-    addr = 0xC6DD,
-    size = 1,
-}
+Model.PokemonTurnCounter = {}
+Model.EnemyPokemonTurnCounter = {}
+Model.MenuPointer = {}
+local Model = BattleFactory:loadModel()
 
-EnemyPokemonTurnCounter = {
-    addr = 0xC6DC,
-    size = 1,
-}
+-- Load in default tables
 
-BattleMenuPointer = {
-    addr = GameSettings.battleCursor,
-    size = 2,
-    FIGHT = 257, -- 0101
-    PKMN = 258,  -- 0102
-    PACK = 513,  -- 0201
-    RUN = 514,   -- 0202
-}
+-- Merge model into class
+Battle = Common:tableMerge(Battle, Model)
 
 function Battle:attackByIndex(moveIndex)
     --[[
@@ -86,7 +67,7 @@ function Battle:runFromPokemon()
     Input:performButtonSequence(ButtonSequences.BATTLE_RUN)
     Input:pressButtons{buttonKeys={Buttons.B}, duration=80, waitFrames=1}
     Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.TAP}
-    Common:waitFrames(60) -- Wait for overworld
+    Positioning:waitForOverworld(200) -- Wait for overworld
 end
 
 function Battle:openPack()
@@ -98,7 +79,7 @@ end
 
 function Battle:waitForBattleMenu(bIterations) 
     i = 0
-    while Memory:readFromTable(BattleMenuPointer) == 0 and i < bIterations
+    while Memory:readFromTable(Battle.MenuPointer) == 0 and i < bIterations
     do
         Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.PRESS}
         i = i + 1
@@ -124,16 +105,6 @@ function Battle:getCatchStatus()
             - 1: Pokemon was caught
             - 2: Pokemon was not caught
     ]]
-    i = 0
-
-    while Memory:readFromTable(Catch) == Catch.RESET and i < Catch.waitFrames
-    do
-        emu.frameadvance()
-    end
-
-    return Memory:readFromTable(Catch)
+    Common:waitForState(Battle.Catch, Battle.Catch.RESET)
+    return Memory:readFromTable(Battle.Catch)
 end
-
--- GameSettings.initialize()
-
--- Battle:attackByIndex(1)
