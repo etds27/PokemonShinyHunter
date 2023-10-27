@@ -4,18 +4,17 @@ require "Log"
 require "Memory"
 require "Input"
 
-Fishing = {
-    addr = 0xD1EF,
-    size = 1,
-    FISH = 1,
-    NO_FISH = 2,
-}
+Fishing = {}
 
-Rods = {
-    Items.OLD_ROD,
-    Items.GOOD_ROD,
-    Items.SUPER_ROD
-}
+-- Abstract tables
+local Model = {}
+Model.Rods = {}
+local Model = BattleFactory:loadModel()
+
+-- Load in default tables
+
+-- Merge model into class
+Fishing = Common:tableMerge(Fishing, Model)
 
 function Fishing:fish() 
     --[[
