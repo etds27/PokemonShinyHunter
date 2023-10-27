@@ -31,6 +31,17 @@ Map = {
     Route29 = 62,
 }
 
+function Positioning:waitForOverworld(frameLimit)
+    --[[
+        Advance frames until the player is in the overworld
+
+        This does not guarantee that movement is available 
+        Arguments:
+            - frameLimit: Maximum number of frames to wait
+    ]]
+    Common:waitForState(Battle.PokemonTurnCounter, 0, frameLimit)
+end
+
 function Positioning:inOverworld() 
-    return Memory:readFromTable(PokemonTurnCounter) ~= 0
+    return Memory:readFromTable(Battle.PokemonTurnCounter) ~= 0
 end
