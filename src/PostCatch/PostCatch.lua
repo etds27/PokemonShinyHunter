@@ -12,7 +12,7 @@ function PostCatch:continueUntilOverworld()
     i = 0
     while not Positioning:inOverworld() and i < PostCatch.iterations
     do
-        Input:pressButtons({buttonKeys={Buttons.B}, duration=Duration.LONG_PRESS})
+        Input:pressButtons({buttonKeys={Buttons.B}, duration=Duration.LONG_PRESS, waitFrames=2})
         i = i + 1
     end
 
