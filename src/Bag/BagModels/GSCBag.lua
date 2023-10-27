@@ -1,5 +1,5 @@
 local BagModel = {
-    BagPocket = {
+    Pocket = {
         addr = 0xCF65,
         size = 1,
         ITEMS = 0,
