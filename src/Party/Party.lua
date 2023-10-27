@@ -4,7 +4,7 @@ require "Memory"
 require "PokemonMemory"
 
 Party = {}
-local Model = BattleFactory:loadModel()
+local Model = PartyFactory:loadModel()
 
 -- Merge model into class
 Party = Common:tableMerge(Party, Model)

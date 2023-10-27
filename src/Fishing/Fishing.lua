@@ -1,4 +1,3 @@
-
 require "Common"
 require "Log"
 require "Memory"
@@ -9,7 +8,7 @@ Fishing = {}
 -- Abstract tables
 local Model = {}
 Model.Rods = {}
-local Model = BattleFactory:loadModel()
+local Model = FishingFactory:loadModel()
 
 -- Load in default tables
 

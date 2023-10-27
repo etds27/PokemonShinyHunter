@@ -2,8 +2,6 @@ require "Common"
 require "Log"
 require "Memory"
 
-PokemonMemory = {}
-
 Pokemon = {
     address = -1,
     species = -1,
@@ -40,13 +38,13 @@ Pokemon = {
 
 
 function Pokemon:new(pokemonType, startingAddress, memdomain)
-    o = PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
+    o = Pokemon:getPokemonTable(pokemonType, startingAddress, memdomain)
     setmetatable(o, self)
     self.__index = self
     return o
   end
 
-function PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
+function Pokemon:getPokemonTable(pokemonType, startingAddress, memdomain)
     pokemonTable = {
         address = startingAddress
         pokemonType = pokemonType
@@ -64,12 +62,12 @@ function PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
         -- print("MemValue " .. memValue)
         -- print("-----------")
     end
-    PokemonMemory:determineIvs(pokemonTable)
-    pokemonTable.isShiny = PokemonMemory:isShiny(pokemonTable)
+    Pokemon:determineIvs(pokemonTable)
+    pokemonTable.isShiny = Pokemon:isShiny(pokemonTable)
     return pokemonTable
 end
 
-function PokemonMemory:determineIvs(pokemonTable) 
+function Pokemon:determineIvs(pokemonTable) 
     ivData = pokemonTable.ivData
     attackIv = (ivData >> 12) & 0x000F
     defenseIv = (ivData >> 8) & 0x000F
@@ -110,13 +108,13 @@ local Model = {}
 Model.TrainerPokemonOffsets = {}
 Model.BoxPokemonOffsets = {}
 Model.WildPokemonOffsets = {}
-local Model = BattleFactory:loadModel()
+local Model = PokemonFactory:loadModel()
 
 -- Merge model into class
-PokemonMemory = Common:tableMerge(PokemonMemory, Model)
+Pokemon = Common:tableMerge(Pokemon, Model)
 
-PokemonMemory.PokemonType = {
-    TRAINER = PokemonMemory.TrainerPokemonOffsets,
-    WILD = PokemonMemory.WildPokemonOffsets,
-    BOX = PokemonMemory.BoxPokemonOffsets
+Pokemon.PokemonType = {
+    TRAINER = Pokemon.TrainerPokemonOffsets,
+    WILD = Pokemon.WildPokemonOffsets,
+    BOX = Pokemon.BoxPokemonOffsets
 }
