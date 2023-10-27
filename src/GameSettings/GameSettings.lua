@@ -1,5 +1,16 @@
 require "Memory"
 
+GameID = {
+	CRYSTAL = "Pokemon Crystal (U)",
+	GOLD = "Pokemon Gold (U)",
+	SILVER = "Pokemon Silver (U)",
+}
+
+-- Convenience groups to associate similar games
+GameGroups = {
+	GEN_2 = {GameID.CRYSTAL, GameID.GOLD, GameID.SILVER},
+}
+
 GameSettings = {
 	game = 0,
 	gamename = "",
