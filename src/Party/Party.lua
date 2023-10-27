@@ -3,12 +3,12 @@ require "Log"
 require "Memory"
 require "PokemonMemory"
 
-Party = {
-    addr = 0xDCD7, -- num of pokemon address
-    size = 1, 
-    pokemonSize = 48,
-    maxPokemon = 6
-}
+Party = {}
+local Model = BattleFactory:loadModel()
+
+-- Merge model into class
+Party = Common:tableMerge(Party, Model)
+
 
 function Party:numOfPokemonInParty()
     return Memory:readFromTable(Party)
