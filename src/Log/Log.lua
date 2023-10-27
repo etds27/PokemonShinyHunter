@@ -1,22 +1,20 @@
 LogLevels = {
-    ERROR = 3,
-    WARNING = 2,
-    INFO = 1,
-    DEBUG = 0
+    ERROR = {3, "ERROR"},
+    WARNING = {2, "WARNING"},
+    INFO = {1, "INFO"},
+    DEBUG = {0, "DEBUG"}
 }
 
 Log = {
     loggingLevel = LogLevels.INFO
 }
 
-
-
 function Log:message(type, message) 
     -- Skip if the logging level is too high
-    if type < Log.loggingLevel then return end
+    if type[1] < Log.loggingLevel[1] then return end
     
-    -- timestamp = os.date()
-    print(type .. ": " .. " ".. message)
+    timestamp = os.date("%Y-%m-%d-T%H:%M:%S")
+    print(timestamp .. type[2] .. ": " .. " ".. message)
 end
 
 function Log:error(message)
