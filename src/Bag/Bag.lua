@@ -4,51 +4,16 @@ require "Memory"
 require "Input"
 require "Items"
 
-Bag = {}
-BagPocket = {
-    addr = 0xCF65,
-    size = 1,
-    ITEMS = 0,
-    BALLS = 1,
-    KEY_ITEMS = 2,
-    TM_HM = 3,
-}
 
-BagCursor = { -- Starts at 1
-    addr = 0xCFA9,
-    size = 1,
-}
-
-ItemPocket = {
-    addr = 0xD892,
-    size = 1
-}
-
-BallPocket = {
-    addr = 0xD8D7,
-    size = 1
-}
-
-KeyPocket = {
-    addr = 0xD8BC,
-    size = 1
-}
-
-TMHMPocket = {
-    addr = 0xD859,
-    size = 1
-}
-
-BattleItem = {
-    USE = 1,
-    QUIT = 2,
-}
-
-BagOpen = {
-    addr = 0xCFCC,
-    size = 1,
-    OPEN = 19,
-}
+-- Abstract tables
+local Model = {}
+BagModel.BagPocket = {}
+BagModel.BagCursor = {}
+BagModel.KeyPocket = {}
+BagModel.TMHMPocket = {}
+BagModel.BallPocket = {}
+BagModel.ItemPocket = {}
+local Model = BagFactory:loadModel()
 
 BallPriority = {
     Items.MASTER_BALL,
@@ -57,10 +22,12 @@ BallPriority = {
     Items.POKE_BALL
 }
 
-SelectedItem = {
-    addr = 0xD95C,
-    size = 1
-}
+function Bag:new(o)
+    o = o or {}   -- create object if user does not provide one
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
 
 function Bag:navigateToItem(pocket, item)
     --[[
@@ -69,13 +36,13 @@ function Bag:navigateToItem(pocket, item)
             - pocket: The pocket that the item will be in
             - item: The item to select 
     ]]
-    if pocket == BagPocket.ITEMS then
+    if pocket == Model.BagPocket.ITEMS then
         tab = ItemPocket:containsItem(item)
         location = tab[1]
-    elseif pocket == BagPocket.BALLS then
+    elseif pocket == Model.BagPocket.BALLS then
         tab = BallPocket:containsItem(item)
         location = tab[1]
-    elseif pocket == BagPocket.KEY_ITEMS then
+    elseif pocket == Model.BagPocket.KEY_ITEMS then
         tab = KeyPocket:containsItem(item)
         location = tab[1]
     end
@@ -91,11 +58,11 @@ function Bag:navigateToItem(pocket, item)
         return false
     end 
 
-    currentLocation = Memory:readFromTable(BagCursor)
+    currentLocation = Memory:readFromTable(Model.BagCursor)
 
     Common:navigateMenu(currentLocation, location)
 
-    return Memory:readFromTable(BagCursor) == location
+    return Memory:readFromTable(Model.BagCursor) == location
 end
 
 function Bag:useItem(pocket, item)
@@ -108,8 +75,9 @@ function Bag:useItem(pocket, item)
     if not Bag:navigateToItem(pocket, item) then
         return false
     end
+
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
-    currentLocation = Memory:readFromTable(BagCursor)
+    currentLocation = Memory:readFromTable(Model.BagCursor)
     Common:navigateMenu(currentLocation, BattleItem.USE)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return true
@@ -123,7 +91,7 @@ function Bag:useBestBall()
     do
         if BallPocket:containsItem(ball)[1] ~= 0 then
             Log:debug("Using ball: " .. ball)
-            return Bag:useItem(BagPocket.BALLS, ball)
+            return Bag:useItem(Model.BagPocket.BALLS, ball)
         end
     end
     Log:warning("Did not find any Pokeballs")
@@ -132,7 +100,7 @@ end
 
 function Bag:navigateToPocket(pocket)
     i = 0
-    while Memory:readFromTable(BagPocket) ~= pocket and i < 10
+    while Memory:readFromTable(Model.BagPocket) ~= pocket and i < 10
     do
         Input:pressButtons{buttonKeys={Buttons.RIGHT}, duration=Duration.TAP}
         i = i + 1
@@ -154,23 +122,23 @@ function Bag:doesPocketContain(pocket, item)
             - Quantity of item, 0 if not found or same as location addr if key item
     ]]
     if pocket == BagPocket.ITEMS then
-        pocketTable = ItemPocket
+        pocketTable = Model.ItemPocket
     elseif pocket == BagPocket.BALLS then
-        pocketTable = BallPocket
+        pocketTable = Model.BallPocket
     elseif pocket == BagPocket.KEY_ITEMS then
-        pocketTable = KeyPocket
+        pocketTable = Model.KeyPocket
     elseif pocket == BagPocket.TM_HM then
-        pocketTable = TMHMPocket
+        pocketTable = Model.TMHMPocket
     end
 
     numOfItemsInPocket = Memory:readFromTable(pocketTable)
     for i = 1, numOfItemsInPocket, 1
     do
-        if Common:contains({BagPocket.ITEMS, BagPocket.BALLS}, pocket) then
-            itemAddr =  Bag:_calculateItemBallAddress(pocketTable.addr, i)
+        if Common:contains({Model.BagPocket.ITEMS, Model.BagPocket.BALLS}, pocket) then
+            itemAddr =  Bag:calculateItemBallAddress(pocketTable.addr, i)
             quantityAddr = itemAddr + 1
         elseif pocket == BagPocket.KEY_ITEMS then
-            itemAddr = Bag:_calculateKeyItemAddress(pocketTable.addr, i)
+            itemAddr = Bag:calculateKeyItemAddress(pocketTable.addr, i)
             quantityAddr = itemAddr
         end
 
@@ -182,17 +150,17 @@ function Bag:doesPocketContain(pocket, item)
     return {0, 0}
 end
 
-function Bag:_calculateItemBallAddress(startingAddress, index)
+local function Bag:calculateItemBallAddress(startingAddress, index)
     return startingAddress + 2 * index - 1
 end
 
-function Bag:_calculateKeyItemAddress(startingAddress, index)
+local function Bag:calculateKeyItemAddress(startingAddress, index)
     return startingAddress + index
 end
 
 function Bag:openPack()
     Input:pressButtons{buttonKeys={Buttons.START}, duration=Duration.PRESS}
-    Common:navigateMenuFromAddress(MenuCursor.addr, 3)
+    Common:navigateMenuFromAddress(Model.MenuCursor.addr, 3)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return Bag:isOpen()
 end
@@ -203,23 +171,23 @@ function Bag:isOpen()
         I'm a little iffy on if this is the right address
         but it worked across like 5-6 different states
     ]]
-    return Memory:readFromTable(BagOpen) == BagOpen.OPEN
+    return Memory:readFromTable(Model.BagOpen) == Model.BagOpen.OPEN
 end
 
 function Bag:getSelectedItem()
-    return Memory:readFromTable(SelectedItem)
+    return Memory:readFromTable(Model.SelectedItem)
 end
 
 function ItemPocket:containsItem(item)
-    return Bag:doesPocketContain(BagPocket.ITEMS, item)
+    return Bag:doesPocketContain(Model.BagPocket.ITEMS, item)
 end
 
 function BallPocket:containsItem(item)
-    return Bag:doesPocketContain(BagPocket.BALLS, item)
+    return Bag:doesPocketContain(Model.BagPocket.BALLS, item)
 end
 
 function KeyPocket:containsItem(item)
-    return Bag:doesPocketContain(BagPocket.KEY_ITEMS, item)
+    return Bag:doesPocketContain(Model.BagPocket.KEY_ITEMS, item)
 end
 
 function BallPocket:hasPokeballs()
@@ -229,7 +197,7 @@ function BallPocket:hasPokeballs()
         Returns:
             - true if there are any amount of any type of pokeball
     ]]
-    for i, ball in ipairs(BallPriority)
+    for i, ball in ipairs(Model.BallPriority)
     do
         tab = BallPocket:containsItem(ball)
         if tab[1] ~= 0 then

@@ -1,4 +1,5 @@
 import argparse
+import os
 import subprocess
 import time
 
@@ -6,6 +7,8 @@ bot_id_save_states = {
     "CHRIS51032": "BotStates\\CHRIS51032\\StartUp.State",
     "ETHAN25996": "BotStates\\ETHAN25996\\StartUp.State"
 }
+
+os.environ["PSH_ROOT"] = "C:\\Users\\etds2\\Programming\\PokemonLua"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--port", nargs=1, default=57375, type=int)
@@ -15,7 +18,7 @@ parser.add_argument("-e", "--emulator", nargs=1, default="C:\Emulators\Bizhawk\E
 parser.add_argument("--bot-ids", nargs="+")
 args = parser.parse_args()
 
-server_start_command = ["python3", "Python\\server.py", args.host, str(args.port)]
+server_start_command = ["python3", os.path.join(os.environ["PSH_ROOT"], "\\src\\PythonServer\\server.py"), args.host, str(args.port)]
 print(server_start_command)
 server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 time.sleep(1)
