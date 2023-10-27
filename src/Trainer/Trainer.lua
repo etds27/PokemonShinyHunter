@@ -4,43 +4,30 @@ require "Memory"
 
 Trainer = {}
 
-TrainerID = {
-    addr = 0xD47B,
-    size = 2
-}
+local Model = TextFactory:loadModel()
+Model.ID = {}
+Model.Money = {}
+Model.PlayTime = {}
+Model.Name = {}
 
-TrainerMoney = {
-    addr = 0xD84F,
-    size = 2
-}
-
-TrainerPlayTime = {
-    hrAddr = 0xD4C5,
-    minAddr = 0xD4C6,
-    secAddr = 0xD4C7,
-    size = 1
-}
-
-TrainerName = {
-    addr = 0xD47D,
-    maxLength = 7,
-}
+-- Merge model into class
+Trainer = Common:tableMerge(Trainer, Model)
 
 function Trainer:getTrainerID()
-    return Memory:readFromTable(TrainerID)
+    return Memory:readFromTable(Trainer.ID)
 end
 
 function Trainer:getTrainerMoney()
-    return Memory:readFromTable(TrainerMoney)
+    return Memory:readFromTable(Trainer.Money)
 end 
 
 function Trainer:getPlayTime()
-    hr = Memory:read(TrainerPlayTime.hrAddr, TrainerPlayTime.size)
-    min = Memory:read(TrainerPlayTime.minAddr, TrainerPlayTime.size)
-    sec = Memory:read(TrainerPlayTime.secAddr, TrainerPlayTime.size)
+    hr = Memory:read(Trainer.PlayTime.hrAddr, Trainer.PlayTime.size)
+    min = Memory:read(Trainer.PlayTime.minAddr, Trainer.PlayTime.size)
+    sec = Memory:read(Trainer.PlayTime.secAddr, Trainer.PlayTime.size)
     return {hr, min, sec}
 end
 
 function Trainer:getName()
-    return Text:readTextAtAddress(TrainerName.addr, maxLength)
+    return Text:readTextAtAddress(Trainer.Name.addr, Trainer.Name.maxLength)
 end
