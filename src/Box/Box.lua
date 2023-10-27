@@ -4,31 +4,19 @@ require "Memory"
 require "PokemonMemory"
 require "Input"
 
-Box = {
-    addr = 0xDB72, -- For current loaded box
-    firstHalfAddr = 0x4000, -- I think this RAM partition starts at 0xA000
-    secondHalfAddr = 0x6000,
-    size = 1,
-    headerSize = 22,
-    pokemonSize = 32,
-    numBoxes = 14,
-    maxBoxSize = 20,
-}
+Box = {}
+BoxUI = {}
 
-BoxUI = {
+-- Abstract tables
+local Model = {}
+Model.CurrentBoxNumber = {}
+Model.LoadedBox = {}
+local Model = BoxFactory:loadModel()
 
-}
+-- Load in default tables
 
-CurrentBoxNumber = {
-    addr = 0xDB72,
-    size = 1
-}
-
-LoadedBox = {
-    addr = 0x2D10,
-    size = 1,
-    memdomain = Memory.CARTRAM
-}
+-- Merge model into class
+Box = Common:tableMerge(Box, Model)
 
 function Box:getCurrentBoxNumber()
     --[[
@@ -36,14 +24,25 @@ function Box:getCurrentBoxNumber()
         Returns:
             - Box number (Indexed at 1)
     ]]
-    return Memory:readFromTable(CurrentBoxNumber) + 1
+    return Memory:readFromTable(Box.CurrentBoxNumber) + 1
 end
+
 function Box:getNumberOfPokemonInBox(boxNumber)
+    --[[
+        Get the number of pokemon in the specified box
+
+        Returns: Number of pokemon in the box
+    ]]
     startingAddress = Box:getBoxStartingAddress(boxNumber) 
     return Memory:read(startingAddress, size, Memory.CARTRAM) % 255 -- Value may be 255
 end
 
 function Box:getNumberOfPokemonInCurrentBox()
+    --[[
+        Get the number of pokemon in the current box
+
+        Returns: Number of pokemon in the current box
+    ]]
     return Box:getNumberOfPokemonInBox(Box:getCurrentBoxNumber()) 
 end
 
@@ -55,7 +54,7 @@ function Box:getBoxStartingAddress(boxNumber)
     ]]
 
     if boxNumber == Box:getCurrentBoxNumber() then
-        return LoadedBox.addr
+        return Box.LoadedBox.addr
     end
 
     if boxNumber < 8 then
@@ -128,34 +127,18 @@ function Box:isCurrentBoxFull()
     return Box:getNumberOfPokemonInCurrentBox() == Box.maxBoxSize
 end
 
-PCMainMenu = {
-    BILL = 1,
-    TRAINER = 2,
-    PROF_OAK = 3,
-    TURN_OFF = 4
-}
+-- Abstract tables
+local Model = {}
+Model.PCMainMenu = {}
+Model.PCBillsMenu = {}
+Model.PCBoxCursor = {}
+Model.PCBoxEdit = {}
+local Model = BoxUIFactory:loadModel()
 
-PCBillsMenu = {
-    WITHDRAW = 1,
-    DEPOSIT = 2,
-    CHANGE_BOX = 3,
-    MOVE_PKMN = 4
-}
+-- Load in default tables
 
-PCBoxCursor = {
-    addr = 0xD106,
-    size = 1,
-    CANCEL = 255
-}
-
-PCBoxEdit = {
-    addr = MenuCursor.addr,
-    size = MenuCursor.size,
-    SWITCH = 1,
-    NAME = 2,
-    PRINT = 3,
-    QUIT = 4,
-}
+-- Merge model into class
+BoxUI = Common:tableMerge(BoxUI, Model)
 
 function BoxUI:changeBox(newBox)
     --[[
@@ -188,7 +171,7 @@ function BoxUI:selectBillsPC()
         Go from main page of PC to Bills PC
         No verification
     ]]
-    Common:navigateMenuFromAddress(MenuCursor.addr, PCMainMenu.BILL)
+    Common:navigateMenuFromAddress(MenuCursor.addr, BoxUI.PCMainMenu.BILL)
     Input:performButtonSequence(ButtonSequences.PC_MENU_TO_BILLS)
 end
 
@@ -197,7 +180,7 @@ function BoxUI:selectChangeBox()
         Go from Bills PC to Change Box Menu
         No verification
     ]]
-    Common:navigateMenuFromAddress(MenuCursor.addr, PCBillsMenu.CHANGE_BOX)
+    Common:navigateMenuFromAddress(MenuCursor.addr, BoxUI.PCBillsMenu.CHANGE_BOX)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
@@ -206,7 +189,7 @@ function BoxUI:navigateToBox(boxNumber)
         Go from Box select screen to selecting the desired box
         No verification
     ]]
-    Common:navigateMenuFromAddress(PCBoxCursor.addr, boxNumber)
+    Common:navigateMenuFromAddress(BoxUI.PCBoxCursor.addr, boxNumber)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
@@ -215,7 +198,7 @@ function BoxUI:switchBox(boxNumber)
         Go from selected box screen to completing the box change
         No verification
     ]]
-    Common:navigateMenuFromAddress(PCBoxEdit.addr,  PCBoxEdit.SWITCH)
+    Common:navigateMenuFromAddress(BoxUI.PCBoxEdit.addr,  BoxUI.PCBoxEdit.SWITCH)
     Input:pressButtons{buttonKeys={Buttons.A}}
     Input:pressButtons{buttonKeys={Buttons.A}}
     Input:performButtonSequence(ButtonSequences.SAVE_GAME)
