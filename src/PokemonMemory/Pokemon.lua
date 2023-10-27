@@ -38,97 +38,18 @@ Pokemon = {
     spDefenseStat = -1
 }
 
-TrainerPokemonOffsets = {
-    species = {0x00, 1},
-    heldItem = {0x01, 1},
-    move1 = {0x02, 1},
-    move2 = {0x03, 1},
-    move3 = {0x04, 1},
-    move4 = {0x05, 1},
-    trainerId = {0x06, 2},
-    expPoints = {0x08, 3},
-    hpEv = {0x0B, 2},
-    attackEv = {0x0D, 2},
-    defenseEv = {0x0F, 2},
-    speedEv = {0x11, 2},
-    specialEv = {0x13, 2},
-    ivData = {0x15, 2},
-    movePp1 = {0x17, 1},
-    movePp2 = {0x18, 1},
-    movePp3 = {0x19, 1},
-    movePp4 = {0x1A, 1},
-    friendship = {0x1B, 1},
-    pokerus = {0x1C, 1},
-    caughtData = {0x1D, 2},
-    level = {0x1F, 1},
-    status = {0x20, 1},
-    currentHp = {0x22, 2},
-    hpStat = {0x24, 2},
-    attackStat = {0x26, 2},
-    defenseStat = {0x28, 2},
-    speedStat = {0x2A, 2},
-    spAttackStat = {0x2C, 2},
-    spDefenseStat = {0x2E, 2},
-}
 
-BoxPokemonOffsets = {
-    species = {0x00, 1},
-    heldItem = {0x01, 1},
-    move1 = {0x02, 1},
-    move2 = {0x03, 1},
-    move3 = {0x04, 1},
-    move4 = {0x05, 1},
-    trainerId = {0x06, 2},
-    expPoints = {0x08, 3},
-    hpEv = {0x0B, 2},
-    attackEv = {0x0D, 2},
-    defenseEv = {0x0F, 2},
-    speedEv = {0x11, 2},
-    specialEv = {0x13, 2},
-    ivData = {0x15, 2},
-    movePp1 = {0x17, 1},
-    movePp2 = {0x18, 1},
-    movePp3 = {0x19, 1},
-    movePp4 = {0x1A, 1},
-    friendship = {0x1B, 1},
-    pokerus = {0x1C, 1},
-    caughtData = {0x1D, 2},
-    level = {0x1F, 1}  
-}
-
-WildPokemonOffsets = {
-    species = {0x00, 1},
-    heldItem = {0x01, 1},
-    move1 = {0x02, 1},
-    move2 = {0x03, 1},
-    move3 = {0x04, 1},
-    move4 = {0x05, 1},
-    ivData = {0x06, 2},
-    movePp1 = {0x08, 1},
-    movePp2 = {0x09, 1},
-    movePp3 = {0x0A, 1},
-    movePp4 = {0x0B, 1},
-    friendship = {0x0C, 1},
-    level = {0x0D, 1},
-    status = {0x0E, 1},
-    currentHp = {0x10, 2},
-    hpStat = {0x12, 2},
-    attackStat = {0x14, 2},
-    defenseStat = {0x16, 2},
-    speedStat = {0x18, 2},
-    spAttackStat = {0x1A, 2},
-    spDefenseStat = {0x1C, 2},
-}
-
-MemoryPokemonType = {
-    TRAINER = TrainerPokemonOffsets,
-    WILD = WildPokemonOffsets,
-    BOX = BoxPokemonOffsets
-}
+function Pokemon:new(pokemonType, startingAddress, memdomain)
+    o = PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
+    setmetatable(o, self)
+    self.__index = self
+    return o
+  end
 
 function PokemonMemory:getPokemonTable(pokemonType, startingAddress, memdomain)
     pokemonTable = {
         address = startingAddress
+        pokemonType = pokemonType
     }
     for key, value in pairs(pokemonType) do
         offset = value[1]
@@ -165,7 +86,7 @@ function PokemonMemory:determineIvs(pokemonTable)
 
 end
 
-function PokemonMemory:isShiny(pokemonTable)
+function Pokemon:isShiny(pokemonTable)
     attackReq = Common:contains({2, 3, 6, 7, 10, 11, 14, 15}, pokemonTable.attackIv)
     defenseReq = pokemonTable.defenseIv == 10
     speedReq = pokemonTable.speedIv == 10
@@ -184,4 +105,18 @@ function getPokemonValue(startingAddress, key)
     print("nothing")
 end
 
+-- Abstract tables
+local Model = {}
+Model.TrainerPokemonOffsets = {}
+Model.BoxPokemonOffsets = {}
+Model.WildPokemonOffsets = {}
+local Model = BattleFactory:loadModel()
 
+-- Merge model into class
+PokemonMemory = Common:tableMerge(PokemonMemory, Model)
+
+PokemonMemory.PokemonType = {
+    TRAINER = PokemonMemory.TrainerPokemonOffsets,
+    WILD = PokemonMemory.WildPokemonOffsets,
+    BOX = PokemonMemory.BoxPokemonOffsets
+}
