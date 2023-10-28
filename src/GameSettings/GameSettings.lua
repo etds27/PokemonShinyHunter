@@ -1,9 +1,21 @@
 require "Memory"
 
 GameID = {
-	CRYSTAL = "Pokemon Crystal (U)",
-	GOLD = "Pokemon Gold (U)",
-	SILVER = "Pokemon Silver (U)",
+	CRYSTAL = {name = "PM_CRYSTAL",
+			   hex = {0x50, 0x4D, 0x5F, 0x43, 0x52, 0x59, 0x53, 0x54, 0x41, 0x4C}, -- PM_CRYSTAL
+			   addr = 0x134,
+			   size = 10,
+			   memdomain = "ROM"},
+	GOLD = {name = "POKEMON_GLD",
+			hex = {0x50, 0x4F, 0x4B, 0x45, 0x4D, 0x4F, 0x4E, 0x5F, 0x47, 0x4C, 0x44}, -- POKEMON_GLD
+			addr = 0x134,
+			size = 11,
+			memdomain = "ROM"},
+	SILVER = {name = "POKEMON_SLV",
+			hex = {0x50, 0x4F, 0x4B, 0x45, 0x4D, 0x4F, 0x4E, 0x5F, 0x53 , 0x4C, 0x56}, -- POKEMON_GLD
+			addr = 0x134,
+			size = 11,
+			memdomain = "ROM"},
 }
 
 -- Convenience groups to associate similar games
@@ -50,6 +62,21 @@ GameSettings.LANGUAGES = {
 	I = 6
 }
 
+local function determineIfGame(gameTable)
+	for i = 0, gameTable.size - 1
+	do
+		currentMemByte =  memory.readbyte(gameTable.addr + i, gameTable.memdomain)
+		currentGameByte = gameTable.hex[i + 1]
+		if currentMemByte ~= currentGameByte then
+			Log:debug("Game is not " .. gameTable.name .. ". " .. tostring(currentGameByte) .. " ~= " .. tostring(currentMemByte))
+			return false
+		end
+	end
+	Log:debug("Verified " .. gameTable.name .. " is loaded")
+
+	return true
+end
+
 function GameSettings.initialize()
 
 	local gamecode = memory.read_u32_be(0x013A, "ROM")
@@ -64,6 +91,16 @@ function GameSettings.initialize()
 	local trainerpointer = {0xDCDF, 0xDD0F, 0xDD3F, 0xDD6F, 0xDD9F, 0xDDCF} -- Trainer Data Pointer
 	local roamerpokemonoffset = {0x39D4, 0x4188, 0x4074, 0x39D4, 0x4188, 0x4074}
 	
+	for name, game in pairs(GameID)
+	do
+		if determineIfGame(game) then
+			GameSettings.game = game
+		end
+	end
+
+
+
+
 	if gamecode == 0x4E5F474C then -- N_GL
 		GameSettings.game = 1
 		GameSettings.gamename = "Pokemon Gold (U)"
@@ -81,7 +118,7 @@ function GameSettings.initialize()
 
 	-- https://archives.glitchcity.info/forums/board-76/thread-1342/page-0.html
 	elseif gamecode == 0x5354414C then -- STAL
-		GameSettings.game = 3
+		-- GameSettings.game = 3
 		GameSettings.gamename = "Pokemon Crystal (U)"
 		GameSettings.gamecolor = 0xFF009D07
 		GameSettings.encountertable = 0x8552D48
@@ -107,24 +144,6 @@ function GameSettings.initialize()
 		GameSettings.encountertable = 0
 	end
 	
-	if GameSettings.game > 0 then
-		GameSettings.pstats  = pstats[GameSettings.game]
-		GameSettings.estats  = estats[GameSettings.game]
-		GameSettings.rng     = rng[GameSettings.game]
-		GameSettings.rng2    = rng2[GameSettings.game]
-		GameSettings.wram	 = wram[GameSettings.game]
-		GameSettings.mapbank = mapbank[GameSettings.game]
-		GameSettings.mapid = mapid[GameSettings.game]
-		GameSettings.trainerpointer = trainerpointer[GameSettings.game]
-		GameSettings.coords = coords[GameSettings.game]
-		GameSettings.roamerpokemonoffset = roamerpokemonoffset[GameSettings.game]
-	end
-	
-	if GameSettings.game % 3 == 1 then
-		GameSettings.rngseed = 0x5A0
-	else
-		GameSettings.rngseed = Memory:readword(GameSettings.wram)
-	end
 	console.log("Detected game: " .. GameSettings.gamename)
 
 end

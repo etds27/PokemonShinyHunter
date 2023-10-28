@@ -41,12 +41,12 @@ end
 
 function BagTest:testNavigateToPokeball()
     savestate.load(BagTest.SAVE_STATE_PATH)
-    return Bag:navigateToItem(BagPocket.BALLS, Items.POKE_BALL)
+    return Bag:navigateToItem(Bag.Pocket.BALLS, Items.POKE_BALL)
 end
 
 function BagTest:testNavigateToItem()
     savestate.load(BagTest.SAVE_STATE_PATH)
-    return Bag:navigateToItem(BagPocket.ITEMS, Items.ANTIDOTE)
+    return Bag:navigateToItem(Bag.Pocket.ITEMS, Items.ANTIDOTE)
 end
 
 function BagTest:testUseBestBall()
@@ -57,7 +57,7 @@ end
 function BagTest:testUseFishingRod()
     savestate.load(TestStates.PRE_FISHING)
     Bag:openPack()
-    return Bag:useItem(BagPocket.KEY_ITEMS, Items.OLD_ROD)
+    return Bag:useItem(Bag.Pocket.KEY_ITEMS, Items.OLD_ROD)
 end
 
 function BagTest:testHasPokeballs()

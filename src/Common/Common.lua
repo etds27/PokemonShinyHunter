@@ -51,7 +51,7 @@ function Common:navigateMenu(currentLocation, endLocation)
     Log:debug("Pressing " .. button .. " " .. tostring(delta) .. " times")
     for i = 1, math.abs(delta)
     do
-        Input:pressButtons{buttonKeys={button}, duration=Duration.MENU_TAP}
+        Input:pressButtons{buttonKeys={button}, duration=Duration.MENU_TAP, waitFrames=10}
     end
 end
 
@@ -108,9 +108,10 @@ function Common:waitForState(addrTab, desiredState, frameLimit)
             frameLimit = 1000
         else
             frameLimit = addrTab.frameLimit
+        end
     end
 
-    i = 0
+    local i = 0
 
     for i = 1, frameLimit 
     do
@@ -121,6 +122,15 @@ function Common:waitForState(addrTab, desiredState, frameLimit)
     return false
 end
 
+function Common:resetRequires(list)
+    --[[
+        Reset the specified required modules so that `require` will load them again
+    ]]
+    for i, packageName in ipairs(list)
+    do
+        package.loaded[packageName] = nil
+    end
+end
 
 function Common:currentTime()
     return os.clock()
