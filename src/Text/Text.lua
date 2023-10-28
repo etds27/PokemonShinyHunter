@@ -11,7 +11,8 @@ function Text:readTextAtAddress(addr, expectedLength)
         expectedLength = 1000
     end
     
-    i = 0
+    local i = 0
+    local str = ""
     while i < expectedLength
     do
         char = Memory:readbyte(addr + i)
