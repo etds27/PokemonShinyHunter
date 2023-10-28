@@ -128,7 +128,9 @@ function Common:resetRequires(list)
     ]]
     for i, packageName in ipairs(list)
     do
-        package.loaded[packageName] = nil
+        if package.loaded[packageName] ~= nil then
+            package.loaded[packageName] = nil
+        end
     end
 end
 
