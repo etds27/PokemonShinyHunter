@@ -14,5 +14,6 @@ TestStates = {
     FISH_ON_LINE = "States\\FishOnLine.State",
     FISH_OFF_LINE = "States\\FishOffLine.State",
     PRE_FISHING = "States\\PreFishing.State",
-    POKEMON_PARTY = "States\\PokemonParty.State"
+    POKEMON_PARTY = "States\\PokemonParty.State",
+    POKEMON_TESTS = "States\\PokemonTests.State"
 }

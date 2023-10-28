@@ -28,7 +28,7 @@ function Party:getPokemonAtIndex(index)
         Return the pokemonTable for a pokemon in the party at a specific index
     ]]
     local addr = Party:getPokemonAddress(index)
-    return PokemonMemory:getPokemonTable(MemoryPokemonType.TRAINER, addr)
+    return Pokemon:new(Pokemon.PokemonType.TRAINER, addr)
 end
 
 function Party:getAllPokemonInParty()

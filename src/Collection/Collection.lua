@@ -6,7 +6,7 @@ require "Common"
 require "Log"
 require "Memory"
 require "Party"
-require "PokemonMemory"
+require "Pokemon"
 
 Collection = {}
 
