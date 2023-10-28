@@ -1,7 +1,7 @@
 require "Common"
 require "Log"
 require "Memory"
-require "PokemonMemory"
+require "Pokemon"
 
 Party = {}
 local Model = PartyFactory:loadModel()
