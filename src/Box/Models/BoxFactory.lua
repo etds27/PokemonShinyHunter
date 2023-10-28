@@ -6,6 +6,7 @@ function BoxFactory:loadModel()
     if Common:contains(GameGroups.GEN_2, GameSettings.game) then
         return require("GSCBox")
     end
+    return {}
 end
 
 function BoxUIFactory:loadModel()
@@ -13,4 +14,5 @@ function BoxUIFactory:loadModel()
     if Common:contains(GameGroups.GEN_2, GameSettings.game) then
         return require("GSCBoxUI")
     end
+    return {}
 end
