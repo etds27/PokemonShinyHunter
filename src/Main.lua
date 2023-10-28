@@ -14,12 +14,11 @@ local function readJson(filepath)
     return json.decode(content)
 end
 
-local defaultSettings = readJson("BotConfigs\\default.json")
+local defaultSettings = readJson("..\\BotConfigs\\default.json")
 -- local gameSettings = readJson("BotConfigs\\game.json")
-local botSettings = readJson("BotConfigs\\" .. Bot:getBotId() .. ".json")
-
+local botSettings = readJson("..\\BotConfigs\\" .. Bot:getBotId() .. ".json")
+print("TEST", defaultSettings)
 local settings = Common:tableMerge(defaultSettings, botSettings)
-
 Bot.mode = settings.BotMode
 print(Bot.mode)
 Bot:run()

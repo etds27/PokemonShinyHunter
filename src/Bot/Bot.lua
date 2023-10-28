@@ -104,7 +104,7 @@ function Bot:runModeStarterPokemon()
         emu.frameadvance()
         savestate.save(starterSavestate)
         CustomSequences:starterEncounter()
-        starter = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAtIndex(1))
+        starter = Party:getPokemonAtIndex(1)
         starter.caught = true
         Bot:handleEncounter(starter)
         if starter.isShiny then
