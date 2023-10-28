@@ -10,3 +10,4 @@ local Model = {
         Items.SUPER_ROD
     }
 }
+return Model
