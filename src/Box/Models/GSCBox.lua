@@ -11,12 +11,12 @@ local Model = {
     CurrentBoxNumber = {
         addr = 0xDB72,
         size = 1
-    }
+    },
 
     LoadedBox = {
         addr = 0x2D10,
         size = 1,
         memdomain = Memory.CARTRAM
-    }
+    },
 }
 return Model

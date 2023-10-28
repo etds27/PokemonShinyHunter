@@ -42,11 +42,11 @@ function Pokemon:new(pokemonType, startingAddress, memdomain)
     setmetatable(o, self)
     self.__index = self
     return o
-  end
+end
 
 function Pokemon:getPokemonTable(pokemonType, startingAddress, memdomain)
     pokemonTable = {
-        address = startingAddress
+        address = startingAddress,
         pokemonType = pokemonType
     }
     for key, value in pairs(pokemonType) do
