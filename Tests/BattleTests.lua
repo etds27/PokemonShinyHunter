@@ -10,8 +10,7 @@ end
 
 function BattleTest:testRunFromPokemon()
     savestate.load(BattleTest.START_OF_BATTLE_SAVE_STATE)
-    Battle:runFromPokemon()
-    return Positioning:inOverworld()
+    return Battle:runFromPokemon()
 end
 
 function BattleTest:testOpenPack()
@@ -21,6 +20,7 @@ function BattleTest:testOpenPack()
 end
 
 GameSettings.initialize()
+Log.loggingLevel = LogLevels.INFO
 print("BattleTest:testGetCatchStatus()", BattleTest:testGetCatchStatus())
 print("BattleTest:testRunFromPokemon()", BattleTest:testRunFromPokemon())
 print("BattleTest:testOpenPack()", BattleTest:testOpenPack())
