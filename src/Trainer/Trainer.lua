@@ -4,11 +4,12 @@ require "Memory"
 
 Trainer = {}
 
-local Model = TextFactory:loadModel()
+local Model = {}
 Model.ID = {}
 Model.Money = {}
 Model.PlayTime = {}
 Model.Name = {}
+Model = TrainerFactory:loadModel()
 
 -- Merge model into class
 Trainer = Common:tableMerge(Trainer, Model)
