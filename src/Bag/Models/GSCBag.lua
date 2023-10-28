@@ -8,7 +8,7 @@ local BagModel = {
         TM_HM = 3,
     },
 
-    BagCursor = { -- Starts at 1
+    Cursor = { -- Starts at 1
         addr = 0xCFA9,
         size = 1,
     },
@@ -49,5 +49,4 @@ local BagModel = {
         size = 1
     },
 }
-
 return BagModel

@@ -6,7 +6,7 @@ LogLevels = {
 }
 
 Log = {
-    loggingLevel = LogLevels.INFO
+    loggingLevel = LogLevels.DEBUG
 }
 
 function Log:message(type, message) 
@@ -14,7 +14,7 @@ function Log:message(type, message)
     if type[1] < Log.loggingLevel[1] then return end
     
     timestamp = os.date("%Y-%m-%d-T%H:%M:%S")
-    print(timestamp .. type[2] .. ": " .. " ".. message)
+    print(timestamp .. ": " .. type[2] .. ": " .. " ".. message)
 end
 
 function Log:error(message)
