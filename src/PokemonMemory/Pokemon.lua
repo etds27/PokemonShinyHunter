@@ -39,8 +39,10 @@ Pokemon = {
 
 function Pokemon:new(pokemonType, startingAddress, memdomain)
     o = Pokemon:getPokemonTable(pokemonType, startingAddress, memdomain)
-    setmetatable(o, self)
     self.__index = self
+    setmetatable(o, {__index = self})
+    o:determineIvs()
+    o.isShiny = o:determineShininess()
     return o
 end
 
@@ -54,41 +56,31 @@ function Pokemon:getPokemonTable(pokemonType, startingAddress, memdomain)
         size = value[2]
         memValue = Memory:read(startingAddress + offset, size, memdomain)
         pokemonTable[key] = memValue
-        -- print("Key " .. key)
-        -- print("StartingAddess " ..  string.format("%x", startingAddress))
-        -- print("Offset " .. value[1])
-        -- print("Address " .. string.format("%x", startingAddress + offset))
-        -- print("Size " .. value[2])
-        -- print("MemValue " .. memValue)
-        -- print("-----------")
     end
-    Pokemon:determineIvs(pokemonTable)
-    pokemonTable.isShiny = Pokemon:isShiny(pokemonTable)
+
     return pokemonTable
 end
 
-function Pokemon:determineIvs(pokemonTable) 
-    ivData = pokemonTable.ivData
+function Pokemon:determineIvs() 
+    ivData = self.ivData
     attackIv = (ivData >> 12) & 0x000F
     defenseIv = (ivData >> 8) & 0x000F
     speedIv = (ivData >> 4) & 0x000F
     specialIv = ivData & 0x000F
     hpIv = (attackIv & 0x1) * 8 + (defenseIv & 0x1) * 4 + (speedIv & 0x1) * 2 + (specialIv & 0x1)
 
-    pokemonTable.attackIv = attackIv
-    pokemonTable.defenseIv = defenseIv
-    pokemonTable.speedIv = speedIv
-    pokemonTable.specialIv = specialIv
-    pokemonTable.hpIv = hpIv
-
-
+    self.attackIv = attackIv
+    self.defenseIv = defenseIv
+    self.speedIv = speedIv
+    self.specialIv = specialIv
+    self.hpIv = hpIv
 end
 
-function Pokemon:isShiny(pokemonTable)
-    attackReq = Common:contains({2, 3, 6, 7, 10, 11, 14, 15}, pokemonTable.attackIv)
-    defenseReq = pokemonTable.defenseIv == 10
-    speedReq = pokemonTable.speedIv == 10
-    specialReq = pokemonTable.specialIv == 10
+function Pokemon:determineShininess()
+    attackReq = Common:contains({2, 3, 6, 7, 10, 11, 14, 15}, self.attackIv)
+    defenseReq = self.defenseIv == 10
+    speedReq = self.speedIv == 10
+    specialReq = self.specialIv == 10
 
     Log:debug("Shiny Attack:  " .. tostring(attackReq))
     Log:debug("Shiny Defense: " .. tostring(defenseReq))
@@ -96,11 +88,6 @@ function Pokemon:isShiny(pokemonTable)
     Log:debug("Shiny Special: " .. tostring(specialReq))
 
     return speedReq and attackReq and defenseReq and specialReq
-end
-
-function getPokemonValue(startingAddress, key) 
-    -- pass
-    print("nothing")
 end
 
 -- Abstract tables

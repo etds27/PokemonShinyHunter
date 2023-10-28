@@ -8,7 +8,7 @@ require "Fishing"
 require "GameSettings"
 require "Input"
 require "Log"
-require "PokemonMemory"
+require "Pokemon"
 require "PokemonSocket"
 require "Positioning"
 require "PostCatch"
@@ -48,9 +48,9 @@ function Bot:runModeWildPokemon()
         elseif Bot.mode == BotModes.FISHING then
             Bot:fishForWildPokemon()
         end
-        wildPokemon = PokemonMemory:getPokemonTable(MemoryPokemonType.WILD, GameSettings.wildpokemon)
+        wildPokemon = Pokemon:new(Pokemon.PokemonType.WILD, GameSettings.wildpokemon)
 
-        Log:info(tostring(encounters) .." is shiny: " .. tostring(PokemonMemory:isShiny(wildPokemon)))
+        Log:info(tostring(encounters) .." is shiny: " .. tostring(Pokemon:isShiny(wildPokemon)))
         if wildPokemon.isShiny then
             ret = 0
             i = 0
@@ -104,7 +104,7 @@ function Bot:runModeStarterPokemon()
         emu.frameadvance()
         savestate.save(starterSavestate)
         CustomSequences:starterEncounter()
-        starter = PokemonMemory:getPokemonTable(MemoryPokemonType.TRAINER, GameSettings.partypokemon[1])
+        starter = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAtIndex(1))
         starter.caught = true
         Bot:handleEncounter(starter)
         if starter.isShiny then
