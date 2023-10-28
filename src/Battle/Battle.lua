@@ -67,7 +67,7 @@ function Battle:runFromPokemon()
     Input:performButtonSequence(ButtonSequences.BATTLE_RUN)
     Input:pressButtons{buttonKeys={Buttons.B}, duration=80, waitFrames=1}
     Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.TAP}
-    Positioning:waitForOverworld(200) -- Wait for overworld
+    return Positioning:waitForOverworld(500)
 end
 
 function Battle:openPack()
@@ -76,10 +76,9 @@ function Battle:openPack()
     Common:waitFrames(30)
 end
 
-
 function Battle:waitForBattleMenu(bIterations) 
     i = 0
-    while Memory:readFromTable(Battle.MenuPointer) == 0 and i < bIterations
+    while Memory:readFromTable(Battle.MenuCursor) == 0 and i < bIterations
     do
         Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.PRESS}
         i = i + 1
@@ -92,7 +91,6 @@ function Battle:continueUntilNewTurn()
 
 end
     
-
 function Battle:getCatchStatus()
     --[[
         Determine if the pokemon was caught
@@ -105,6 +103,6 @@ function Battle:getCatchStatus()
             - 1: Pokemon was caught
             - 2: Pokemon was not caught
     ]]
-    Common:waitForState(Battle.Catch, Battle.Catch.RESET)
+    Common:waitForState(Battle.Catch, {Battle.Catch.CAUGHT, Battle.Catch.MISSED})
     return Memory:readFromTable(Battle.Catch)
 end

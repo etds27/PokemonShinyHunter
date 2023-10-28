@@ -24,7 +24,7 @@ function Positioning:waitForOverworld(frameLimit)
         Arguments:
             - frameLimit: Maximum number of frames to wait
     ]]
-    Common:waitForState(Battle.PokemonTurnCounter, 0, frameLimit)
+    return Common:waitForNotState(Battle.PokemonTurnCounter, 0, frameLimit)
 end
 
 function Positioning:inOverworld() 

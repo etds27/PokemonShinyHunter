@@ -111,13 +111,54 @@ function Common:waitForState(addrTab, desiredState, frameLimit)
         end
     end
 
-    local i = 0
+    if type(desiredState) ~= "table" then
+        desiredState = {desiredState}
+    end
+
+    Log:debug("Waiting for: " .. tostring(desiredState))
 
     for i = 1, frameLimit 
     do
-        if Memory:readFromTable(addrTab) == desiredState then
+        if Common:contains(desiredState, Memory:readFromTable(addrTab)) then
             return true
         end
+        emu.frameadvance()
+    end
+    return false
+end
+
+function Common:waitForNotState(addrTab, undesiredState, frameLimit)
+    --[[
+        General function to advance frames until a specific memory address is set to a value
+
+        Arguments:
+            - addrTab: Address table to look up in memory
+                {addr: size: memdomain: frameLimit:}
+            - desiredState: Expected value to wait for
+            - frameLimit: Maximum number of frames to wait
+                Default: 1000 (frames)
+        Returns: true if the desired state is found in memory
+    ]]
+    if frameLimit == nil then
+        if addrTab.frameLimit == nil then
+            frameLimit = 1000
+        else
+            frameLimit = addrTab.frameLimit
+        end
+    end
+
+    if type(undesiredState) ~= "table" then
+        undesiredState = {undesiredState}
+    end
+
+    Log:debug("Waiting for: " .. tostring(undesiredState))
+
+    for i = 1, frameLimit 
+    do
+        if not Common:contains(undesiredState, Memory:readFromTable(addrTab)) then
+            return true
+        end
+        emu.frameadvance()
     end
     return false
 end
