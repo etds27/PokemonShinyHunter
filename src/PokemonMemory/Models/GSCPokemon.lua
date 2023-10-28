@@ -30,7 +30,7 @@ local Model = {
         speedStat = {0x2A, 2},
         spAttackStat = {0x2C, 2},
         spDefenseStat = {0x2E, 2},
-    }
+    },
 
     BoxPokemonOffsets = {
         species = {0x00, 1},
@@ -55,7 +55,7 @@ local Model = {
         pokerus = {0x1C, 1},
         caughtData = {0x1D, 2},
         level = {0x1F, 1}  
-    }
+    },
 
     WildPokemonOffsets = {
         species = {0x00, 1},
@@ -79,6 +79,6 @@ local Model = {
         speedStat = {0x18, 2},
         spAttackStat = {0x1A, 2},
         spDefenseStat = {0x1C, 2},
-    }
+    },
 }
  return Model

@@ -1,11 +1,9 @@
 require "Common"
 require "Log"
 require "Memory"
-require "PokemonMemory"
+require "Pokemon"
 require "Input"
-
 Box = {}
-BoxUI = {}
 
 -- Abstract tables
 local Model = {}
@@ -88,9 +86,9 @@ function Box:getBox(boxNumber)
     for i = 1, numPokemon 
     do
         pokemonAddress =  Box:pokemonLocation(startingAddress, i)
-        pokemonTable = PokemonMemory:getPokemonTable(MemoryPokemonType.BOX, 
-                                                     pokemonAddress, 
-                                                     Memory.CARTRAM)
+        pokemonTable = Pokemon:new(Pokemon.PokemonType.BOX, 
+                                    pokemonAddress, 
+                                    Memory.CARTRAM)
         table.insert(box, pokemonTable)
     end
     return box
@@ -126,6 +124,8 @@ function Box:isCurrentBoxFull()
     ]]
     return Box:getNumberOfPokemonInCurrentBox() == Box.maxBoxSize
 end
+
+BoxUI = {}
 
 -- Abstract tables
 local Model = {}
