@@ -4,3 +4,5 @@ Data/*
 WorkingStates/*
 BotStates/*
 Shortcuts/*
+.venv/*
+src/PythonServer/.env
