@@ -166,6 +166,10 @@ function Bag:openPack()
     return Bag:isOpen()
 end
 
+function Bag:closePack()
+    Input:repeatedlyPressButton{buttonKeys={Buttons.B}, duration=Duration.PRESS, iterations=6}
+end
+
 function Bag:isOpen()
     --[[
         Determine if the bag is currently open
@@ -189,6 +193,26 @@ end
 
 function KeyPocket:containsItem(item)
     return Bag:doesPocketContain(Bag.Pocket.KEY_ITEMS, item)
+end
+
+function KeyPocket:selectItem(item)
+    --[[
+        Registers an item in the key pocket
+    ]]
+    if Bag:getSelectedItem() == item then
+        return true
+    end
+
+    print(KeyPocket:containsItem(item), item)
+    if not Bag:navigateToItem(Bag.Pocket.KEY_ITEMS, item) then
+        Log:error("Unable to find item to register")
+        return false
+    end
+    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
+    currentLocation = Memory:readFromTable(Bag.Cursor)
+    Common:navigateMenu(currentLocation, Bag.KeyMenu.SEL)
+    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
+    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
 end
 
 function BallPocket:hasPokeballs()

@@ -15,5 +15,12 @@ TestStates = {
     FISH_OFF_LINE = "States\\FishOffLine.State",
     PRE_FISHING = "States\\PreFishing.State",
     POKEMON_PARTY = "States\\PokemonParty.State",
-    POKEMON_TESTS = "States\\PokemonTests.State"
+    POKEMON_TESTS = "States\\PokemonTests.State",
+    POSITIONING_NO_BIKE = "States\\PositioningNoBike.State",
+    POSITIONING_BIKE = "States\\PositioningBike.State",
+    DAY_CARE_MAN = "States\\DayCareMan.State",
+    DAY_CARE_PC = "States\\DayCarePC.State",
+    EGG_RESET_POINT = "States\\EggResetPoint.State",
+    POKEMON_DEPOSIT = "States\\PokemonDeposit.State",
+    EGG_READY = "States\\EggReady2Pokemon.State"
 }

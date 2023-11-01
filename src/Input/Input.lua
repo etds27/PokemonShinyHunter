@@ -106,7 +106,6 @@ function Input:repeatedlyPressButton(args)
     end
 
     for _ = 1, iterations do
-        print("TEST")
         Input:pressButtons(args)
     end
 

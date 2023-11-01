@@ -18,6 +18,45 @@ local Model = {
         size = 1,
     },
 
+    -- Is set when the current movement is blocked
+    Collision = {
+        addr = 0xC1DE,
+        size = 1,
+        NO_COLLISION = {0, 1} -- 2 values to represent no collision
+    },
+
+    MovementEnabled = {
+        addr = 0xD434,
+        size = 1,
+        memdomain = Memory.WRAM,
+        MOVEMENT_ENABLED = 0,
+        MOVEMENT_DISABLED = 4
+    },
+
+    Motion = {
+        addr = 0xD04E,
+        size = 1,
+        NO_MOTION = 0,
+        NORTH = 129,
+        EAST = 131,
+        SOUTH = 128,
+        WEST = 130
+    },
+
+    Bicycle = {
+        addr = 0xD95D,
+        size = 1,
+        memdomain = "WRAM",
+        ACTIVE = 1,
+        INACTIVE = 0,
+        moveFrames = 7
+    },
+
+    Walking = {
+        moveFrames = 16, -- Total number of frames required to update coordinate in memory
+        pressFrames = 2, -- Minimum frames required to initiate steps
+    },
+
     Map = {
         addr = 0xC2D8,
         size = 1,

@@ -2,7 +2,6 @@ local json = require "json"
 local open = io.open
 
 local function readJson(filepath)
-	print("TEST")
     local f = open(filepath, "rb")
     if not f then return {} end
 
