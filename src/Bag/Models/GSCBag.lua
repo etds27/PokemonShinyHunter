@@ -28,6 +28,12 @@ local BagModel = {
         size = 1
     },
 
+    KeyMenu = {
+        USE = 1,
+        SEL = 2,
+        QUIT = 2
+    },
+
     TMHMPocket = {
         addr = 0xD859,
         size = 1

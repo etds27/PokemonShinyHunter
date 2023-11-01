@@ -38,27 +38,28 @@ Pokemon = {
 
 
 function Pokemon:new(pokemonType, startingAddress, memdomain)
-    o = Pokemon:getPokemonTable(pokemonType, startingAddress, memdomain)
+    o = {
+        memoryType = pokemonType, 
+        addr = startingAddress, 
+        memdomain = memdomain
+    }
+    
     self.__index = self
     setmetatable(o, {__index = self})
+    o:update()
     o:determineIvs()
     o.isShiny = o:determineShininess()
     return o
 end
 
-function Pokemon:getPokemonTable(pokemonType, startingAddress, memdomain)
-    pokemonTable = {
-        address = startingAddress,
-        pokemonType = pokemonType
-    }
-    for key, value in pairs(pokemonType) do
+
+function Pokemon:update()
+    for key, value in pairs(self.memoryType) do
         offset = value[1]
         size = value[2]
-        memValue = Memory:read(startingAddress + offset, size, memdomain)
-        pokemonTable[key] = memValue
+        memValue = Memory:read(self.addr + offset, size, self.memdomain)
+        self[key] = memValue
     end
-
-    return pokemonTable
 end
 
 function Pokemon:determineIvs() 
@@ -82,12 +83,26 @@ function Pokemon:determineShininess()
     speedReq = self.speedIv == 10
     specialReq = self.specialIv == 10
 
-    Log:debug("Shiny Attack:  " .. tostring(attackReq))
-    Log:debug("Shiny Defense: " .. tostring(defenseReq))
-    Log:debug("Shiny Speed:   " .. tostring(speedReq))
-    Log:debug("Shiny Special: " .. tostring(specialReq))
+    -- Log:debug("Shiny Attack:  " .. tostring(attackReq))
+    -- Log:debug("Shiny Defense: " .. tostring(defenseReq))
+    -- Log:debug("Shiny Speed:   " .. tostring(speedReq))
+    -- Log:debug("Shiny Special: " .. tostring(specialReq))
 
     return speedReq and attackReq and defenseReq and specialReq
+end
+
+function Pokemon:isEgg()
+    self:update()
+    return self.caughtData == 0
+end
+
+function Pokemon:eggCyclesRemaining()
+    self:update()
+    if self:isEgg() then
+        return self.friendship
+    else
+        return -1
+    end
 end
 
 -- Abstract tables

@@ -23,10 +23,16 @@ function Memory:read(addr, size, memdomain)
 			- size: Number of bytes to read
 			- memdomain (optional): The memory domain to read from
 	]]
-	mem = ""
+	local mem = ""
+	local value = 0
+
 	if memdomain == nil then
     	memdomain = (addr >> 8)
 	end
+	if type(memdomain) == "string" then
+		memdomain = Memory[memdomain]
+	end
+
 	if memdomain == 0x0 then
 		mem = "ROM"
 	elseif memdomain == 0x80 then
@@ -43,14 +49,16 @@ function Memory:read(addr, size, memdomain)
 	end
 	addr = (addr & 0xFFFF)
 	if size == 1 then
-		return memory.read_u8(addr, mem)
+		value = memory.read_u8(addr, mem)
 	elseif size == 2 then
-		return memory.read_u16_be(addr, mem)
+		value = memory.read_u16_be(addr, mem)
 	elseif size == 3 then
-		return memory.read_u24_be(addr, mem)
+		value = memory.read_u24_be(addr, mem)
     elseif size == 4 then
-		return memory.read_u32_be(addr, mem)
+		value = memory.read_u32_be(addr, mem)
 	end 
+
+	return value
 end
 
 function Memory:readFromTable(args)
@@ -62,6 +70,10 @@ function Memory:readFromTable(args)
 			- size: Number of bytes to read
 			- memdomain (optional): The memory domain to read from
 	]]
+	-- Reroute request to readBitFromTable
+	if args.bit ~= nil then
+		return Memory:readBitFromTable(args)
+	end
 	if args.addr == nil then
 		Log:error("No property 'addr' in table")
 		return nil
@@ -76,7 +88,7 @@ function Memory:readFromTable(args)
 		size = args.size
 	end
 
-	memdomain = args.memdomain
+	local memdomain = args.memdomain
 	return Memory:read(addr, size, memdomain)
 end
 
@@ -90,4 +102,30 @@ end
 
 function Memory:readbyte(addr)
 	return Memory:read(addr, 1)
+end
+
+function Memory:readBit(addr, bit, memdomain)
+	local value = Memory:read(addr, 1, memdomain)
+	return (value >> bit) & 0x1
+end
+
+function Memory:readBitFromTable(args)
+	local addr = 0
+	local bit = 0
+	if args.addr == nil then
+		Log:error("No property 'addr' in table")
+		return nil
+	else
+		addr = args.addr
+	end
+
+	if args.bit == nil then
+		Log:error("No property 'bit' in table")
+		return nil
+	else
+		bit = args.bit
+	end
+	local memdomain = args.memdomain
+
+	return Memory:readBit(addr, bit, memdomain)
 end

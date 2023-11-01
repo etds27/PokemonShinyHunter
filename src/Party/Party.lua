@@ -3,7 +3,9 @@ require "Log"
 require "Memory"
 require "Pokemon"
 
-Party = {}
+Party = {
+    numEggs = 0
+}
 local Model = PartyFactory:loadModel()
 
 -- Merge model into class
@@ -35,10 +37,39 @@ function Party:getAllPokemonInParty()
     --[[
         Get a table of all of the pokemon tables in your party
     ]]
-    tab = {}
+    local tab = {}
     for i = 1, Party:numOfPokemonInParty()
     do
         table.insert(tab, Party:getPokemonAtIndex(i))
     end
     return tab
 end
+
+function Party:getAllEggsInParty()
+    --[[
+        Get a table containing all of the eggs in the party
+    ]]
+    local tab = {}
+    for i, pokemon in pairs(Party:getAllPokemonInParty())
+    do
+        if pokemon:isEgg() then
+            table.insert(tab, pokemon)
+        end
+    end
+    return tab
+end
+
+function Party:getEggMask()
+    local tab = {false, false, false, false, false, false}
+    for i, pokemon in pairs(Party:getAllPokemonInParty())
+    do
+        if pokemon:isEgg() then
+            table[i] = true
+        end
+    end
+    return tab
+end
+
+function Party:getNumberOfEggsInParty()
+    return Common:tableLength(Party:getAllEggsInParty())
+end 

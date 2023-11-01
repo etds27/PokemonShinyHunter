@@ -125,20 +125,92 @@ function Box:isCurrentBoxFull()
     return Box:getNumberOfPokemonInCurrentBox() == Box.maxBoxSize
 end
 
+function Box:findFirstBoxWithCapacity(capacity)
+    --[[
+        Search through the boxes to find one that has enough open space
+
+        Arguments:
+            capacity: default 1, the minimum open space required for a box
+    ]]
+    for i = 1, Box.numBoxes
+    do
+        if Box.maxBoxSize - Box:getNumberOfPokemonInBox(i) >= capacity then
+            return i
+            break
+        end
+    end
+end
+
 BoxUI = {}
 
--- Abstract tables
-local Model = {}
-Model.PCMainMenu = {}
-Model.PCBillsMenu = {}
-Model.PCBoxCursor = {}
-Model.PCBoxEdit = {}
-local Model = BoxUIFactory:loadModel()
+function BoxUI:performDepositMenuActions(boxActions) 
+    --[[
+        Perform the specified actions in box actions
+        THIS CAN INCLUDE RELEASES
 
--- Load in default tables
+        Arguments: Table of box actions to conduct
+            {{index: action:}, {index: action:}}
+                index: Slot in the party to perform action
+                action: DEPOSIT or RELEASE
+    ]]
+    -- Sort the actions in reverse order by party index
+    -- This will allow us to iterate backwards through the list
+    -- And not mess up pokemon ordering when performing deposit or release actions
+    table.sort(boxActions, function(lhs, rhs) return lhs.index > rhs.index end)
+    
+    -- Determine how many deposit actions will be taken
+    local numActions = 0
+    for i, actionPair in ipairs(boxActions)
+    do
+        if actionPair.action == BoxUI.Action.DEPOSIT then numActions = numActions + 1 end
+    end
 
--- Merge model into class
-BoxUI = Common:tableMerge(BoxUI, Model)
+    -- Find a box capable of storing enough pokemon
+    local index = BoxUI.findFirstBoxWithCapacity(numActions)
+    BoxUI:changeBox(index)
+
+    BoxUI:bootUpPC()
+    BoxUI:selectBillsPC()
+    Common:navigateMenuFromAddress(MenuCursor.addr, BoxUI.PCBillsMenu.DEPOSIT)
+    Input:pressButtons{buttonKeys={Buttons.A}, waitFrames=40}
+    for i, actionPair in ipairs(boxActions)
+    do
+        local index = actionPair.index - 1 -- Indices start at 0
+        local action = actionPair.action
+        local numPokemon = Party:numOfPokemonInParty()
+        print(action, index)
+        -- Move to pokemon at index
+        print(BoxUI:currentPokemonIndex())
+
+        Common:navigateMenu(BoxUI:currentPokemonIndex(), index, {duration = 2, waitFrames=15})
+        if BoxUI:currentPokemonIndex() ~= index then 
+            return false 
+        end
+
+        Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS, waitFrames=30}
+        if action == BoxUI.Action.DEPOSIT then
+            if not Common:navigateMenuFromAddress(MenuCursor.addr, BoxUI.DepositMenu.DEPOSIT) then return false end
+            Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
+        elseif action == BoxUI.Action.RELEASE then
+            if not Common:navigateMenuFromAddress(MenuCursor.addr, BoxUI.DepositMenu.RELEASE) then return false end
+            Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS, waitFrames=30}
+            -- Extra A press for release confirmation
+            Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
+        end
+        -- About 120 for deposit and 180 for release
+        Common:waitFrames(200)
+        -- Compare the current number of pokemon to the start value,
+        -- If it is the same still, then we did not deposit
+        if numPokemon == Party:numOfPokemonInParty() then
+            Log:error("Did not deposit or release pokemon")
+            return false
+        end
+
+    end
+
+    BoxUI:exitPC()
+    return true
+end
 
 function BoxUI:changeBox(newBox)
     --[[
@@ -207,6 +279,26 @@ end
 function BoxUI:exitPC()
     Input:performButtonSequence(ButtonSequences.EXIT_PC)
 end
+
+function BoxUI:currentPokemonIndex()
+    --[[
+        ABSTRACT FUNCTION. Will differ between games 
+        Determine the index of the currently focused pokemon in the box
+    ]]
+end
+
+-- Abstract tables
+local Model = {}
+Model.PCMainMenu = {}
+Model.PCBillsMenu = {}
+Model.PCBoxCursor = {}
+Model.PCBoxEdit = {}
+local Model = BoxUIFactory:loadModel()
+
+-- Load in default tables
+
+-- Merge model into class
+BoxUI = Common:tableMerge(BoxUI, Model)
 
 -- Box Structure
 -- Box 1

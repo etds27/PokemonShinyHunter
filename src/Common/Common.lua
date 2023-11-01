@@ -38,7 +38,20 @@ function Common:contains(table, value)
     return false
 end
 
-function Common:navigateMenu(currentLocation, endLocation)
+function Common:navigateMenu(currentLocation, endLocation, options)
+    local button = ""
+    local delta = 0
+    local duration = Duration.MENU_TAP
+    local waitFrames = 10
+    if options ~= nil then
+        if options.duration ~= nil then
+            duration = options.duration
+        end
+        if options.waitFrames ~= nil then
+            waitFrames = options.waitFrames
+        end
+    end
+
     delta = endLocation - currentLocation
     if delta > 0 then
         Log:debug("Searching DOWN in menu")
@@ -51,11 +64,11 @@ function Common:navigateMenu(currentLocation, endLocation)
     Log:debug("Pressing " .. button .. " " .. tostring(delta) .. " times")
     for i = 1, math.abs(delta)
     do
-        Input:pressButtons{buttonKeys={button}, duration=Duration.MENU_TAP, waitFrames=10}
+        Input:pressButtons{buttonKeys={button}, duration=duration, waitFrames=waitFrames}
     end
 end
 
-function Common:navigateMenuFromAddress(cursorAddress, endLocation)
+function Common:navigateMenuFromAddress(cursorAddress, endLocation, options)
     --[[
         Navigates a menu to the desired index
 
@@ -64,7 +77,8 @@ function Common:navigateMenuFromAddress(cursorAddress, endLocation)
             - endLocation: End value for the cursor address
     ]]
     currentLocation = Memory:read(cursorAddress, 1)
-    return Common:navigateMenu(currentLocation, endLocation)
+    Common:navigateMenu(currentLocation, endLocation)
+    return Memory:read(cursorAddress, 1) == endLocation
 end
 
 function Common:tableLength(table)
@@ -177,4 +191,8 @@ end
 
 function Common:currentTime()
     return os.clock()
+end
+
+function Common:coordinateToString(coord)
+    return "x: " .. tostring(coord.x) .. ", y: " .. tostring(coord.y) 
 end
