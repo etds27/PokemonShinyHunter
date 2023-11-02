@@ -1,6 +1,7 @@
 require "Common"
 require "Log"
 require "Memory"
+require "Party"
 require "Pokemon"
 require "Input"
 Box = {}
@@ -132,11 +133,11 @@ function Box:findFirstBoxWithCapacity(capacity)
         Arguments:
             capacity: default 1, the minimum open space required for a box
     ]]
+    if capacity == nil then capacity = 1 end
     for i = 1, Box.numBoxes
     do
         if Box.maxBoxSize - Box:getNumberOfPokemonInBox(i) >= capacity then
             return i
-            break
         end
     end
 end
@@ -166,7 +167,7 @@ function BoxUI:performDepositMenuActions(boxActions)
     end
 
     -- Find a box capable of storing enough pokemon
-    local index = BoxUI.findFirstBoxWithCapacity(numActions)
+    local index = Box.findFirstBoxWithCapacity(numActions)
     BoxUI:changeBox(index)
 
     BoxUI:bootUpPC()
@@ -178,10 +179,7 @@ function BoxUI:performDepositMenuActions(boxActions)
         local index = actionPair.index - 1 -- Indices start at 0
         local action = actionPair.action
         local numPokemon = Party:numOfPokemonInParty()
-        print(action, index)
         -- Move to pokemon at index
-        print(BoxUI:currentPokemonIndex())
-
         Common:navigateMenu(BoxUI:currentPokemonIndex(), index, {duration = 2, waitFrames=15})
         if BoxUI:currentPokemonIndex() ~= index then 
             return false 

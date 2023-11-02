@@ -48,10 +48,10 @@ function BoxUITest:testPerformDepositMenuActions()
 
 end
 
--- print("BoxTest:testCurrentBoxNumber()", BoxTest:testCurrentBoxNumber())
--- print("BoxTest:testGetCurrentBox()", BoxTest:testGetCurrentBox())
--- print("BoxTest:testGetBox()", BoxTest:testGetBox())
--- print("BoxTest:testGetAllPokemonInPC()", BoxTest:testGetAllPokemonInPC())
--- print("BoxUITest:testChangeBox()", BoxUITest:testChangeBox())
--- print("BoxUITest:testChangeBoxExisting()", BoxUITest:testChangeBoxExisting())
+print("BoxTest:testCurrentBoxNumber()", BoxTest:testCurrentBoxNumber())
+print("BoxTest:testGetCurrentBox()", BoxTest:testGetCurrentBox())
+print("BoxTest:testGetBox()", BoxTest:testGetBox())
+print("BoxTest:testGetAllPokemonInPC()", BoxTest:testGetAllPokemonInPC())
+print("BoxUITest:testChangeBox()", BoxUITest:testChangeBox())
+print("BoxUITest:testChangeBoxExisting()", BoxUITest:testChangeBoxExisting())
 print("BoxUITest:testPerformDepositMenuActions()",  BoxUITest:testPerformDepositMenuActions())
