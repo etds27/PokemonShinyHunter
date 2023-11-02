@@ -50,12 +50,12 @@ local Model = {
         ACTIVE = 1,
         INACTIVE = 0,
         moveFrames = 7,
-        initialMoveFrame = 3,
+        initialMoveFrames = 3,
         postMoveFrames = 5
     },
 
     Walking = {
-        initialMoveFrame = 6, -- Total number of frames required to update coordinate in memory
+        initialMoveFrames = 6, -- 
         postMoveFrames = 10, -- Minimum frames required to initiate steps
     },
 

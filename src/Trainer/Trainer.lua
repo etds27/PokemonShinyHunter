@@ -1,6 +1,7 @@
 require "Common"
 require "Log"
 require "Memory"
+require "TrainerFactory"
 
 Trainer = {}
 

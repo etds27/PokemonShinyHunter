@@ -1,3 +1,4 @@
+require "BreedingFactory"
 require "Common"
 require "Log"
 require "Memory"
@@ -45,7 +46,7 @@ function Breeding:completeEggCycle()
         end
         
         Log:debug("Adjusted egg point: " .. Common:coordinateToString(newPos))
-        if not Positioning:moveToPoint(newPos.x, newPos.y) then
+        if not Positioning:moveToPoint(newPos.x, newPos.y).ret then
             print(newX, newY, Positioning:getPosition())
             Log:error("Unable to move to adjusted point")
             break

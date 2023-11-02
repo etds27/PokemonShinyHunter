@@ -1,6 +1,7 @@
 require "Bag"
 require "Battle"
 require "Box"
+require "Breeding"
 require "ButtonSequences"
 require "Collection"
 require "Common"

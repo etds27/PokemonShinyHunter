@@ -1,4 +1,5 @@
 require "Common"
+require "FishingFactory"
 require "Log"
 require "Memory"
 require "Input"

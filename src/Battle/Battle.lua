@@ -1,3 +1,4 @@
+require "BattleFactory"
 require "Common"
 require "GameSettings"
 require "Log"
