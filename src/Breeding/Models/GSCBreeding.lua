@@ -41,50 +41,50 @@ local Model = {
 
 function Model:walkToPCFromReset() 
     -- Move to right outside the day care house
-    if not Positioning:moveToPoint(11, 15) then return false end
+    if not Positioning:moveToPoint(11, 15).ret then return false end
     -- Step into daycare house.
     Positioning:moveStepsInDirection(1, Positioning.Direction.EAST) 
     Common:waitFrames(20)
     -- Walk to front of PC
-    if not Positioning:moveToPosition(Model.PCPoint) then return false end
+    if not Positioning:moveToPosition(Model.PCPoint).ret then return false end
     -- Face the PC
-    if not Positioning:faceDirection(Positioning.Direction.NORTH) then return false end
+    if not Positioning:faceDirection(Positioning.Direction.NORTH).ret then return false end
     return true
 end
 
 function Model:walkToResetPointFromPC() 
     -- Move to door of Day Care room
-    if not Positioning:moveToPoint(0, 6) then return false end
+    if not Positioning:moveToPoint(0, 6).ret then return false end
     -- Step out of daycare house. 
     Positioning:moveStepsInDirection(1, Positioning.Direction.WEST)
     -- Walk to reset point
-    if not Positioning:moveToPosition(Model.MovementResetPoint) then return false end
+    if not Positioning:moveToPosition(Model.MovementResetPoint).ret then return false end
     return true
 end
 
 function Model:walkToDayCareManFromReset() 
     -- Move to right outside the day care house
-    if not Positioning:moveToPoint(11, 15) then return false end
+    if not Positioning:moveToPoint(11, 15).ret then return false end
     -- Step into daycare house.
     Positioning:moveStepsInDirection(1, Positioning.Direction.EAST)
     Common:waitFrames(20)
     -- Walk to doorway to yard
-    if not Positioning:moveToPoint(2, 7) then return false end
+    if not Positioning:moveToPoint(2, 7).ret then return false end
     -- Step into the Day Care yard.
     Positioning:moveStepsInDirection(1, Positioning.Direction.SOUTH)
     Common:waitFrames(60)
     -- Face the Day Care man
-    if not Positioning:moveToPoint(14, 16) then return false end
+    if not Positioning:moveToPoint(14, 16).ret then return false end
     if not Positioning:faceDirection(Positioning.Direction.EAST) then return false end
     return true
 end
 
 function Model:walkToResetFromDayCareMan() 
     -- Step into the Day Care house.
-    if not Positioning:moveToPoint(13, 16) then return false end
+    if not Positioning:moveToPoint(13, 16).ret then return false end
     Positioning:moveStepsInDirection(1, Positioning.Direction.NORTH)
     -- Move to door of Day Care room
-    if not Positioning:moveToPoint(0, 6) then return false end
+    if not Positioning:moveToPoint(0, 6).ret then return false end
     -- Step out of daycare house. 
     Positioning:moveStepsInDirection(1, Positioning.Direction.WEST)
     -- Walk to reset point

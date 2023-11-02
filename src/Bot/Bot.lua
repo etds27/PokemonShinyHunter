@@ -76,6 +76,11 @@ function Bot:runModeWildPokemon()
             if ret == 1 then
                 wildPokemon.caught = true
                 Log:info("You caught the shiny pokemon!")
+
+                if Box:isCurrentBoxFull() then
+                    Log:info("Current box is full")
+                    break
+                end
             else
                 wildPokemon.caught = false
                 Log:info("You did not catch the shiny pokemon")
@@ -188,6 +193,7 @@ function Bot:runModeHatchEggs()
         if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
             if not Breeding:walkToDayCareManFromReset() then return false end
             -- Pick up new eggs
+            if not Breeding:pickUpEggs() then return false end
             if not Breeding:walkToResetFromDayCareMan() then return false end
         end
     end

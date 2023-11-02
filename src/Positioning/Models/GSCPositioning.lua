@@ -49,12 +49,14 @@ local Model = {
         memdomain = "WRAM",
         ACTIVE = 1,
         INACTIVE = 0,
-        moveFrames = 7
+        moveFrames = 7,
+        initialMoveFrame = 3,
+        postMoveFrames = 5
     },
 
     Walking = {
-        moveFrames = 16, -- Total number of frames required to update coordinate in memory
-        pressFrames = 2, -- Minimum frames required to initiate steps
+        initialMoveFrame = 6, -- Total number of frames required to update coordinate in memory
+        postMoveFrames = 10, -- Minimum frames required to initiate steps
     },
 
     Map = {
