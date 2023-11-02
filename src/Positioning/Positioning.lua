@@ -16,6 +16,16 @@ local Model = PositioningFactory:loadModel()
 -- Merge model into class
 Positioning = Common:tableMerge(Positioning, Model)
 
+function Positioning:manhattanDistance(pos1, pos2)
+    --[[
+        Calculate the Manhattan distance between 2 points
+
+        This is useful to determine the number of steps travelled
+        between two points assuming an optimal path
+    ]]
+    return math.abs(pos1.x - pos2.x) + math.abs(pos1.y - pos2.y)
+end
+
 function Positioning:waitForOverworld(frameLimit)
     --[[
         Advance frames until the player is in the overworld
@@ -77,25 +87,25 @@ function Positioning:faceDirection(direction)
     return Memory:readFromTable(Positioning.Direction) == direction
 end
 
-function Positioning:moveToPosition(newPos, maxAttempts)
+function Positioning:moveToPosition(newPos, maxSteps)
     --[[
         Move the character to a specified position
 
         Arguments:
             - newPos: Position table with the following structure
                 {x: y: ...}
-            - maxAttempts: Number of turns the trainer will attempt to make when pathing
+            - maxSteps: Number of turns the trainer will attempt to make when pathing
     ]]
-    return Positioning:moveToPoint(newPos.x, newPos.y)
+    return Positioning:moveToPoint(newPos.x, newPos.y, maxSteps)
 end
 
-function Positioning:moveToPoint(newX, newY, maxAttempts)
+function Positioning:moveToPoint(newX, newY, maxSteps)
     --[[
         Very dumb walk from one position to another method.
     ]]
 
-    if maxAttempts == nil then
-        maxAttempts = 100
+    if maxSteps == nil then
+        maxSteps = 100
     end
     -- true = N/S, false = E/W
     local axis = true 
@@ -104,11 +114,10 @@ function Positioning:moveToPoint(newX, newY, maxAttempts)
     local direction = 0
     local position = {x = 0, y = 0}
     local adjustedSteps = 0
+    local totalSteps = 0
 
-    local totalAttempts = 0
-    while totalAttempts < maxAttempts
+    while totalSteps < maxSteps
     do
-
         position = Positioning:getPosition()
         currentX = position.x
         currentY = position.y
@@ -116,7 +125,7 @@ function Positioning:moveToPoint(newX, newY, maxAttempts)
         -- Break if destination has been reached
         if currentX == newX and currentY == newY then
             Log:info("Navigated to x: " .. tostring(newX) .. " y: " .. tostring(newY))
-            return true
+            return {ret = true, steps = totalSteps}
         end
 
         -- North South movement
@@ -145,16 +154,27 @@ function Positioning:moveToPoint(newX, newY, maxAttempts)
             adjustedSteps = math.abs(newX - currentX)
         end
 
-        local ret = Positioning:moveStepsInDirection(adjustedSteps, direction)
-        if ret == 2 then
-            return false
+        local t = Positioning:moveStepsInDirection(adjustedSteps, direction)
+        if t.ret == 2 then
+            return {ret = false, steps = totalSteps}
         end
+        totalSteps = totalSteps + t.steps
+
         axis = not axis
-        totalAttempts = totalAttempts + 1
     end
 end
 
 function Positioning:moveStepsInDirection(maxSteps, direction) 
+    --[[
+        Move N steps in a particular direction
+
+        This will attempt to take a maximum number of steps in a specified direction
+        If a collision is detected, it will immediately return
+        If the trainer leaves the current map area, it will immediately return
+
+        Returns: Table with a return value and the number of steps taken
+            {ret: steps:}
+    ]]
     local position = Positioning:getPosition()
     local startX = position.x
     local startY = position.y
@@ -168,7 +188,7 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
     local waitFrames = 0
     local localWait = 0
     
-    -- If this changes, then we collided
+    -- If this changes, then we collided. This value isn't constant for some reason
     local initialCollision = Memory:readFromTable(Positioning.Collision)
     local button = 0
     if direction == Positioning.Direction.NORTH then
@@ -189,13 +209,11 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
 
     -- Update the input durations for bike or not
     if Memory:readFromTable(Positioning.Bicycle) == Positioning.Bicycle.ACTIVE then
-        buttonDuration = 3
-        waitFrames = 0
-        localWait = 5
+        buttonDuration = Positioning.Bicycle.initialMoveFrames
+        localWait = Positioning.Bicycle.postMoveFrames
     else
-        buttonDuration = 6
-        waitFrames = 0
-        localWait = 10
+        buttonDuration = Positioning.Walking.initialMoveFrames
+        localWait = Positioning.Walking.postMoveFrames
     end
 
     local i = 0
@@ -209,17 +227,19 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
         -- Terminate if we are in a new map
         if startingMap ~= map then
             Log:debug("Left current map during navigation")
-            return 2
+            return {ret = 2, -1}
         end
 
         Input:pressButtons{buttonKeys={button}, duration=buttonDuration, waitFrames=waitFrames}
         -- Check if we are colliding with anything after the first half press
         if Memory:readFromTable(Positioning.Collision) ~= initialCollision then
             Log:debug("Detected collision")
-            return 1
+            return {ret = 1, Positioning:manhattanDistance({x = startX, y = startY}, position)}
         end
 
         -- Check if we are 1 tile away from the goal
+        -- If we are one tile away, then the partial press we are doing will move
+        -- the trainer onto the correct tile
         if math.abs(startX - currentX) + math.abs(startY - currentY) >= maxSteps - 1 then
             break
         end
@@ -228,10 +248,8 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
         Input:pressButtons{buttonKeys={button}, duration=localWait, waitFrames=waitFrames}
     end        
 
-    -- Perform partial press to continue movement into goal square
+    -- Release the second portion of the press to stop moving
     Common:waitFrames(localWait)
 
-    return 0
+    return {ret = 0, steps = Positioning:manhattanDistance({x = startX, y = startY}, Positioning:getPosition())}
 end
-
--- Positioning:moveStepsInDirection(19, Positioning.Direction.SOUTH) 

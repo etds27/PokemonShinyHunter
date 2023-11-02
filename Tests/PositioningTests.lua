@@ -24,33 +24,33 @@ end
 
 function PositioningTest:testMoveStepsInDirectionNoBikeS()
     savestate.load(TestStates.POSITIONING_NO_BIKE)
-    return Positioning:moveStepsInDirection(8, Positioning.Direction.SOUTH)
+    return Positioning:moveStepsInDirection(8, Positioning.Direction.SOUTH).steps == 8
 end
 
 function PositioningTest:testMoveStepsInDirectionBikeS()
     savestate.load(TestStates.POSITIONING_BIKE)
-    return Positioning:moveStepsInDirection(8, Positioning.Direction.SOUTH)
+    return Positioning:moveStepsInDirection(8, Positioning.Direction.SOUTH).steps == 8
 end
 
 function PositioningTest:testMoveToPointNoBikeNW()
     savestate.load(TestStates.POSITIONING_NO_BIKE)
-    return Positioning:moveToPoint(8, 0)
+    return Positioning:moveToPoint(8, 0).ret
 end
 
 function PositioningTest:testMoveToPointBikeNW()
     savestate.load(TestStates.POSITIONING_BIKE)
-    return Positioning:moveToPoint(8, 0)
+    return Positioning:moveToPoint(8, 0).ret
 end
 
 
 function PositioningTest:testMoveToPointNoBikeSE()
     savestate.load(TestStates.POSITIONING_NO_BIKE)
-    return Positioning:moveToPoint(16, 23)
+    return Positioning:moveToPoint(16, 23).ret
 end
 
 function PositioningTest:testMoveToPointBikeSE()
     savestate.load(TestStates.POSITIONING_BIKE)
-    return Positioning:moveToPoint(16, 23)
+    return Positioning:moveToPoint(16, 23).ret
 end
 
 

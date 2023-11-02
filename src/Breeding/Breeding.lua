@@ -10,13 +10,17 @@ function Breeding:completeEggCycle()
     --[[
         Walk the remaining steps needed to complete an egg cycle
 
-        This must be ran while in the path between the reset and turnaround points
+        This must be ran while in the path between the reset and turnaround points. 
+        The trainer will complete the egg cycle at any arbitrary point in the movement cycle.
+        There is no logic to complete the egg cycle at a certain position
+
+        Returns: true, when the cycle has been completed
     ]]
     local direction = true
     local eggSteps = 0
     local remainingSteps = 0
     local newPos = {x = 0, y = 0}
-    while true
+    while Positioning:inOverworld()
     do
         remainingSteps = 0
         eggSteps = Memory:readFromTable(Breeding.EggCycleCounter)
@@ -49,6 +53,8 @@ function Breeding:completeEggCycle()
 
         direction = not direction
     end
+
+    return false
 end
 
 function Breeding:determineHatchedPokemon(previousEggSlots, newEggSlots)
@@ -56,6 +62,7 @@ function Breeding:determineHatchedPokemon(previousEggSlots, newEggSlots)
         Determine which eggs have hatched between two party egg snapshots
 
         Returns: List of indices of the pokemon that hatched
+            i.e {2, 5, 6}
     ]]
     t = {}
     for i, eggStatus in ipairs(previousEggSlots)
@@ -67,17 +74,30 @@ function Breeding:determineHatchedPokemon(previousEggSlots, newEggSlots)
     return t
 end
 
-function Breeding:hatchEgg()
+function Breeding:hatchEgg(pressLimit)
     --[[
         Complete the animation for egg hatching and skip nicknaming
+
+        Returns: true if the player is back in the overworld after inputs
     ]]
-    while not Positioning:inOverworld()
+    if pressLimit == nil then pressLimit = 200 end
+    local i = 0
+    while not Positioning:inOverworld() and i < pressLimit
     do
         Input:pressButtons{buttonKeys={Buttons.B}, duration=14, waitFrames=2}
     end
+
+    return Positioning:inOverworld()
 end
 
 function Breeding:calculateAdjustedMovementPoint(remainingSteps, endPoint)
+    --[[
+        Calculate the destination point given the desired destination point and
+        the maximum number of steps available to take
+
+        Returns: Position table of adjust destination point
+            {x: y:}
+    ]]
     local newX = endPoint.x
     local newY = endPoint.y
     local pos = Positioning:getPosition()
@@ -112,6 +132,8 @@ end
 function Breeding:pickUpEggs(pressLimit)
     --[[
         Interacts with the Day Care person and accepts the egg
+
+        Returns: true if an egg is no longer available to be picked up
     ]]
     if pressLimit == nil then
         pressLimit = 100
