@@ -1,6 +1,7 @@
 require "Common"
 require "Log"
 require "Memory"
+require "PokemonFactory"
 
 Pokemon = {
     address = -1,

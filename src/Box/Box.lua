@@ -1,3 +1,4 @@
+require "BoxFactory"
 require "Common"
 require "Log"
 require "Memory"

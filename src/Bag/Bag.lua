@@ -1,3 +1,4 @@
+require "BagFactory"
 require "Common"
 require "Log"
 require "Memory"
@@ -7,7 +8,7 @@ require "Items"
 -- Abstract tables
 local Model = {}
 Model.BagPocket = {}
-Model.Cursor = {}
+Model.BagCursor = {}
 Model.KeyPocket = {}
 Model.TMHMPocket = {}
 Model.BallPocket = {}
@@ -27,10 +28,7 @@ Bag = {
     BallPriority = BallPriority
 }
 Bag = Common:tableMerge(Bag, Model)
-ItemPocket = {}
-KeyPocket = {}
-TMHMPocket = {}
-BallPocket = {}
+
 
 function Bag:navigateToItem(pocket, item)
     --[[
@@ -60,10 +58,12 @@ function Bag:navigateToItem(pocket, item)
         Log:error("Unable to navigate to pocket")
         return false
     end 
-    currentLocation = Memory:readFromTable(Bag.Cursor)
+
+    currentLocation = Memory:readFromTable(Bag.BagCursor)
+
     Common:navigateMenu(currentLocation, location)
- 
-    return Memory:readFromTable(Bag.Cursor) == location
+
+    return Memory:readFromTable(Bag.BagCursor) == location
 end
 
 function Bag:useItem(pocket, item)
@@ -78,7 +78,7 @@ function Bag:useItem(pocket, item)
     end
 
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
-    currentLocation = Memory:readFromTable(Bag.Cursor)
+    currentLocation = Memory:readFromTable(Bag.BagCursor)
     Common:navigateMenu(currentLocation, Bag.BattleItem.USE)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return true
@@ -92,7 +92,7 @@ function Bag:useBestBall()
     do
         if BallPocket:containsItem(ball)[1] ~= 0 then
             Log:debug("Using ball: " .. ball)
-            return Bag:useItem(Bag.Pocket.BALLS, ball)
+            return Bag:useItem(Bag.BagPocket.BALLS, ball)
         end
     end
     Log:warning("Did not find any Pokeballs")
@@ -101,7 +101,7 @@ end
 
 function Bag:navigateToPocket(pocket)
     i = 0
-    while Memory:readFromTable(Bag.Pocket) ~= pocket and i < 10
+    while Memory:readFromTable(Bag.BagPocket) ~= pocket and i < 10
     do
         Input:pressButtons{buttonKeys={Buttons.RIGHT}, duration=Duration.TAP}
         i = i + 1
@@ -136,10 +136,10 @@ function Bag:doesPocketContain(pocket, item)
     for i = 1, numOfItemsInPocket, 1
     do
         if Common:contains({Bag.Pocket.ITEMS, Bag.Pocket.BALLS}, pocket) then
-            itemAddr =  calculateItemBallAddress(pocketTable.addr, i)
+            itemAddr =  Bag:calculateItemBallAddress(pocketTable.addr, i)
             quantityAddr = itemAddr + 1
         elseif pocket == Bag.Pocket.KEY_ITEMS then
-            itemAddr = calculateKeyItemAddress(pocketTable.addr, i)
+            itemAddr = Bag:calculateKeyItemAddress(pocketTable.addr, i)
             quantityAddr = itemAddr
         end
 
@@ -151,23 +151,19 @@ function Bag:doesPocketContain(pocket, item)
     return {0, 0}
 end
 
-function calculateItemBallAddress(startingAddress, index)
+local function Bag:calculateItemBallAddress(startingAddress, index)
     return startingAddress + 2 * index - 1
 end
 
-function calculateKeyItemAddress(startingAddress, index)
+local function Bag:calculateKeyItemAddress(startingAddress, index)
     return startingAddress + index
 end
 
 function Bag:openPack()
     Input:pressButtons{buttonKeys={Buttons.START}, duration=Duration.PRESS}
-    Common:navigateMenuFromAddress(Bag.Cursor.addr, 3)
+    Common:navigateMenuFromAddress(Bag.MenuCursor.addr, 3)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return Bag:isOpen()
-end
-
-function Bag:closePack()
-    Input:repeatedlyPressButton{buttonKeys={Buttons.B}, duration=Duration.PRESS, iterations=6}
 end
 
 function Bag:isOpen()
@@ -183,7 +179,7 @@ function Bag:getSelectedItem()
     return Memory:readFromTable(Bag.SelectedItem)
 end
 
-function ItemPocket:containsItem(item)
+function Bag:ItemPocket:containsItem(item)
     return Bag:doesPocketContain(Bag.Pocket.ITEMS, item)
 end
 
@@ -193,26 +189,6 @@ end
 
 function KeyPocket:containsItem(item)
     return Bag:doesPocketContain(Bag.Pocket.KEY_ITEMS, item)
-end
-
-function KeyPocket:selectItem(item)
-    --[[
-        Registers an item in the key pocket
-    ]]
-    if Bag:getSelectedItem() == item then
-        return true
-    end
-
-    print(KeyPocket:containsItem(item), item)
-    if not Bag:navigateToItem(Bag.Pocket.KEY_ITEMS, item) then
-        Log:error("Unable to find item to register")
-        return false
-    end
-    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
-    currentLocation = Memory:readFromTable(Bag.Cursor)
-    Common:navigateMenu(currentLocation, Bag.KeyMenu.SEL)
-    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
-    Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
 end
 
 function BallPocket:hasPokeballs()

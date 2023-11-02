@@ -1,7 +1,8 @@
 require "Common"
+require "Input"
 require "Log"
 require "Memory"
-require "Input"
+require "PositioningFactory"
 
 Positioning = {}
 
@@ -227,14 +228,14 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
         -- Terminate if we are in a new map
         if startingMap ~= map then
             Log:debug("Left current map during navigation")
-            return {ret = 2, -1}
+            return {ret = 2, steps = -1}
         end
 
         Input:pressButtons{buttonKeys={button}, duration=buttonDuration, waitFrames=waitFrames}
         -- Check if we are colliding with anything after the first half press
         if Memory:readFromTable(Positioning.Collision) ~= initialCollision then
             Log:debug("Detected collision")
-            return {ret = 1, Positioning:manhattanDistance({x = startX, y = startY}, position)}
+            return {ret = 1, steps = Positioning:manhattanDistance({x = startX, y = startY}, position)}
         end
 
         -- Check if we are 1 tile away from the goal

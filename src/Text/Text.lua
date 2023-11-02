@@ -1,4 +1,5 @@
 require "Memory"
+require "TextFactory"
 
 Text = {}    
 
