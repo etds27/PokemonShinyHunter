@@ -48,7 +48,9 @@ function Model:walkToPCFromReset()
     -- Walk to front of PC
     if not Positioning:moveToPosition(Model.PCPoint).ret then return false end
     -- Face the PC
-    if not Positioning:faceDirection(Positioning.Direction.NORTH) then return false end
+    -- if not Positioning:faceDirection(Positioning.Direction.NORTH) then return false end
+    Positioning:faceDirection(Positioning.Direction.NORTH)
+    Common:waitFrames(20)
     return true
 end
 

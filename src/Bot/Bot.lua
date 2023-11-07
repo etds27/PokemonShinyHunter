@@ -9,7 +9,9 @@ require "Fishing"
 require "GameSettings"
 require "Input"
 require "Log"
+require "Memory"
 require "Pokemon"
+require "PokemonData"
 require "PokemonSocket"
 require "Positioning"
 require "PostCatch"
@@ -149,53 +151,57 @@ function Bot:runModeHatchEggs()
 
     while true
     do
+        Log:debug("runModeHatchEggs: cycle init")
         -- Get back on bike for next egg cycle
         if Memory:readFromTable(Positioning.Bicycle) == Positioning.Bicycle.INACTIVE then
             if Bag:getSelectedItem() == Items.BICYCLE then
-                Input:pressButtons{buttonKeys={Buttons.SELECT}, duration=Duration.PRESS, waitFrames=30}
+                Input:pressButtons{buttonKeys={Buttons.SELECT}, duration=Duration.PRESS, waitFrames=60}
             else
                 Bag:openPack()
-                Bag:useItem(BagPocket.KEY_ITEMS, Items.BICYCLE)
+                Bag:useItem(Bag.Pocket.KEY_ITEMS, Items.BICYCLE)
+                Common:waitFrames(60)
             end
         end
-
         previousEggSlots = Party:getEggMask()
+
+        Common:waitFrames(10)
+
         -- Walk until a potential breeding event
         Breeding:completeEggCycle()
         eggSlots = Party:getEggMask()
-        print(previousEggSlots)
-        print(eggSlots)
 
         -- Determine what eggs were hatched after the egg cycle
-        hatchedEggs = Breeding:determineHatchedPokemon(previousEggSlots, eggSlots)
-        for i, index in ipairs(hatchedEggs) do
-            Breeding:hatchEgg()
-            local hatchedPokemon = Pokemon:new(Pokemon.Memory.TRAINER, Party:getPokemonAddress(index), Memory.WRAM)
-            Log:info("Hatched pokemon " .. PokemonData[hatchedPokemon.species].name)
-            Bot:handleEncounter(hatchedPokemon)
-            if hatchedPokemon.isShiny then
-                pcActionList[i] = {index = index, action = BoxUI.Action.DEPOSIT}
-            else
-                pcActionList[i] = {index = index, action = BoxUI.Action.RELEASE}
+        if not Positioning:inOverworld() then
+            hatchedEggs = Breeding:determineHatchedPokemon(previousEggSlots, eggSlots)
+            for i, index in ipairs(hatchedEggs) do
+                Breeding:hatchEgg()
+                local hatchedPokemon = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAddress(index), Memory.WRAM)
+                Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species))
+                Bot:handleEncounter(hatchedPokemon)
+                if hatchedPokemon.isShiny then
+                    pcActionList[i] = {index = index, action = BoxUI.Action.DEPOSIT}
+                else
+                    pcActionList[i] = {index = index, action = BoxUI.Action.RELEASE}
+                end
             end
-        end
 
-        -- If something hatched, perform PC actions
-        if Common:tableLength(hatchedEggs) > 0 then
-            if not Breeding:walkToResetPoint() then return false end
-            if not Breeding:walkToPCFromReset() then return false end
-            -- Perform PC Actions
-            if not BoxUI:performDepositMenuActions(pcActionList) then return false end
+            -- If something hatched, perform PC actions
+            if Common:tableLength(hatchedEggs) > 0 then
+                if not Breeding:walkToResetPoint() then return false end
+                if not Breeding:walkToPCFromReset() then return false end
+                -- Perform PC Actions
+                if not BoxUI:performDepositMenuActions(pcActionList) then return false end
 
-            if not Breeding:walkToResetPointFromPC() then return false end
-        end
+                if not Breeding:walkToResetPointFromPC() then return false end
+            end
 
-        -- Determine if room in party
-        if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
-            if not Breeding:walkToDayCareManFromReset() then return false end
-            -- Pick up new eggs
-            if not Breeding:pickUpEggs() then return false end
-            if not Breeding:walkToResetFromDayCareMan() then return false end
+            -- Determine if room in party
+            if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
+                if not Breeding:walkToDayCareManFromReset() then return false end
+                -- Pick up new eggs
+                if not Breeding:pickUpEggs() then return false end
+                if not Breeding:walkToResetFromDayCareMan() then return false end
+            end
         end
     end
 end
@@ -211,7 +217,7 @@ function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
             Input:pressButtons{buttonKeys={Buttons.SELECT}, duration=Duration.PRESS, waitFrames=30}
         else
             Bag:openPack()
-            Bag:useItem(BagPocket.KEY_ITEMS, Items.OLD_ROD)
+            Bag:useItem(Bag.Pocket.KEY_ITEMS, Items.OLD_ROD)
         end
         if Fishing:fish() then
             Log:debug("Hooked a fish!")

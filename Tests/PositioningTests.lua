@@ -55,7 +55,7 @@ end
 
 
 GameSettings.initialize()
-Log.loggingLevel = LogLevels.DEBUG
+Log.loggingLevel = LogLevels.INFO
 
 
 print("PositioningTest:testFaceDirectionNoBike()", PositioningTest:testFaceDirectionNoBike())

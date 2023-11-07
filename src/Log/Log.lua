@@ -1,4 +1,5 @@
 LogLevels = {
+    OFF = {4, "OFF"},
     ERROR = {3, "ERROR"},
     WARNING = {2, "WARNING"},
     INFO = {1, "INFO"},

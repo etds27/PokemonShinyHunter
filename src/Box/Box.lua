@@ -234,6 +234,7 @@ function BoxUI:bootUpPC()
         Go from overworld to main page of PC
         No verification
     ]]
+    Log:debug("BoxUI:bootUpPC - init")
     Input:performButtonSequence(ButtonSequences.OPEN_TO_PC_MENU)
 end
 
@@ -242,6 +243,7 @@ function BoxUI:selectBillsPC()
         Go from main page of PC to Bills PC
         No verification
     ]]
+    Log:debug("BoxUI:selectBillsPC() - init")
     Common:navigateMenuFromAddress(MenuCursor.addr, BoxUI.PCMainMenu.BILL)
     Input:performButtonSequence(ButtonSequences.PC_MENU_TO_BILLS)
 end

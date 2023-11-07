@@ -39,7 +39,7 @@ function Positioning:waitForOverworld(frameLimit)
 end
 
 function Positioning:inOverworld() 
-    return Memory:readFromTable(Battle.PokemonTurnCounter) == Positioning.MovementEnabled.MOVEMENT_ENABLED
+    return Memory:readFromTable(Positioning.MovementEnabled) == Positioning.MovementEnabled.MOVEMENT_ENABLED
 end
 
 function Positioning:getPosition()
@@ -78,6 +78,7 @@ function Positioning:faceDirection(direction)
     -- If the person is moving, then they should be able to turn without end lag
     local waitFrames = 0
     if Memory:readFromTable(Positioning.Motion) == Positioning.Motion.NO_MOTION then
+        Log:debug("Waiting frames after turn")
         waitFrames = 20
     else
         Log:debug("Currently in motion for turn")
@@ -85,6 +86,7 @@ function Positioning:faceDirection(direction)
     end
 
     Input:pressButtons{buttonKeys={button}, duration=5, waitFrames=waitFrames}
+    print(Memory:readFromTable(Positioning.Direction), direction)
     return Memory:readFromTable(Positioning.Direction) == direction
 end
 
@@ -96,11 +98,13 @@ function Positioning:moveToPosition(newPos, maxSteps)
             - newPos: Position table with the following structure
                 {x: y: ...}
             - maxSteps: Number of turns the trainer will attempt to make when pathing
+            - releaseEnd: Bool to have frames at the end of the movement without any input
+                def: true
     ]]
-    return Positioning:moveToPoint(newPos.x, newPos.y, maxSteps)
+    return Positioning:moveToPoint(newPos.x, newPos.y, maxSteps, releaseEnd)
 end
 
-function Positioning:moveToPoint(newX, newY, maxSteps)
+function Positioning:moveToPoint(newX, newY, maxSteps, releaseEnd)
     --[[
         Very dumb walk from one position to another method.
     ]]
@@ -117,7 +121,7 @@ function Positioning:moveToPoint(newX, newY, maxSteps)
     local adjustedSteps = 0
     local totalSteps = 0
 
-    while totalSteps < maxSteps
+    while totalSteps < maxSteps and Positioning:inOverworld()
     do
         position = Positioning:getPosition()
         currentX = position.x
@@ -155,17 +159,18 @@ function Positioning:moveToPoint(newX, newY, maxSteps)
             adjustedSteps = math.abs(newX - currentX)
         end
 
-        local t = Positioning:moveStepsInDirection(adjustedSteps, direction)
+        local t = Positioning:moveStepsInDirection(adjustedSteps, direction, releaseEnd)
         if t.ret == 2 then
             return {ret = false, steps = totalSteps}
         end
-        totalSteps = totalSteps + t.steps
+        totalSteps = totalSteps + math.max(t.steps, 1)
 
         axis = not axis
     end
+    return {ret = false, steps = totalSteps}
 end
 
-function Positioning:moveStepsInDirection(maxSteps, direction) 
+function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd) 
     --[[
         Move N steps in a particular direction
 
@@ -173,6 +178,11 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
         If a collision is detected, it will immediately return
         If the trainer leaves the current map area, it will immediately return
 
+        Arguments:
+            - maxSteps: Maximum number of steps to take before returning
+            - direction: Direction to walk towards
+            - releaseEnd: Bool to have frames at the end of the movement without any input
+                def: true
         Returns: Table with a return value and the number of steps taken
             {ret: steps:}
     ]]
@@ -242,6 +252,7 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
         -- If we are one tile away, then the partial press we are doing will move
         -- the trainer onto the correct tile
         if math.abs(startX - currentX) + math.abs(startY - currentY) >= maxSteps - 1 then
+            Log:debug("Within 1 step of destination, breaking")
             break
         end
 
@@ -250,7 +261,11 @@ function Positioning:moveStepsInDirection(maxSteps, direction)
     end        
 
     -- Release the second portion of the press to stop moving
-    Common:waitFrames(localWait)
+    if releaseEnd == nil or releaseEnd then
+        Log:debug("Releasing positioning inputs")
+        Common:waitFrames(localWait)
+    end
+    
 
     return {ret = 0, steps = Positioning:manhattanDistance({x = startX, y = startY}, Positioning:getPosition())}
 end

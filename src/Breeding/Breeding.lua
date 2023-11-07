@@ -17,27 +17,34 @@ function Breeding:completeEggCycle()
 
         Returns: true, when the cycle has been completed
     ]]
-    local direction = true
+    local direction = false
     local eggSteps = 0
     local remainingSteps = 0
     local newPos = {x = 0, y = 0}
+    local hasMoved = false
+    local totalSteps = 0
+
+    Log:debug("Breeding:completeEggCycle - init")
     while Positioning:inOverworld()
     do
         remainingSteps = 0
         eggSteps = Memory:readFromTable(Breeding.EggCycleCounter)
+        Log:debug("Breeding:completeEggCycle - eggSteps: " .. tostring(eggSteps))
+        Log:debug("Breeding:completeEggCycle - totalSteps: " .. tostring(totalSteps))
+        Log:debug("Breeding:completeEggCycle - remainingSteps" .. tostring(remainingSteps))
 
-        if eggSteps == Breeding.EggCycleCounter.RESET then
+        if eggSteps == Breeding.EggCycleCounter.RESET and totalSteps > 0 then
+            Log:debug("Breeding:completeEggCycle - cycle reset found")
             return true
         end
-
         
-        if eggSteps > Breeding.EggCycleCounter.RESET then
+        if eggSteps >= Breeding.EggCycleCounter.RESET then
             remainingSteps = 0xFF - eggSteps
             eggSteps = 0
         end
+
         remainingSteps = remainingSteps + Breeding.EggCycleCounter.RESET - eggSteps
 
-        Log:debug("Remaining steps in cycle: " .. tostring(remainingSteps))
         -- This only works for straight paths
         if direction then
             newPos = Breeding:calculateAdjustedMovementPoint(remainingSteps, Breeding.MovementTurnAroundPoint)
@@ -46,12 +53,14 @@ function Breeding:completeEggCycle()
         end
         
         Log:debug("Adjusted egg point: " .. Common:coordinateToString(newPos))
-        if not Positioning:moveToPoint(newPos.x, newPos.y).ret then
+        local tab = Positioning:moveToPoint(newPos.x, newPos.y, 100, false)
+        if not tab.ret then
             print(newX, newY, Positioning:getPosition())
             Log:error("Unable to move to adjusted point")
             break
         end
 
+        totalSteps = totalSteps + tab.steps
         direction = not direction
     end
 
@@ -65,11 +74,13 @@ function Breeding:determineHatchedPokemon(previousEggSlots, newEggSlots)
         Returns: List of indices of the pokemon that hatched
             i.e {2, 5, 6}
     ]]
-    t = {}
+    Log:debug("Breeding:determineHatchedPokemon - init")
+    local t = {}
     for i, eggStatus in ipairs(previousEggSlots)
     do
         if eggStatus ~= newEggSlots[i] then
-            t.insert(i)
+            Log:debug("Breeding:determineHatchedPokemon - hatched pokemon at index " .. tostring(i))
+            table.insert(t, i)
         end
     end
     return t
@@ -81,11 +92,13 @@ function Breeding:hatchEgg(pressLimit)
 
         Returns: true if the player is back in the overworld after inputs
     ]]
+    Log:debug("Breeding:hatchEgg - init")
     if pressLimit == nil then pressLimit = 200 end
     local i = 0
     while not Positioning:inOverworld() and i < pressLimit
     do
         Input:pressButtons{buttonKeys={Buttons.B}, duration=14, waitFrames=2}
+        i = i + 1
     end
 
     return Positioning:inOverworld()
@@ -105,6 +118,8 @@ function Breeding:calculateAdjustedMovementPoint(remainingSteps, endPoint)
     local adjustedX = 0
     local adjustedY = 0
 
+    Log:debug("Breeding:calculateAdjustedMovementPoint - init")
+
     if endPoint.direction == Positioning.Direction.NORTH then
         adjustedY = math.max(pos.y - remainingSteps, newY)
         adjustedX = newX
@@ -119,6 +134,7 @@ function Breeding:calculateAdjustedMovementPoint(remainingSteps, endPoint)
         adjustedY = newY
     end
     
+    Log:debug("Breeding:calculateAdjustedMovementPoint - adjustedPos: " .. Common:coordinateToString{x = adjustedX, y = adjustedY})
     return {x = adjustedX, y = adjustedY}
 end
 
@@ -200,5 +216,5 @@ local Model = BreedingFactory:loadModel()
 
 Breeding = Common:tableMerge(Breeding, Model)
 
-Log.loggingLevel = LogLevels.DEBUG
+Log.loggingLevel = LogLevels.INFO
 -- Breeding:hatchEgg()
