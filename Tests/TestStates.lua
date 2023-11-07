@@ -24,5 +24,6 @@ TestStates = {
     POKEMON_DEPOSIT = "States\\PokemonDeposit.State",
     EGG_READY = "States\\EggReady2Pokemon.State",
     SHUCKLE = "States\\Shuckle.State",
-    EEVEE = "States\\Eevee.State"
+    EEVEE = "States\\Eevee.State",
+    MENU_OPEN = "States\\MenuOpen.State"
 }

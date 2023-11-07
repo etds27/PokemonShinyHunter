@@ -1,5 +1,6 @@
 require "Bag"
 require "Battle"
+require "BotModes"
 require "Box"
 require "Breeding"
 require "ButtonSequences"
@@ -15,17 +16,9 @@ require "PokemonData"
 require "PokemonSocket"
 require "Positioning"
 require "PostCatch"
-require "StaticEncountersBot"
+require "StaticEncounters"
 require "Text"
 require "Trainer"
-
-BotModes = {
-    WILD_GRASS = 1,
-    STARTER = 2,
-    FISHING = 3,
-    EGG = 4,
-    SHUCKLE_GSC = 5
-}
 
 Bot = {
     mode = BotModes.WILD_GRASS,
@@ -38,8 +31,12 @@ function Bot:run()
     Bot:initializeBot()
     if Common:contains({BotModes.WILD_GRASS, BotModes.FISHING}, Bot.mode) then
         Bot:runModeWildPokemon()
-    elseif Bot.mode == BotModes.STARTER then
-        Bot:runModeStarterPokemon()
+    elseif Common:contains(
+        {BotModes.STARTER,
+         BotModes.SHUCKLE_GSC,
+         BotModes.EEVEE_GSC}, 
+        Bot.mode) then
+        Bot:runModeStaticEncounter(Bot.mode)
     elseif Bot.mode == BotModes.EGG then
         Bot:runModeHatchEggs()
     end
@@ -61,6 +58,11 @@ function Bot:runModeWildPokemon()
         
         Bot:handleWildPokemon(wildPokemon)
         Bot:reportEncounter(wildPokemon)
+
+        if Box:isCurrentBoxFull() then
+            Log:info("Current box is full")
+            break
+        end
         encounters = encounters + 1
     end
 end
@@ -86,10 +88,11 @@ function Bot:runModeStaticEncounter(staticEncounter)
         -- different
         emu.frameadvance()
         savestate.save(staticEncounterSave)
-        CustomSequences:starterEncounter()
+        StaticEncounters[staticEncounter]()
+        Party:navigateToPokemon(newPokemonSlot)
         pokemon = Party:getPokemonAtIndex(newPokemonSlot)
         pokemon.caught = true
-        Bot:handleEncounter(pokemon)
+        Bot:reportEncounter(pokemon)
         if pokemon.isShiny then
             break
         end
@@ -150,7 +153,7 @@ function Bot:runModeStarterPokemon()
         CustomSequences:starterEncounter()
         starter = Party:getPokemonAtIndex(1)
         starter.caught = true
-        Bot:handleEncounter(starter)
+        Bot:reportEncounter(starter)
         if starter.isShiny then
             break
         end
@@ -210,7 +213,7 @@ function Bot:runModeHatchEggs()
                 Breeding:hatchEgg()
                 local hatchedPokemon = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAddress(index), Memory.WRAM)
                 Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species))
-                Bot:handleEncounter(hatchedPokemon)
+                Bot:reportEncounter(hatchedPokemon)
                 if hatchedPokemon.isShiny then
                     pcActionList[i] = {index = index, action = BoxUI.Action.DEPOSIT}
                 else
@@ -312,11 +315,6 @@ function Bot:handleWildPokemon(pokemon)
         if ret == 1 then
             wildPokemon.caught = true
             Log:info("You caught the shiny pokemon!")
-
-            if Box:isCurrentBoxFull() then
-                Log:info("Current box is full")
-                break
-            end
         else
             wildPokemon.caught = false
             Log:info("You did not catch the shiny pokemon")

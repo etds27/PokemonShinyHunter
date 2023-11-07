@@ -1,5 +1,6 @@
 require "Common"
 require "Log"
+require "MainMenu"
 require "Memory"
 require "PartyFactory"
 require "Pokemon"
@@ -74,3 +75,17 @@ end
 function Party:getNumberOfEggsInParty()
     return Common:tableLength(Party:getAllEggsInParty())
 end 
+
+function Party:navigateToPokemon(num)    
+    MainMenu:open()
+    MainMenu:navigateToOption(MainMenu.POKEMON)
+    Input:pressButtons{buttonKeys={Buttons.A},
+                    duration=Duration.PRESS,
+                    waitFrames=60}
+    Common:navigateMenuFromAddress(MenuCursor.addr, num)
+
+    Input:repeatedlyPressButton{buttonKeys={Buttons.A},
+                                duration=Duration.PRESS,
+                                waitFrames=25,
+                                iterations=3}
+end
