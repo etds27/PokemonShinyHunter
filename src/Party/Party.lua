@@ -65,7 +65,7 @@ function Party:getEggMask()
     for i, pokemon in pairs(Party:getAllPokemonInParty())
     do
         if pokemon:isEgg() then
-            table[i] = true
+            tab[i] = true
         end
     end
     return tab

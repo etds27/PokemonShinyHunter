@@ -1,4 +1,4 @@
-local BagModel = {
+local Model = {
     Pocket = {
         addr = 0xCF65,
         size = 1,
@@ -28,12 +28,6 @@ local BagModel = {
         size = 1
     },
 
-    KeyMenu = {
-        USE = 1,
-        SEL = 2,
-        QUIT = 2
-    },
-
     TMHMPocket = {
         addr = 0xD859,
         size = 1
@@ -55,4 +49,5 @@ local BagModel = {
         size = 1
     },
 }
-return BagModel
+
+return Model
