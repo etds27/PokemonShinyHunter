@@ -22,5 +22,7 @@ TestStates = {
     DAY_CARE_PC = "States\\DayCarePC.State",
     EGG_RESET_POINT = "States\\EggResetPoint.State",
     POKEMON_DEPOSIT = "States\\PokemonDeposit.State",
-    EGG_READY = "States\\EggReady2Pokemon.State"
+    EGG_READY = "States\\EggReady2Pokemon.State",
+    SHUCKLE = "States\\Shuckle.State",
+    EEVEE = "States\\Eevee.State"
 }

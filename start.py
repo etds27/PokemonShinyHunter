@@ -13,7 +13,7 @@ os.environ["LUA_PATH"] = ""
 # os.environ["PSH_ROOT"] = "C:\\Users\\etds2\\Programming\\PokemonLua"
 # Sets the root environment to be the directory of this script
 # Therefore this script should always be at the top level of the project
-os.environ["PSH_RO OT"] = os.path.dirname(os.path.abspath(__file__))
+os.environ["PSH_ROOT"] = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.environ["PSH_ROOT"]
 SRC_DIR = os.path.join(ROOT_DIR, "src")
 TEST_DIR = os.path.join(ROOT_DIR, "Tests")

@@ -15,6 +15,7 @@ require "PokemonData"
 require "PokemonSocket"
 require "Positioning"
 require "PostCatch"
+require "StaticEncountersBot"
 require "Text"
 require "Trainer"
 
@@ -23,6 +24,7 @@ BotModes = {
     STARTER = 2,
     FISHING = 3,
     EGG = 4,
+    SHUCKLE_GSC = 5
 }
 
 Bot = {
@@ -35,7 +37,6 @@ Bot = {
 function Bot:run() 
     Bot:initializeBot()
     if Common:contains({BotModes.WILD_GRASS, BotModes.FISHING}, Bot.mode) then
-        print(Bot.mode)
         Bot:runModeWildPokemon()
     elseif Bot.mode == BotModes.STARTER then
         Bot:runModeStarterPokemon()
@@ -45,7 +46,7 @@ function Bot:run()
 end
 
 function Bot:runModeWildPokemon()
-    encounters = 1
+    local encounters = 1
     Bot.mode = 3
     while true
     do
@@ -54,49 +55,81 @@ function Bot:runModeWildPokemon()
         elseif Bot.mode == BotModes.FISHING then
             Bot:fishForWildPokemon()
         end
-        wildPokemon = Pokemon:new(Pokemon.PokemonType.WILD, GameSettings.wildpokemon)
 
+        local wildPokemon = Pokemon:new(Pokemon.PokemonType.WILD, GameSettings.wildpokemon)
         Log:info(tostring(encounters) .." is shiny: " .. tostring(Pokemon:isShiny(wildPokemon)))
-        if wildPokemon.isShiny then
-            ret = 0
-            i = 0
-            while BallPocket:hasPokeballs() and i < 10
-            do
-            Battle:openPack()
-            Bag:useBestBall()
-            ret = Battle:getCatchStatus()
-            if ret == 1 then -- SHINY WAS CAUGHT!
-                PostCatch:continueUntilOverworld()
-                break
-            else
-
-            end
-            i = i + 1
-            end 
-
-            encounters = 1
-
-            if ret == 1 then
-                wildPokemon.caught = true
-                Log:info("You caught the shiny pokemon!")
-
-                if Box:isCurrentBoxFull() then
-                    Log:info("Current box is full")
-                    break
-                end
-            else
-                wildPokemon.caught = false
-                Log:info("You did not catch the shiny pokemon")
-            end
-            -- Bot:waitForHuman() 
-        else
-            wildPokemon.caught = false
-            Battle:runFromPokemon()
-        end
-        Bot:handleEncounter(wildPokemon)
+        
+        Bot:handleWildPokemon(wildPokemon)
+        Bot:reportEncounter(wildPokemon)
         encounters = encounters + 1
     end
 end
+
+function Bot:runModeStaticEncounter(staticEncounter)
+    --[[
+        Assumes that we are standing in front of a pokemon that is given to player and not caught
+    ]]
+    staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter.State"
+    savestate.save(staticEncounterSave)
+    local newPokemonSlot = Party:numOfPokemonInParty() + 1
+    if newPokemonSlot == Party.maxPokemon + 1 then 
+        Log:error("Already at max pokemon") 
+        return 
+    end
+    resets = 1
+    while true
+    do
+        Log:info("Reset number: " .. tostring(resets))
+        savestate.load(staticEncounterSave)
+        -- Need to advance the game one frame each reset so that 
+        -- the random seed can update and Pokemon values will be 
+        -- different
+        emu.frameadvance()
+        savestate.save(staticEncounterSave)
+        CustomSequences:starterEncounter()
+        pokemon = Party:getPokemonAtIndex(newPokemonSlot)
+        pokemon.caught = true
+        Bot:handleEncounter(pokemon)
+        if pokemon.isShiny then
+            break
+        end
+        resets = resets + 1
+    end
+
+    Log:info("Found shiny pokemon after: " .. tostring(resets) .. " resets")
+end
+
+function Bot:runModeStaticWildEncounter(staticEncounter)
+    --[[
+        Assumes that we are standing in front of a pokemon that needs to be caught
+    ]]
+    local staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter.State"
+    savestate.save(staticEncounterSave)
+    local resets = 1
+    while true
+    do
+        Log:info("Reset number: " .. tostring(resets))
+        savestate.load(staticEncounterSave)
+        -- Need to advance the game one frame each reset so that 
+        -- the random seed can update and Pokemon values will be 
+        -- different
+        emu.frameadvance()
+        savestate.save(staticEncounterSave)
+        CustomSequences:starterEncounter()
+        local wildPokemon = Pokemon:new(Pokemon.PokemonType.WILD, GameSettings.wildpokemon)
+        Log:info(tostring(resets) .." is shiny: " .. tostring(Pokemon:isShiny(wildPokemon)))
+        
+        Bot:handleWildPokemon(wildPokemon)
+        Bot:reportEncounter(wildPokemon)
+
+        if pokemon.isShiny then
+            break
+        end
+        resets = resets + 1
+    end
+
+    Log:info("Found shiny pokemon after: " .. tostring(resets) .. " resets")
+end    
 
 function Bot:runModeStarterPokemon()
     --[[
@@ -195,7 +228,7 @@ function Bot:runModeHatchEggs()
                 if not Breeding:walkToResetPointFromPC() then return false end
             end
         end
-        
+
         -- Determine if room in party
         if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
             if not Breeding:walkToDayCareManFromReset() then return false end
@@ -241,7 +274,6 @@ function Bot:searchForWildPokemon()
         -- If we are facing north, spin in a circle starting from the south
         -- If we are facing not north, spin in a circle starting from the north
         -- print(Memory:read(Direction.addr, Direction.size))
-        direction = Memory:readFromTable(Direction)
         Log:debug("Searching for pokemon " .. i .. " Dir: " .. direction)
         if direction == Direction.NORTH then
             Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_S)
@@ -259,7 +291,46 @@ function Bot:searchForWildPokemon()
     -- Common:waitFrames(120)
 end
 
-function Bot:handleEncounter(pokemonTable)
+function Bot:handleWildPokemon(pokemon)
+    local ret = 0
+    local i = 0
+        
+    if wildPokemon.isShiny then
+
+        while BallPocket:hasPokeballs() and i < 10
+        do
+            Battle:openPack()
+            Bag:useBestBall()
+            ret = Battle:getCatchStatus()
+            if ret == 1 then -- SHINY WAS CAUGHT!
+                PostCatch:continueUntilOverworld()
+                break
+            end
+            i = i + 1
+        end 
+
+        if ret == 1 then
+            wildPokemon.caught = true
+            Log:info("You caught the shiny pokemon!")
+
+            if Box:isCurrentBoxFull() then
+                Log:info("Current box is full")
+                break
+            end
+        else
+            wildPokemon.caught = false
+            Log:info("You did not catch the shiny pokemon")
+        end
+        -- Bot:waitForHuman() 
+    else
+        wildPokemon.caught = false
+        Battle:runFromPokemon()
+    end
+
+    return wildPokemon
+end
+
+function Bot:reportEncounter(pokemonTable)
     PokemonSocket:logEncounter(pokemonTable)
     if pokemonTable.isShiny then
         Bot:handleShiny(pokemonTable)

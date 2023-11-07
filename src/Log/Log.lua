@@ -7,7 +7,7 @@ LogLevels = {
 }
 
 Log = {
-    loggingLevel = LogLevels.DEBUG
+    loggingLevel = LogLevels.OFF
 }
 
 function Log:message(type, message) 
