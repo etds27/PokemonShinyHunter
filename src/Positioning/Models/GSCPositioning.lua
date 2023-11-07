@@ -55,8 +55,8 @@ local Model = {
     },
 
     Walking = {
-        initialMoveFrames = 4, -- 
-        postMoveFrames = 12, -- Minimum frames required to initiate steps
+        initialMoveFrames = 3, -- Minimum frames required to initiate steps
+        postMoveFrames = 13, -- 
     },
 
     Map = {

@@ -1,4 +1,5 @@
 {
 "BotMode": 2,
-"SaveState": null
+"SaveState": null,
+"LogLevel": 4
 }

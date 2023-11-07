@@ -44,13 +44,13 @@ function Model:walkToPCFromReset()
     if not Positioning:moveToPoint(11, 15).ret then return false end
     -- Step into daycare house.
     Positioning:moveStepsInDirection(1, Positioning.Direction.EAST) 
-    Common:waitFrames(20)
+    Common:waitFrames(60)
     -- Walk to front of PC
     if not Positioning:moveToPosition(Model.PCPoint).ret then return false end
     -- Face the PC
     -- if not Positioning:faceDirection(Positioning.Direction.NORTH) then return false end
     Positioning:faceDirection(Positioning.Direction.NORTH)
-    Common:waitFrames(20)
+    Common:waitFrames(60)
     return true
 end
 
@@ -69,7 +69,7 @@ function Model:walkToDayCareManFromReset()
     if not Positioning:moveToPoint(11, 15).ret then return false end
     -- Step into daycare house.
     Positioning:moveStepsInDirection(1, Positioning.Direction.EAST)
-    Common:waitFrames(20)
+    Common:waitFrames(60)
     -- Walk to doorway to yard
     if not Positioning:moveToPoint(2, 7).ret then return false end
     -- Step into the Day Care yard.

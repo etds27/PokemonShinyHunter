@@ -33,3 +33,13 @@ end
 function Log:debug(message)
     Log:message(LogLevels.DEBUG, message)
 end
+
+function Log:intToLogLevel(num)
+    for key, value in pairs(LogLevels)
+    do
+        if value[1] == num then
+            return value
+        end
+    end
+    return LogLevels.OFF
+end

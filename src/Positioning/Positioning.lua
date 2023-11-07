@@ -86,7 +86,6 @@ function Positioning:faceDirection(direction)
     end
 
     Input:pressButtons{buttonKeys={button}, duration=5, waitFrames=waitFrames}
-    print(Memory:readFromTable(Positioning.Direction), direction)
     return Memory:readFromTable(Positioning.Direction) == direction
 end
 

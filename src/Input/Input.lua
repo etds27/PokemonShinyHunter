@@ -130,7 +130,7 @@ function Input:performButtonSequence(args)
         waitEnd = args.waitEnd
     end
 
-    if args.buttonSequence == nil then print("ERROR: Button sequence not provided") end
+    if args.buttonSequence == nil then Log:error("Button sequence not provided") end
     for _, buttonKeys in pairs(args.buttonSequence) do
         arg = Common:shallowcopy(args)
         arg.buttonSequence = nil

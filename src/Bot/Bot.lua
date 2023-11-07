@@ -194,14 +194,14 @@ function Bot:runModeHatchEggs()
 
                 if not Breeding:walkToResetPointFromPC() then return false end
             end
-
-            -- Determine if room in party
-            if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
-                if not Breeding:walkToDayCareManFromReset() then return false end
-                -- Pick up new eggs
-                if not Breeding:pickUpEggs() then return false end
-                if not Breeding:walkToResetFromDayCareMan() then return false end
-            end
+        end
+        
+        -- Determine if room in party
+        if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
+            if not Breeding:walkToDayCareManFromReset() then return false end
+            -- Pick up new eggs
+            if not Breeding:pickUpEggs() then return false end
+            if not Breeding:walkToResetFromDayCareMan() then return false end
         end
     end
 end

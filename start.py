@@ -13,7 +13,7 @@ os.environ["LUA_PATH"] = ""
 # os.environ["PSH_ROOT"] = "C:\\Users\\etds2\\Programming\\PokemonLua"
 # Sets the root environment to be the directory of this script
 # Therefore this script should always be at the top level of the project
-os.environ["PSH_ROOT"] = os.path.dirname(os.path.abspath(__file__))
+os.environ["PSH_RO OT"] = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.environ["PSH_ROOT"]
 SRC_DIR = os.path.join(ROOT_DIR, "src")
 TEST_DIR = os.path.join(ROOT_DIR, "Tests")
@@ -30,6 +30,7 @@ parser.add_argument("--bot-ids", nargs="+")
 args = parser.parse_args()
 
 def create_luases(lua_files, path):
+    print(f"Creating .luases for {path}")
     with open(path, "w") as f:
         [f.write(f"0 {lua_file}\n") for lua_file in lua_files]
 
