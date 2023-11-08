@@ -5,7 +5,23 @@ require "StartMenu"
 require "Memory"
 require "Positioning"
 
-local Model = {}
+local Model = {
+    ENTEI = {
+        Location = {
+            addr = 0xDFD9,
+            size = 1
+        },
+        MapLocation = {
+            addr = 0xCFBA.
+            size = 1
+        },
+        
+    },
+    RAIKOU = {
+        addr = 0xDFD2,
+        size = 1,
+    }
+}
 
 -- These function signatures allow them to be used as callbacks in tests
 Model[BotModes.SHUCKLE_GSC] = function()

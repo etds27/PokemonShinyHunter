@@ -118,26 +118,7 @@ function GameSettings.initialize()
 
 	-- https://archives.glitchcity.info/forums/board-76/thread-1342/page-0.html
 	elseif gamecode == 0x5354414C then -- STAL
-		-- GameSettings.game = 3
-		GameSettings.gamename = "Pokemon Crystal (U)"
-		GameSettings.gamecolor = 0xFF009D07
-		GameSettings.encountertable = 0x8552D48
-		GameSettings.version = GameSettings.VERSIONS.C
-		GameSettings.language = GameSettings.LANGUAGES.U
-		GameSettings.partypokemon = {0xDCDF, 0xDD0F, 0xDD3F, 0xDD6F, 0xDD9F, 0xDDCF}
-		GameSettings.enemypokemon = {0xD288, 0xD2B8, 0xD2E8, 0xD318, 0xD348, 0xD378}
 		GameSettings.wildpokemon = 0xD206
-		GameSettings.posx = 0xDCB8
-		GameSettings.posy = 0xDCB7
-		GameSettings.menupointer = 0xC5E5
-		GameSettings.menuCursor = 0xCFA9
-		GameSettings.bagCursor = 0xCF65
-		GameSettings.battleCursor = 0xCFA8 -- 2 Bytes
-		GameSettings.frameCounter = 0xD4C8
-		MenuCursor = {
-			addr = 0xCFA9,
-			size = 1
-		}
 	else
 		GameSettings.game = 0
 		GameSettings.gamename = "Unsupported game"
