@@ -12,7 +12,7 @@ local Model = {
             size = 1
         },
         MapLocation = {
-            addr = 0xCFBA.
+            addr = 0xCFBA,
             size = 1
         },
         
