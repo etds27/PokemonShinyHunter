@@ -1,7 +1,7 @@
 require "BotModes"
 require "Common"
 require "Input"
-require "MainMenu"
+require "StartMenu"
 require "Memory"
 require "Positioning"
 

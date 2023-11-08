@@ -1,7 +1,7 @@
 require "BagFactory"
 require "Common"
 require "Log"
-require "MainMenu"
+require "StartMenu"
 require "Memory"
 require "Menu"
 require "Input"
@@ -162,8 +162,8 @@ function calculateKeyItemAddress(startingAddress, index)
 end
 
 function Bag:openPack()
-    MainMenu:open()
-    MainMenu:selectOption(MainMenu.PACK)
+    StartMenu:open()
+    StartMenu:selectOption(StartMenu.PACK)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return Bag:isOpen()
 end

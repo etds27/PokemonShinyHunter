@@ -1,4 +1,4 @@
-require "MainMenuFactory"
+require "StartMenuFactory"
 require "Memory"
 require "Positioning"
 
@@ -6,13 +6,13 @@ require "Positioning"
 local Model = {}
 Model.size = 0
 Model.addr = 0
-local Model = MainMenuFactory:loadModel()
+local Model = StartMenuFactory:loadModel()
 
 -- 
-MainMenu = {}
-MainMenu = Common:tableMerge(MainMenu, Model)
+StartMenu = {}
+StartMenu = Common:tableMerge(StartMenu, Model)
 
-function MainMenu:open()
+function StartMenu:open()
     if not Positioning:inOverworld() then
         Log:error("Not in overworld")
         return false
@@ -23,7 +23,7 @@ function MainMenu:open()
     return not Positioning:inOverworld()
 end
 
-function MainMenu:navigateToOption(option, maxAttempts)
+function StartMenu:navigateToOption(option, maxAttempts)
     --[[
         Move the cursor to the desired option. Assumes the menu is open
     ]]
@@ -31,7 +31,7 @@ function MainMenu:navigateToOption(option, maxAttempts)
     local i = 0
     while i < maxAttempts
     do
-        if Memory:readFromTable(MainMenu) == option then
+        if Memory:readFromTable(StartMenu) == option then
             return true
         end
         Input:pressButtons{buttonKeys={Buttons.DOWN}, duration=5, waitFrames=5}
@@ -41,8 +41,8 @@ function MainMenu:navigateToOption(option, maxAttempts)
     return false
 end
 
-function MainMenu:selectOption(option, maxAttempts)
-    if not MainMenu:navigateToOption(option, maxAttempts) then
+function StartMenu:selectOption(option, maxAttempts)
+    if not StartMenu:navigateToOption(option, maxAttempts) then
         Log:error("Unable to find menu option: " .. tostring(option))
         return false
     end
