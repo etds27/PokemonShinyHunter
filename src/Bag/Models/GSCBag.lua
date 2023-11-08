@@ -1,3 +1,5 @@
+require "Menu"
+
 local Model = {
     Pocket = {
         addr = 0xCF65,
@@ -8,10 +10,7 @@ local Model = {
         TM_HM = 3,
     },
 
-    Cursor = { -- Starts at 1
-        addr = 0xCFA9,
-        size = 1,
-    },
+    Cursor = Menu.Cursor,
 
     ItemPocket = {
         addr = 0xD892,

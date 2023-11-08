@@ -38,49 +38,6 @@ function Common:contains(table, value)
     return false
 end
 
-function Common:navigateMenu(currentLocation, endLocation, options)
-    local button = ""
-    local delta = 0
-    local duration = Duration.MENU_TAP
-    local waitFrames = 10
-    if options ~= nil then
-        if options.duration ~= nil then
-            duration = options.duration
-        end
-        if options.waitFrames ~= nil then
-            waitFrames = options.waitFrames
-        end
-    end
-
-    delta = endLocation - currentLocation
-    if delta > 0 then
-        Log:debug("Searching DOWN in menu")
-        button = Buttons.DOWN
-    else
-        Log:debug("Searching UP in menu")
-        button = Buttons.UP
-    end
-
-    Log:debug("Pressing " .. button .. " " .. tostring(delta) .. " times")
-    for i = 1, math.abs(delta)
-    do
-        Input:pressButtons{buttonKeys={button}, duration=duration, waitFrames=waitFrames}
-    end
-end
-
-function Common:navigateMenuFromAddress(cursorAddress, endLocation, options)
-    --[[
-        Navigates a menu to the desired index
-
-        Arguments:
-            - cursorAddress: 1 Byte address where the cursor position is held
-            - endLocation: End value for the cursor address
-    ]]
-    currentLocation = Memory:read(cursorAddress, 1)
-    Common:navigateMenu(currentLocation, endLocation)
-    return Memory:read(cursorAddress, 1) == endLocation
-end
-
 function Common:tableLength(table)
     i = 0
     for _ in pairs(table)

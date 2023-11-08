@@ -2,6 +2,7 @@ require "Common"
 require "Log"
 require "MainMenu"
 require "Memory"
+require "Menu"
 require "PartyFactory"
 require "Pokemon"
 
@@ -82,7 +83,7 @@ function Party:navigateToPokemon(num)
     Input:pressButtons{buttonKeys={Buttons.A},
                     duration=Duration.PRESS,
                     waitFrames=60}
-    Common:navigateMenuFromAddress(MenuCursor.addr, num)
+    Menu:navigateMenuFromTable(MenuCursor, num)
 
     Input:repeatedlyPressButton{buttonKeys={Buttons.A},
                                 duration=Duration.PRESS,

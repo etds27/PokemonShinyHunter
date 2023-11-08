@@ -1,7 +1,9 @@
 require "BagFactory"
 require "Common"
 require "Log"
+require "MainMenu"
 require "Memory"
+require "Menu"
 require "Input"
 require "Items"
 
@@ -61,8 +63,7 @@ function Bag:navigateToItem(pocket, item)
         Log:error("Unable to navigate to pocket")
         return false
     end 
-    currentLocation = Memory:readFromTable(Bag.Cursor)
-    Common:navigateMenu(currentLocation, location)
+    Menu:navigateMenuFromTable(Bag.Cursor, location)
  
     return Memory:readFromTable(Bag.Cursor) == location
 end
@@ -80,7 +81,7 @@ function Bag:useItem(pocket, item)
 
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
     currentLocation = Memory:readFromTable(Bag.Cursor)
-    Common:navigateMenu(currentLocation, Bag.BattleItem.USE)
+    Menu:navigateMenuFromTable(Bag.Cursor, Bag.BattleItem.USE)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return true
 end
@@ -161,8 +162,8 @@ function calculateKeyItemAddress(startingAddress, index)
 end
 
 function Bag:openPack()
-    Input:pressButtons{buttonKeys={Buttons.START}, duration=Duration.PRESS}
-    Common:navigateMenuFromAddress(Bag.Cursor.addr, 3)
+    MainMenu:open()
+    MainMenu:selectOption(MainMenu.PACK)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return Bag:isOpen()
 end
@@ -204,14 +205,12 @@ function KeyPocket:selectItem(item)
         return true
     end
 
-    print(KeyPocket:containsItem(item), item)
     if not Bag:navigateToItem(Bag.Pocket.KEY_ITEMS, item) then
         Log:error("Unable to find item to register")
         return false
     end
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
-    currentLocation = Memory:readFromTable(Bag.Cursor)
-    Common:navigateMenu(currentLocation, Bag.KeyMenu.SEL)
+    Menu:navigateMenuFromTable(Bag.Cursor, Bag.KeyMenu.SEL)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
 end
