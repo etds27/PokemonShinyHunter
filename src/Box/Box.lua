@@ -174,7 +174,7 @@ function BoxUI:performDepositMenuActions(boxActions)
 
     BoxUI:bootUpPC()
     BoxUI:selectBillsPC()
-    Menu:navigateMenuFromTable(MenuCursor, BoxUI.PCBillsMenu.DEPOSIT)
+    Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.DEPOSIT)
     Input:pressButtons{buttonKeys={Buttons.A}, waitFrames=40}
     for i, actionPair in ipairs(boxActions)
     do
@@ -182,17 +182,17 @@ function BoxUI:performDepositMenuActions(boxActions)
         local action = actionPair.action
         local numPokemon = Party:numOfPokemonInParty()
         -- Move to pokemon at index
-        Menu:navigateMenu(BoxUI:currentPokemonIndex(), index, {duration = 2, waitFrames=15})
+        Menu:navigateMenu(BoxUI:currentPokemonIndex(), index, {duration = 1, waitFrames=20})
         if BoxUI:currentPokemonIndex() ~= index then 
             return false 
         end
 
         Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS, waitFrames=30}
         if action == BoxUI.Action.DEPOSIT then
-            if not Menu:navigateMenuFromTable(MenuCursor, BoxUI.DepositMenu.DEPOSIT) then return false end
+            if not Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.DepositMenu.DEPOSIT) then return false end
             Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
         elseif action == BoxUI.Action.RELEASE then
-            if not Menu:navigateMenuFromTable(MenuCursor, BoxUI.DepositMenu.RELEASE) then return false end
+            if not Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.DepositMenu.RELEASE) then return false end
             Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS, waitFrames=30}
             -- Extra A press for release confirmation
             Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
@@ -244,7 +244,7 @@ function BoxUI:selectBillsPC()
         No verification
     ]]
     Log:debug("BoxUI:selectBillsPC() - init")
-    Menu:navigateMenuFromTable(MenuCursor, BoxUI.PCMainMenu.BILL)
+    Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCMainMenu.BILL)
     Input:performButtonSequence(ButtonSequences.PC_MENU_TO_BILLS)
 end
 
@@ -253,7 +253,7 @@ function BoxUI:selectChangeBox()
         Go from Bills PC to Change Box Menu
         No verification
     ]]
-    Menu:navigateMenuFromTable(MenuCursor, BoxUI.PCBillsMenu.CHANGE_BOX)
+    Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.CHANGE_BOX)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
@@ -329,9 +329,3 @@ Box 12 - 0x7140
 Box 13 - 0x7590
 Box 14 - 0x79E0
 ]]
-
--- print(Box:getCurrentBoxNumber())
--- print(Box:getBox(1)[1])
--- print(Box:getBox(1)[2])
--- BoxUI:changeBox(3)
- -- Box:getAllPokemonInPC()

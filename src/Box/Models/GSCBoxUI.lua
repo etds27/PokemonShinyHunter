@@ -1,3 +1,4 @@
+require "Menu"
 local Model = {
     PCMainMenu = {
         BILL = 1,
@@ -20,8 +21,8 @@ local Model = {
     },
 
     PCBoxEdit = {
-        addr = MenuCursor.addr,
-        size = MenuCursor.size,
+        addr = Menu.Cursor.addr,
+        size = Menu.Cursor.size,
         SWITCH = 1,
         NAME = 2,
         PRINT = 3,

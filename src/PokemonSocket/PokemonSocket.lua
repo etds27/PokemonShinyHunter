@@ -24,7 +24,6 @@ function PokemonSocket:sendTable(tab, eventType)
                content = tab}
 
     jsonString = json.encode(payload)
-    -- print(jsonString, package, eventType)
     -- Data delimiter
     comm.socketServerSend(jsonString .. "|||")
 end

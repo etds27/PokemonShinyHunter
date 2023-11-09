@@ -22,7 +22,6 @@ function Pokedex:navigateToPosition(position)
     local small_button = ""
     local large_button = ""
 
-    print("TEST")
     while true
     do
         currentPos = Pokedex:currentPosition()
@@ -42,7 +41,6 @@ function Pokedex:navigateToPosition(position)
         else
             button = small_button
         end
-        print(button)
         Input:pressButtons{buttonKeys={button}, duration=2}
     end
     return Pokedex:currentPosition() == position
@@ -63,7 +61,6 @@ function Pokedex:navigateToPokemon(pokemonNo)
         currentPokemon = Pokedex:currentPokemonNo()
         currentPos = Pokedex:currentPosition()
         if currentPos == previousPos then 
-            print(direction, "FLIP")
             -- If we already changed direction, then exit
             if not direction then
                 return false

@@ -55,7 +55,6 @@ function Breeding:completeEggCycle()
         Log:debug("Adjusted egg point: " .. Common:coordinateToString(newPos))
         local tab = Positioning:moveToPoint(newPos.x, newPos.y, 100, false)
         if not tab.ret then
-            print(newX, newY, Positioning:getPosition())
             Log:error("Unable to move to adjusted point")
             break
         end

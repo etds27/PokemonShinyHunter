@@ -1,4 +1,5 @@
 {
     "BotMode": 4,
-    "SaveState": "BotStates\\CHRIS51032\\StartUp.State"    
+    "SaveState": "BotStates\\CHRIS51032\\StartUp.State",
+    "LogLevel": 4
 }

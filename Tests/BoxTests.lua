@@ -48,6 +48,7 @@ function BoxUITest:testPerformDepositMenuActions()
 
 end
 
+Log.loggingLevel = LogLevels.DEBUG
 print("BoxTest:testCurrentBoxNumber()", BoxTest:testCurrentBoxNumber())
 print("BoxTest:testGetCurrentBox()", BoxTest:testGetCurrentBox())
 print("BoxTest:testGetBox()", BoxTest:testGetBox())

@@ -134,35 +134,6 @@ function Bot:runModeStaticWildEncounter(staticEncounter)
     Log:info("Found shiny pokemon after: " .. tostring(resets) .. " resets")
 end    
 
-function Bot:runModeStarterPokemon()
-    --[[
-        Assumes that we are standing in front of the starter pokeball that we want
-    ]]
-    starterSavestate = Bot.BOT_STATE_PATH .. "StarterResetState.State"
-    savestate.save(starterSavestate)
-    resets = 1
-    while true
-    do
-        Log:info("Reset number: " .. tostring(resets))
-        savestate.load(starterSavestate)
-        -- Need to advance the game one frame each reset so that 
-        -- the random seed can update and Pokemon values will be 
-        -- different
-        emu.frameadvance()
-        savestate.save(starterSavestate)
-        CustomSequences:starterEncounter()
-        starter = Party:getPokemonAtIndex(1)
-        starter.caught = true
-        Bot:reportEncounter(starter)
-        if starter.isShiny then
-            break
-        end
-        resets = resets + 1
-    end
-
-    Log:info("Found shiny starter after: " .. tostring(resets) .. " resets")
-end
-
 function Bot:runModeHatchEggs()
     --[[
         Egg Cycle completion process:
@@ -173,17 +144,17 @@ function Bot:runModeHatchEggs()
         - Deposit shiny hatches
         - Pick up new egg if applicable
     ]]
-    local numOfEggs = 0
-    local eggSlots = {false, false, false, false, false, false}
-    local previousEggSlots = {false, false, false, false, false, false}
+    local eggSlots = Party:getEggMask()
+    local previousEggSlots = Party:getEggMask()
     local hatchedEggs = {}
     -- Contiains the pokemon indices and desired actions to take with that pokemon at the PC
     local pcActionList = {}
-    local depositList
 
-    Bag:openPack()
-    KeyPocket:selectItem(Items.BICYCLE)
-    Bag:closePack()
+    if Bag:getSelectedItem() ~= Items.BICYCLE then
+        Bag:openPack()
+        KeyPocket:selectItem(Items.BICYCLE)
+        Bag:closePack()
+    end
 
     while true
     do
@@ -198,16 +169,16 @@ function Bot:runModeHatchEggs()
                 Common:waitFrames(60)
             end
         end
-        previousEggSlots = Party:getEggMask()
 
-        Common:waitFrames(10)
-
+        Common:waitFrames(1)
         -- Walk until a potential breeding event
         Breeding:completeEggCycle()
-        eggSlots = Party:getEggMask()
 
         -- Determine what eggs were hatched after the egg cycle
-        if not Positioning:inOverworld() then
+        if not Position:inOverworld() then
+            -- About 30 frames to update the hatched pokemon after movement is disabled
+            Common:waitFrames(30)
+            eggSlots = Party:getEggMask()
             hatchedEggs = Breeding:determineHatchedPokemon(previousEggSlots, eggSlots)
             for i, index in ipairs(hatchedEggs) do
                 Breeding:hatchEgg()
@@ -215,21 +186,23 @@ function Bot:runModeHatchEggs()
                 Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species))
                 Bot:reportEncounter(hatchedPokemon)
                 if hatchedPokemon.isShiny then
-                    pcActionList[i] = {index = index, action = BoxUI.Action.DEPOSIT}
+                    table.insert(pcActionList, {index = index, action = BoxUI.Action.DEPOSIT})
                 else
-                    pcActionList[i] = {index = index, action = BoxUI.Action.RELEASE}
+                    table.insert(pcActionList, {index = index, action = BoxUI.Action.RELEASE})
                 end
             end
 
-            -- If something hatched, perform PC actions
-            if Common:tableLength(hatchedEggs) > 0 then
+            -- If something hatched, and we have a new egg to pick up and the party is full, then deposit
+            if Common:tableLength(pcActionList) > 0 and Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() == Party.maxPokemon then
                 if not Breeding:walkToResetPoint() then return false end
                 if not Breeding:walkToPCFromReset() then return false end
                 -- Perform PC Actions
                 if not BoxUI:performDepositMenuActions(pcActionList) then return false end
-
+                pcActionList = {}
                 if not Breeding:walkToResetPointFromPC() then return false end
             end
+            previousEggSlots = Party:getEggMask()
+
         end
 
         -- Determine if room in party
@@ -238,6 +211,7 @@ function Bot:runModeHatchEggs()
             -- Pick up new eggs
             if not Breeding:pickUpEggs() then return false end
             if not Breeding:walkToResetFromDayCareMan() then return false end
+            previousEggSlots = Party:getEggMask()
         end
     end
 end
@@ -276,7 +250,6 @@ function Bot:searchForWildPokemon()
     do
         -- If we are facing north, spin in a circle starting from the south
         -- If we are facing not north, spin in a circle starting from the north
-        -- print(Memory:read(Direction.addr, Direction.size))
         Log:debug("Searching for pokemon " .. i .. " Dir: " .. direction)
         if direction == Direction.NORTH then
             Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_S)
