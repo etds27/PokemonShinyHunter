@@ -170,12 +170,14 @@ function Bot:runModeHatchEggs()
             end
         end
 
+        -- This was set before when ghost cycles would happen
+        -- Not sure if it is still needed
         Common:waitFrames(1)
         -- Walk until a potential breeding event
         Breeding:completeEggCycle()
 
         -- Determine what eggs were hatched after the egg cycle
-        if not Position:inOverworld() then
+        if not Positioning:inOverworld() then
             -- About 30 frames to update the hatched pokemon after movement is disabled
             Common:waitFrames(30)
             eggSlots = Party:getEggMask()
@@ -191,18 +193,18 @@ function Bot:runModeHatchEggs()
                     table.insert(pcActionList, {index = index, action = BoxUI.Action.RELEASE})
                 end
             end
-
-            -- If something hatched, and we have a new egg to pick up and the party is full, then deposit
-            if Common:tableLength(pcActionList) > 0 and Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() == Party.maxPokemon then
-                if not Breeding:walkToResetPoint() then return false end
-                if not Breeding:walkToPCFromReset() then return false end
-                -- Perform PC Actions
-                if not BoxUI:performDepositMenuActions(pcActionList) then return false end
-                pcActionList = {}
-                if not Breeding:walkToResetPointFromPC() then return false end
-            end
             previousEggSlots = Party:getEggMask()
+        end
 
+        -- If something hatched, and we have a new egg to pick up and the party is full, then deposit
+        if Common:tableLength(pcActionList) > 0 and Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() == Party.maxPokemon then
+            if not Breeding:walkToResetPoint() then return false end
+            if not Breeding:walkToPCFromReset() then return false end
+            -- Perform PC Actions
+            if not BoxUI:performDepositMenuActions(pcActionList) then return false end
+            pcActionList = {}
+            if not Breeding:walkToResetPointFromPC() then return false end
+            previousEggSlots = Party:getEggMask()
         end
 
         -- Determine if room in party

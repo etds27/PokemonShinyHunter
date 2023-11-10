@@ -34,7 +34,6 @@ function Battle:attackByIndex(moveIndex)
     if string.find(gameState, "battle_menu") ~= nil then
         Input:performButtonSequence(ButtonSequences.BATTLE_FIGHT)
     end
-    -- print(ButtonSequences.BATTLE_FIGHT)
 
     gameState = GameState:getCurrentGameState()
     if string.find(gameState, "fight_menu") ~= nil then
