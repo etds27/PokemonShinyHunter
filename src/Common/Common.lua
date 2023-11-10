@@ -86,8 +86,6 @@ function Common:waitForState(addrTab, desiredState, frameLimit)
         desiredState = {desiredState}
     end
 
-    Log:debug("Waiting for: " .. tostring(desiredState))
-
     for i = 1, frameLimit 
     do
         if Common:contains(desiredState, Memory:readFromTable(addrTab)) then
@@ -121,8 +119,6 @@ function Common:waitForNotState(addrTab, undesiredState, frameLimit)
     if type(undesiredState) ~= "table" then
         undesiredState = {undesiredState}
     end
-
-    Log:debug("Waiting for: " .. tostring(undesiredState))
 
     for i = 1, frameLimit 
     do

@@ -43,11 +43,6 @@ GameSettings = {
 	frameCounter = 0
 }
 
-MenuCursor = {
-	addr = 0,
-	size = 0,
-}
-
 GameSettings.VERSIONS = {
     G = 1,
     S = 2,

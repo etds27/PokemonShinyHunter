@@ -24,12 +24,15 @@ Bot = {
     mode = BotModes.WILD_GRASS,
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
+    POKEMON_SEARCH_MAX = 100,
     botId = "NONE0000"
 }
 
 function Bot:run() 
     Bot:initializeBot()
-    if Common:contains({BotModes.WILD_GRASS, BotModes.FISHING}, Bot.mode) then
+    if Common:contains({BotModes.WILD_GRASS, 
+                        BotModes.FISHING,
+                        BotModes.HEADBUTT}, Bot.mode) then
         Bot:runModeWildPokemon()
     elseif Common:contains(
         {BotModes.STARTER,
@@ -44,17 +47,19 @@ end
 
 function Bot:runModeWildPokemon()
     local encounters = 1
-    Bot.mode = 3
     while true
     do
         if Bot.mode == BotModes.WILD_GRASS then
             Bot:searchForWildPokemon()
         elseif Bot.mode == BotModes.FISHING then
             Bot:fishForWildPokemon()
+        elseif Bot.mode == BotModes.HEADBUTT then
+            Bot:headbuttForWildPokemon()
         end
+        Battle:waitForBattleMenu(300)
 
         local wildPokemon = Pokemon:new(Pokemon.PokemonType.WILD, GameSettings.wildpokemon)
-        Log:info(tostring(encounters) .." is shiny: " .. tostring(Pokemon:isShiny(wildPokemon)))
+        Log:info(tostring(encounters) .." is shiny: " .. tostring(wildPokemon.isShiny))
         
         Bot:handleWildPokemon(wildPokemon)
         Bot:reportEncounter(wildPokemon)
@@ -219,8 +224,8 @@ function Bot:runModeHatchEggs()
 end
 
 function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
-    isRodSelected = Common:contains(Rods, Bag:getSelectedItem())
-    i = 0
+    local isRodSelected = Common:contains(Rods, Bag:getSelectedItem())
+    local i = 0
     while i < Bot.FISH_MAXIMUM
     do
         Log:debug("Starting fishing loop")
@@ -247,7 +252,7 @@ function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
 end
 
 function Bot:searchForWildPokemon() 
-    i = 0
+    local i = 0
     while Positioning:inOverworld() and i < Bot.SEARCH_SPIN_MAXIMUM
     do
         -- If we are facing north, spin in a circle starting from the south
@@ -266,14 +271,29 @@ function Bot:searchForWildPokemon()
         Log:warning("Unable to find pokemon after " .. Bot.SEARCH_SPIN_MAXIMUM .. " spins")
         Bot:waitForHuman()
     end
-    -- Common:waitFrames(120)
+end
+
+function Bot:headbuttForWildPokemon()
+    local i = 0
+    while Positioning:inOverworld() and i < Bot.POKEMON_SEARCH_MAX
+    do
+        if Headbutt:headbuttTree() then
+            break
+        end
+        i = i + 1
+    end
+
+    if i == Bot.POKEMON_SEARCH_MAX then
+        Log:warning("Unable to find pokemon after " .. Bot.SEARCH_SPIN_MAXIMUM .. " spins")
+        Bot:waitForHuman()
+    end
 end
 
 function Bot:handleWildPokemon(pokemon)
     local ret = 0
     local i = 0
         
-    if wildPokemon.isShiny then
+    if pokemon.isShiny then
 
         while BallPocket:hasPokeballs() and i < 10
         do
@@ -288,19 +308,19 @@ function Bot:handleWildPokemon(pokemon)
         end 
 
         if ret == 1 then
-            wildPokemon.caught = true
+            pokemon.caught = true
             Log:info("You caught the shiny pokemon!")
         else
-            wildPokemon.caught = false
+            pokemon.caught = false
             Log:info("You did not catch the shiny pokemon")
         end
         -- Bot:waitForHuman() 
     else
-        wildPokemon.caught = false
+        pokemon.caught = false
         Battle:runFromPokemon()
     end
 
-    return wildPokemon
+    return pokemon
 end
 
 function Bot:reportEncounter(pokemonTable)

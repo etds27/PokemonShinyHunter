@@ -6,11 +6,11 @@ local Model = {
 
     MultiCursor = {
         X = {
-            addr = 0xCFA0,
+            addr = 0xCFA9,
             size = 1
         },
         Y = {
-            addr = 0xCFA9,
+            addr = 0xCFA8,
             size = 1
         }
     }

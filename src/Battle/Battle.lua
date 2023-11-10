@@ -78,8 +78,12 @@ end
 
 function Battle:waitForBattleMenu(bIterations) 
     i = 0
-    while Memory:readFromTable(Battle.MenuCursor) == 0 and i < bIterations
+    while i < bIterations
     do
+        cursor = Menu:getMultiCursorPosition(Battle.MenuCursor)
+        if cursor.x == Battle.MenuCursor.FIGHT.x and cursor.y == Battle.MenuCursor.FIGHT.y then
+            break
+        end
         Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.PRESS}
         i = i + 1
     end

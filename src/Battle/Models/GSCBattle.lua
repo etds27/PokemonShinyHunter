@@ -1,3 +1,5 @@
+require "Menu"
+
 local Model = {
     Catch = {
         addr = 0x11416,
@@ -21,12 +23,12 @@ local Model = {
     },
 
     MenuCursor = {
-        addr = GameSettings.battleCursor,
-        size = 2,
-        FIGHT = 257, -- 0101
-        PKMN = 258,  -- 0102
-        PACK = 513,  -- 0201
-        RUN = 514,   -- 0202
+        X = Menu.MultiCursor.X,
+        Y = Menu.MultiCursor.Y,
+        FIGHT = {x = 1, y = 1}, -- 0101
+        PKMN = {x = 2, y = 1},  -- 0102
+        PACK = {x = 1, y = 2},  -- 0201
+        RUN = {x = 2, y = 2},   -- 0202
     },
 }
 return Model

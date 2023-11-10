@@ -29,9 +29,11 @@ function Menu:getCursorPosition()
     return Memory:readFromTable(Menu.Cursor)
 end
 
-function Menu:getMultiCursorPosition()
+function Menu:getMultiCursorPosition(args)
     --[[
         Get the position of the 2 dimensional menu cursor
+
+        Arguments
 
         Returns: Table of cursor coordinates
             {x: y:}

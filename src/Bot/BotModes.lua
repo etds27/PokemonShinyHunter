@@ -5,4 +5,5 @@ BotModes = {
     EGG = 4,
     SHUCKLE_GSC = 5,
     EEVEE_GSC = 6,
+    HEADBUTT = 7
 }

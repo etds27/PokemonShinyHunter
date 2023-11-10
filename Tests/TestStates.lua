@@ -26,5 +26,7 @@ TestStates = {
     SHUCKLE = "States\\Shuckle.State",
     EEVEE = "States\\Eevee.State",
     MENU_OPEN = "States\\MenuOpen.State",
-    POKEDEX = "States\\Pokedex.State"
+    POKEDEX = "States\\Pokedex.State",
+    HEADBUTT_ENCOUNTER = "States\\HeadbuttEncounter.State",
+    HEADBUTT_NO_ENCOUNTER = "States\\HeadbuttNoEncounter.State"
 }
