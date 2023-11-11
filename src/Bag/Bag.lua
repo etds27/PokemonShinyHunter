@@ -140,10 +140,10 @@ function Bag:doesPocketContain(pocket, item)
     for i = 1, numOfItemsInPocket, 1
     do
         if Common:contains({Bag.Pocket.ITEMS, Bag.Pocket.BALLS}, pocket) then
-            itemAddr =  calculateItemBallAddress(pocketTable.addr, i)
+            itemAddr =  Bag:calculateItemBallAddress(pocketTable.addr, i)
             quantityAddr = itemAddr + 1
         elseif pocket == Bag.Pocket.KEY_ITEMS then
-            itemAddr = calculateKeyItemAddress(pocketTable.addr, i)
+            itemAddr = Bag:calculateKeyItemAddress(pocketTable.addr, i)
             quantityAddr = itemAddr
         end
 
@@ -155,11 +155,14 @@ function Bag:doesPocketContain(pocket, item)
     return {0, 0}
 end
 
-function calculateItemBallAddress(startingAddress, index)
+
+---@private
+function Bag:calculateItemBallAddress(startingAddress, index)
     return startingAddress + 2 * index - 1
 end
 
-function calculateKeyItemAddress(startingAddress, index)
+---@private
+function Bag:calculateKeyItemAddress(startingAddress, index)
     return startingAddress + index
 end
 

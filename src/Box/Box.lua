@@ -19,41 +19,31 @@ local Model = BoxFactory:loadModel()
 -- Merge model into class
 Box = Common:tableMerge(Box, Model)
 
+---Get the current loaded box number
+---@return integer boxNumber Box number (Indexed at 1)
 function Box:getCurrentBoxNumber()
-    --[[
-        Get the current loaded box number
-        Returns:
-            - Box number (Indexed at 1)
-    ]]
     return Memory:readFromTable(Box.CurrentBoxNumber) + 1
 end
 
+---Get the number of pokemon in the specified box
+---@param boxNumber integer Box number to query
+---@return integer numPokemonInBox Number of pokemon in the box
 function Box:getNumberOfPokemonInBox(boxNumber)
-    --[[
-        Get the number of pokemon in the specified box
-
-        Returns: Number of pokemon in the box
-    ]]
-    startingAddress = Box:getBoxStartingAddress(boxNumber) 
+    local startingAddress = Box:getBoxStartingAddress(boxNumber)
     return Memory:read(startingAddress, size, Memory.CARTRAM) % 255 -- Value may be 255
 end
 
+---Get the number of pokemon in the current box
+---@return integer numPokemon Number of pokemon in the current box
 function Box:getNumberOfPokemonInCurrentBox()
-    --[[
-        Get the number of pokemon in the current box
-
-        Returns: Number of pokemon in the current box
-    ]]
-    return Box:getNumberOfPokemonInBox(Box:getCurrentBoxNumber()) 
+    return Box:getNumberOfPokemonInBox(Box:getCurrentBoxNumber())
 end
 
-function Box:getBoxStartingAddress(boxNumber) 
-    --[[
-        Calculate the starting address of the box in SRAM.
-        Arguments:
-            - boxNumber: integer between 1 and 14
-    ]]
 
+---Calculate the starting address of the box in SRAM.
+---@param boxNumber integer between 1 and 14
+---@return integer boxAddress Address of the start of the box
+function Box:getBoxStartingAddress(boxNumber)
     if boxNumber == Box:getCurrentBoxNumber() then
         return Box.LoadedBox.addr
     end
@@ -65,44 +55,45 @@ function Box:getBoxStartingAddress(boxNumber)
     end
 end
 
+---
+---@param startingAddress integer The starting address of the box the pokemon is in
+---@param pokemonPosition integer The index of the pokemon (Start at 1)
+---@return integer pokemonAddress Location of the pokemon within the box
 function Box:pokemonLocation(startingAddress, pokemonPosition)
-    --[[
-        Calculate the starting address of the pokemon's data
-
-        Arguments:
-            - startingAddress: The starting address of the box the pokemon is in
-            - pokemonPosition: The index of the pokemon (Start at 1)
-    ]]
     return startingAddress + Box.headerSize + Box.pokemonSize * (pokemonPosition - 1)
 end
 
+
+---Collect the Pokemon data in the box
+---@param boxNumber integer between 1 and 14
+---@return table pokemon Table of `Pokemon` from the box
 function Box:getBox(boxNumber)
-    --[[
-        Collect the Pokemon data in the box
-        Arguments:
-            - boxNumber: integer between 1 and 14
-    ]]
     -- First Byte is always the number of Pokemon in the box
-    box = {}
-    startingAddress = Box:getBoxStartingAddress(boxNumber) 
-    numPokemon = Box:getNumberOfPokemonInBox(boxNumber)
-    for i = 1, numPokemon 
+    local box = {}
+    local startingAddress = Box:getBoxStartingAddress(boxNumber)
+    local numPokemon = Box:getNumberOfPokemonInBox(boxNumber)
+    for i = 1, numPokemon
     do
-        pokemonAddress =  Box:pokemonLocation(startingAddress, i)
-        pokemonTable = Pokemon:new(Pokemon.PokemonType.BOX, 
-                                    pokemonAddress, 
+        local pokemonAddress =  Box:pokemonLocation(startingAddress, i)
+        local pokemonTable = Pokemon:new(Pokemon.PokemonType.BOX,
+                                    pokemonAddress,
                                     Memory.CARTRAM)
         table.insert(box, pokemonTable)
     end
     return box
 end
 
+
+---Get the currently loaded box
+---@return table pokemon Table of `Pokemon` from the box
 function Box:getCurrentBox()
     return Box:getBox(Box:getCurrentBoxNumber())
 end
 
+---Get all the pokemon in the PC
+---@return table pokemon Table of `Pokemon` from the PC
 function Box:getAllPokemonInPC()
-    pokemon = {}
+    local pokemon = {}
     for i = 1, Box.numBoxes
     do
         currentBox = Box:getBox(i)
@@ -114,27 +105,23 @@ function Box:getAllPokemonInPC()
     return pokemon
 end
 
+---Determine if the specified box is full
+---@param boxNumber integer Box to check
+---@return boolean true if the box is full
 function Box:isBoxFull(boxNumber)
-    --[[
-        Determine if the specified box is full
-    ]]
     return Box:getNumberOfPokemonInBox(boxNumber) == Box.maxBoxSize
 end
 
+---Determine if the current box is full
+---@return boolean true if the box is full
 function Box:isCurrentBoxFull()
-    --[[
-        Determine if the current box is full
-    ]]
     return Box:getNumberOfPokemonInCurrentBox() == Box.maxBoxSize
 end
 
+---Search through the boxes to find one that has enough open space
+---@param capacity integer? [1] the minimum open space required for a box
+---@return integer boxNumber Number of box with available capacity
 function Box:findFirstBoxWithCapacity(capacity)
-    --[[
-        Search through the boxes to find one that has enough open space
-
-        Arguments:
-            capacity: default 1, the minimum open space required for a box
-    ]]
     if capacity == nil then capacity = 1 end
     for i = 1, Box.numBoxes
     do
@@ -142,25 +129,25 @@ function Box:findFirstBoxWithCapacity(capacity)
             return i
         end
     end
+
+    return -1
 end
 
 BoxUI = {}
 
-function BoxUI:performDepositMenuActions(boxActions) 
-    --[[
-        Perform the specified actions in box actions
-        THIS CAN INCLUDE RELEASES
-
-        Arguments: Table of box actions to conduct
-            {{index: action:}, {index: action:}}
-                index: Slot in the party to perform action
-                action: DEPOSIT or RELEASE
-    ]]
+---Perform the specified actions in box actions
+---THIS CAN INCLUDE RELEASES
+---@param boxActions table Table of box actions to conduct
+---     {{index: action:}, {index: action:}}
+---         index: `Slot in the party to perform action`
+---         action: `DEPOSIT or RELEASE`
+---@return boolean true if the actions were complete successfully
+function BoxUI:performDepositMenuActions(boxActions)
     -- Sort the actions in reverse order by party index
     -- This will allow us to iterate backwards through the list
     -- And not mess up pokemon ordering when performing deposit or release actions
     table.sort(boxActions, function(lhs, rhs) return lhs.index > rhs.index end)
-    
+
     -- Determine how many deposit actions will be taken
     local numActions = 0
     for i, actionPair in ipairs(boxActions)
@@ -176,15 +163,15 @@ function BoxUI:performDepositMenuActions(boxActions)
     BoxUI:selectBillsPC()
     Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.DEPOSIT)
     Input:pressButtons{buttonKeys={Buttons.A}, waitFrames=40}
-    for i, actionPair in ipairs(boxActions)
+    for _, actionPair in ipairs(boxActions)
     do
-        local index = actionPair.index - 1 -- Indices start at 0
+        index = actionPair.index - 1 -- Indices start at 0
         local action = actionPair.action
         local numPokemon = Party:numOfPokemonInParty()
         -- Move to pokemon at index
         Menu:navigateMenu(BoxUI:currentPokemonIndex(), index, {duration = 1, waitFrames=20})
-        if BoxUI:currentPokemonIndex() ~= index then 
-            return false 
+        if BoxUI:currentPokemonIndex() ~= index then
+            return false
         end
 
         Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS, waitFrames=30}
@@ -211,10 +198,10 @@ function BoxUI:performDepositMenuActions(boxActions)
     return BoxUI:exitPC()
 end
 
+---Performs the entire changing box flow from starting up the pc to closing out
+---@param newBox integer Box to change to
+---@return boolean true If box was changed correctly
 function BoxUI:changeBox(newBox)
-    --[[
-        Performs the entire changing box flow from starting up the pc to closing out
-    ]]
     if Box:getCurrentBoxNumber() == newBox then
         Log:info("Box is already set to " .. tostring(newBox))
         return true
@@ -224,59 +211,51 @@ function BoxUI:changeBox(newBox)
     BoxUI:selectBillsPC()
     BoxUI:selectChangeBox()
     BoxUI:navigateToBox(newBox)
-    BoxUI:switchBox(boxNumber)
+    BoxUI:switchBox()
     BoxUI:exitPC()
     return Box:getCurrentBoxNumber() == newBox
 end
 
+---Go from overworld to main page of PC.
+---No verification
 function BoxUI:bootUpPC()
-    --[[
-        Go from overworld to main page of PC
-        No verification
-    ]]
     Log:debug("BoxUI:bootUpPC - init")
     Input:performButtonSequence(ButtonSequences.OPEN_TO_PC_MENU)
 end
 
+---Go from main page of PC to Bills PC.
+---No verification
 function BoxUI:selectBillsPC()
-    --[[
-        Go from main page of PC to Bills PC
-        No verification
-    ]]
     Log:debug("BoxUI:selectBillsPC() - init")
     Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCMainMenu.BILL)
     Input:performButtonSequence(ButtonSequences.PC_MENU_TO_BILLS)
 end
 
+---Go from Bills PC to Change Box Menu.
+---No verification
 function BoxUI:selectChangeBox()
-    --[[
-        Go from Bills PC to Change Box Menu
-        No verification
-    ]]
     Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.CHANGE_BOX)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
+---Go from Box select screen to selecting the desired box.
+---No verification
 function BoxUI:navigateToBox(boxNumber)
-    --[[
-        Go from Box select screen to selecting the desired box
-        No verification
-    ]]
     Menu:navigateMenuFromTable(BoxUI.PCBoxCursor, boxNumber)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
-function BoxUI:switchBox(boxNumber)
-    --[[
-        Go from selected box screen to completing the box change
-        No verification
-    ]]
+---Go from selected box screen to completing the box change.
+---No verification
+function BoxUI:switchBox()
     Menu:navigateMenuFromTable(BoxUI.PCBoxEdit,  BoxUI.PCBoxEdit.SWITCH)
     Input:pressButtons{buttonKeys={Buttons.A}}
     Input:pressButtons{buttonKeys={Buttons.A}}
     Input:performButtonSequence(ButtonSequences.SAVE_GAME)
 end
 
+---Close out of the PC
+---@return boolean true If overworld is back
 function BoxUI:exitPC()
     Input:performButtonSequence(ButtonSequences.EXIT_PC)
     return Positioning:inOverworld()
