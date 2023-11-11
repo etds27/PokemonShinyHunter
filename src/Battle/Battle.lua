@@ -21,45 +21,8 @@ local Model = BattleFactory:loadModel()
 -- Merge model into class
 Battle = Common:tableMerge(Battle, Model)
 
-function Battle:attackByIndex(moveIndex)
-    --[[
-    Perform an attack action by nevaigting through the fight menu and selecting the move at the specified index
-
-    This will navigate from either the battle menu or fight menu to select the current 
-
-    Arguements:
-        - moveIndex: Number to represent the position of the move being used. Indexed at 1
-    --]]
-    gameState = GameState:getCurrentGameState() 
-    if string.find(gameState, "battle_menu") ~= nil then
-        Input:performButtonSequence(ButtonSequences.BATTLE_FIGHT)
-    end
-
-    gameState = GameState:getCurrentGameState()
-    if string.find(gameState, "fight_menu") ~= nil then
-        currentMove = Memory:readbyte(GameSettings.currentMove)
-    end
-
-    if currentMove == nil then Log.error("Unable to find current move index") end
-    Log:info("Current Move: " .. currentMove .. " |  Move Index: " .. moveIndex)
-
-    if currentMove > moveIndex then
-        Input:repeatedlyPressButton{buttonKeys = {Buttons.UP}, 
-                                    iterations = currentMove - moveIndex,
-                                    duration = Duration.TAP,
-                                    waitFrames = 20}
-    elseif currentMove < moveIndex then
-        Input:repeatedlyPressButton{buttonKeys = {Buttons.DOWN}, 
-                                    iterations = moveIndex - currentMove,
-                                    duration = Duration.TAP,
-                                    waitFrames = 20}
-    end
-
-    Input:pressButtons{buttonKeys = {Buttons.A}}
-end
-
-    --- Run from the current pokemon battle
-    --- This assumes that the battle menu has or is loading
+--- Run from the current pokemon battle
+--- This assumes that the battle menu has or is loading
 function Battle:runFromPokemon()
 
     Battle:waitForBattleMenu(100)
@@ -69,43 +32,41 @@ function Battle:runFromPokemon()
     return Positioning:waitForOverworld(500)
 end
 
+---Open the pack from the battle menu
 function Battle:openPack()
     Battle:waitForBattleMenu(100)
     Input:performButtonSequence(ButtonSequences.BATTLE_PACK)
     Common:waitFrames(30)
 end
 
-function Battle:waitForBattleMenu(bIterations) 
-    i = 0
+---comment
+---@param bIterations integer Maximum number of times to press button before battle menu appears
+---@return boolean true if the battle menu appears
+function Battle:waitForBattleMenu(bIterations)
+    local i = 0
+    local cursor = {x = 0, y = 0}
     while i < bIterations
     do
         cursor = Menu:getMultiCursorPosition(Battle.MenuCursor)
         if cursor.x == Battle.MenuCursor.FIGHT.x and cursor.y == Battle.MenuCursor.FIGHT.y then
-            break
+            return true
         end
         Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.PRESS}
         i = i + 1
     end
 
-    return i < bIterations
+    return false
 end
 
-function Battle:continueUntilNewTurn()
-
-end
-    
+---Determine if the pokemon was caught
+---
+---This will continously poll the catch status memory until it changes from
+---a reset state or the maximum frame count is reached
+---@return integer
+---|0: Catch status wasn't updated
+---|1: Pokemon was caught
+---|2: Pokemon was not caught
 function Battle:getCatchStatus()
-    --[[
-        Determine if the pokemon was caught
-
-        This will continously poll the catch status memory until it changes from
-        a reset state or the maximum frame count is reached
-
-        Returns:
-            - 0: Catch status wasn't updated
-            - 1: Pokemon was caught
-            - 2: Pokemon was not caught
-    ]]
     Common:waitForState(Battle.Catch, {Battle.Catch.CAUGHT, Battle.Catch.MISSED})
     return Memory:readFromTable(Battle.Catch)
 end

@@ -8,6 +8,7 @@
         "Rods",
         "memory",
         "calculateItemBallAddress",
-        "calculateKeyItemAddress"
+        "calculateKeyItemAddress",
+        "emu"
     ]
 }
