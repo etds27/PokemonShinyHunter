@@ -17,6 +17,20 @@ local Model = PositioningFactory:loadModel()
 -- Merge model into class
 Positioning = Common:tableMerge(Positioning, Model)
 
+---@class Coordinate
+---@field x integer X coordinate
+---@field y integer Y coordinate
+
+---@class Position
+---@field x integer X coordinate
+---@field y integer Y coordinate
+---@field direction integer Direction
+---@field map integer Map ID code
+
+---@class MovementReturn
+---@field ret boolean
+---@field steps integer
+
 function Positioning:manhattanDistance(pos1, pos2)
     --[[
         Calculate the Manhattan distance between 2 points
@@ -38,7 +52,7 @@ function Positioning:waitForOverworld(frameLimit)
     return Common:waitForState(Positioning.MovementEnabled, Positioning.MovementEnabled.MOVEMENT_ENABLED, frameLimit)
 end
 
-function Positioning:inOverworld() 
+function Positioning:inOverworld()
     return Memory:readFromTable(Positioning.MovementEnabled) == Positioning.MovementEnabled.MOVEMENT_ENABLED
 end
 
@@ -128,7 +142,7 @@ function Positioning:moveToPoint(newX, newY, maxSteps, releaseEnd)
         maxSteps = 100
     end
     -- true = N/S, false = E/W
-    local axis = true 
+    local axis = true
     local currentX = 0
     local currentY = 0
     local direction = 0
@@ -155,7 +169,7 @@ function Positioning:moveToPoint(newX, newY, maxSteps, releaseEnd)
         if currentX == newX then
             axis = true
         end
-      
+
         if axis then
             if currentY > newY then
                 direction = Positioning.Direction.NORTH
@@ -185,7 +199,7 @@ function Positioning:moveToPoint(newX, newY, maxSteps, releaseEnd)
     return {ret = false, steps = totalSteps}
 end
 
-function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd) 
+function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd)
     --[[
         Move N steps in a particular direction
 
@@ -213,7 +227,7 @@ function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd)
     local buttonDuration = 0
     local waitFrames = 0
     local localWait = 0
-    
+
     -- If this changes, then we collided. This value isn't constant for some reason
     local initialCollision = Memory:readFromTable(Positioning.Collision)
     local button = 0
@@ -273,14 +287,14 @@ function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd)
 
         -- We are not near our goal so continue to hold button for direction
         Input:pressButtons{buttonKeys={button}, duration=localWait, waitFrames=waitFrames}
-    end        
+    end
 
     -- Release the second portion of the press to stop moving
     if releaseEnd == nil or releaseEnd then
         Log:debug("Releasing positioning inputs")
         Common:waitFrames(localWait)
     end
-    
+
 
     return {ret = 0, steps = Positioning:manhattanDistance({x = startX, y = startY}, Positioning:getPosition())}
 end

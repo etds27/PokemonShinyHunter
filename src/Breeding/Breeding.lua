@@ -7,21 +7,18 @@ require "Positioning"
 
 Breeding = {}
 
+---Walk the remaining steps needed to complete an egg cycle
+---
+---This must be ran while in the path between the reset and turnaround points. 
+---The trainer will complete the egg cycle at any arbitrary point in the movement cycle.
+---There is no logic to complete the egg cycle at a certain position
+---
+---@return boolean true when the cycle has been completed
 function Breeding:completeEggCycle()
-    --[[
-        Walk the remaining steps needed to complete an egg cycle
-
-        This must be ran while in the path between the reset and turnaround points. 
-        The trainer will complete the egg cycle at any arbitrary point in the movement cycle.
-        There is no logic to complete the egg cycle at a certain position
-
-        Returns: true, when the cycle has been completed
-    ]]
     local direction = false
     local eggSteps = 0
     local remainingSteps = 0
     local newPos = {x = 0, y = 0}
-    local hasMoved = false
     local totalSteps = 0
 
     Log:debug("Breeding:completeEggCycle - init")
@@ -66,13 +63,12 @@ function Breeding:completeEggCycle()
     return false
 end
 
+---Determine which eggs have hatched between two party egg snapshots
+---@param previousEggSlots table Table representing the egg status at each position in the party
+---@param newEggSlots table Table representing the egg status at each position in the party
+---@return table indices Tables of indices of the pokemon that hatched
+---         {2, 5, 6}
 function Breeding:determineHatchedPokemon(previousEggSlots, newEggSlots)
-    --[[
-        Determine which eggs have hatched between two party egg snapshots
-
-        Returns: List of indices of the pokemon that hatched
-            i.e {2, 5, 6}
-    ]]
     Log:debug("Breeding:determineHatchedPokemon - init")
     local t = {}
     for i, eggStatus in ipairs(previousEggSlots)
@@ -85,12 +81,10 @@ function Breeding:determineHatchedPokemon(previousEggSlots, newEggSlots)
     return t
 end
 
+---Complete the animation for egg hatching and skip nicknaming
+---@param pressLimit integer Maximum number of button presses
+---@return boolean true if the player is back in the overworld after inputs
 function Breeding:hatchEgg(pressLimit)
-    --[[
-        Complete the animation for egg hatching and skip nicknaming
-
-        Returns: true if the player is back in the overworld after inputs
-    ]]
     Log:debug("Breeding:hatchEgg - init")
     if pressLimit == nil then pressLimit = 200 end
     local i = 0
@@ -103,14 +97,12 @@ function Breeding:hatchEgg(pressLimit)
     return Positioning:inOverworld()
 end
 
+---Calculate the destination point given the desired destination point and
+---the maximum number of steps available to take
+---@param remainingSteps integer Maximum number of steps to take
+---@param endPoint Position Position to move to
+---@return Coordinate position Table of adjusted destination point
 function Breeding:calculateAdjustedMovementPoint(remainingSteps, endPoint)
-    --[[
-        Calculate the destination point given the desired destination point and
-        the maximum number of steps available to take
-
-        Returns: Position table of adjust destination point
-            {x: y:}
-    ]]
     local newX = endPoint.x
     local newY = endPoint.y
     local pos = Positioning:getPosition()
@@ -137,20 +129,16 @@ function Breeding:calculateAdjustedMovementPoint(remainingSteps, endPoint)
     return {x = adjustedX, y = adjustedY}
 end
 
+---Determine if the Day Care man has an egg ready to be picked up
+---@return boolean true if the egg is ready
 function Breeding:eggReadyForPickup()
-    --[[
-        Determine if the Day Care man has an egg ready to be picked up
-    ]]
     return Memory:readFromTable(Breeding.EggAvailable) == Breeding.EggAvailable.EGG_READY
 end
 
-
+---Interact with the Day Care person and accepts the egg
+---@param pressLimit integer Maximum number of presses to take to complete interaction
+---@return boolean true if an egg is no longer available to be picked up
 function Breeding:pickUpEggs(pressLimit)
-    --[[
-        Interacts with the Day Care person and accepts the egg
-
-        Returns: true if an egg is no longer available to be picked up
-    ]]
     if pressLimit == nil then
         pressLimit = 100
     end
@@ -168,41 +156,46 @@ function Breeding:pickUpEggs(pressLimit)
 end
 
 -- WALKING COMMANDS
+---Walk from wherever the user is in the defined pacing path to the reset point
+---@return MovementReturn true if the player ends at the reset point
 function Breeding:walkToResetPoint()
-    --[[
-        Walk from wherever the user is in the defined pacing path to the reset point
-
-        Returns: true if the player ends at the reset point
-    --]]
     return Positioning:moveToPosition(Breeding.MovementResetPoint)
 end
 
+---@return boolean true If trainer moves to correct position
 function Breeding:walkToPCFromReset()
     --[[
         ABSTRACT FUNCTION. Define per game as this path will change
         Walk from the pacing reset point to the Day Care PC
     ]]
+    return false
 end
 
+---@return boolean true If trainer moves to correct position
 function Breeding:walkToResetPointFromPC()
     --[[
         ABSTRACT FUNCTION. Define per game as this path will change
         Walk from the Day Care PC to the pacing reset point
     ]]
+    return false
 end
 
+---@return boolean true If trainer moves to correct position
 function Breeding:walkToDayCareManFromReset()
     --[[
         ABSTRACT FUNCTION. Define per game as this path will change
         Walk from the pacing reset point to the daycare man holding a new egg
     ]]
+    return false
 end
 
+---@return boolean true If trainer moves to correct position
 function Breeding:walkToResetFromDayCareMan()
     --[[
         ABSTRACT FUNCTION. Define per game as this path will change
         Walk from the daycare man holding a new egg to the pacing reset point
     ]]
+    return false
 end
 
 -- Abstract tables
@@ -214,6 +207,3 @@ Model.EggAvailable = {}
 local Model = BreedingFactory:loadModel()
 
 Breeding = Common:tableMerge(Breeding, Model)
-
-Log.loggingLevel = LogLevels.INFO
--- Breeding:hatchEgg()

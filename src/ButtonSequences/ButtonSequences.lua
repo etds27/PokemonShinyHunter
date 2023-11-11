@@ -1,7 +1,7 @@
 require "Log"
 require "Input"
 
-
+---@enum ButtonSequences
 ButtonSequences = {
     -- Battle sequences
     BATTLE_RUN = {buttonSequence={{Buttons.DOWN}, {Buttons.RIGHT}, {Buttons.A}}, waitFrames=5},

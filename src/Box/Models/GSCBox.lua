@@ -7,7 +7,7 @@ local Model = {
     pokemonSize = 32,
     numBoxes = 14,
     maxBoxSize = 20,
-    
+
     CurrentBoxNumber = {
         addr = 0xDB72,
         size = 1

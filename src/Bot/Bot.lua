@@ -294,8 +294,7 @@ function Bot:handleWildPokemon(pokemon)
             pokemon.caught = false
             Log:info("You did not catch the shiny pokemon")
         end
-        Bot:handleShiny(pokemonTable)
-        -- Bot:waitForHuman() 
+        Bot:handleShiny(pokemon)
     else
         pokemon.caught = false
         Battle:runFromPokemon()
@@ -319,7 +318,7 @@ function Bot:handleShiny(pokemonTable)
     savestate.save(savestatePath)
     Log:debug("Bot:handleShiny: saved game")
 
-    pokemon = Collection:getAllShinyPokemon()
+    local pokemon = Collection:getAllShinyPokemon()
     PokemonSocket:logCollection(pokemon)
 end
 
@@ -333,7 +332,7 @@ function Bot:initializeBot()
     os.execute("mkdir " .. Bot.BOT_STATE_PATH)
     os.execute("mkdir " .. Bot.SAVESTATE_PATH)
 
-    pokemon = Collection:getAllShinyPokemon()
+    local pokemon = Collection:getAllShinyPokemon()
     PokemonSocket:logCollection(pokemon)
 end
 
