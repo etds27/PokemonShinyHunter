@@ -214,6 +214,7 @@ function KeyPocket:selectItem(item)
     Menu:navigateMenuFromTable(Bag.Cursor, Bag.KeyMenu.SEL)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
+    return true
 end
 
 ---Determine if the user has any pokeballs left
