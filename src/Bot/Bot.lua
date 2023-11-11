@@ -30,6 +30,21 @@ Bot = {
 }
 
 function Bot:run() 
+    local savestatePath = "StaticEncounter.State"
+    local i = 1
+    savestate.save(savestatePath)
+
+    while true
+    do
+        print(i)
+        savestate.load(savestatePath)
+        for i=1,10 do emu.frameadvance() end
+        savestate.save(savestatePath)
+        for i=1,10 do emu.frameadvance() end
+        i = i + 1
+    end
+
+
     Bot:initializeBot()
     if Common:contains({BotModes.WILD_GRASS, 
                         BotModes.FISHING,
@@ -74,7 +89,7 @@ function Bot:runModeStaticEncounter(staticEncounter)
     --[[
         Assumes that we are standing in front of a pokemon that is given to player and not caught
     ]]
-    staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter.State"
+    staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter1.State"
     savestate.save(staticEncounterSave)
     local newPokemonSlot = Party:numOfPokemonInParty() + 1
     if newPokemonSlot == Party.maxPokemon + 1 then 
@@ -85,17 +100,22 @@ function Bot:runModeStaticEncounter(staticEncounter)
     while true
     do
         Log:info("Reset number: " .. tostring(resets))
-        savestate.load(staticEncounterSave)
+        Common:waitFrames(40)
+        savestate.load(Bot.BOT_STATE_PATH .. "StaticEncounter" .. tostring(resets) .. ".State")
+        Log:debug("Bot:runModeStaticEncounter loaded static encounter state")
         -- Need to advance the game one frame each reset so that 
         -- the random seed can update and Pokemon values will be 
         -- different
-        emu.frameadvance()
-        savestate.save(staticEncounterSave)
+        Common:waitFrames(1)
+        Log:debug("Bot:runModeStaticEncounter saved new static encounter state")
+        savestate.save(Bot.BOT_STATE_PATH .. "StaticEncounter" .. tostring(resets + 1) .. ".State")
+        Log:debug("Bot:runModeStaticEncounter running static encounter")
         StaticEncounters[staticEncounter]()
         Party:navigateToPokemon(newPokemonSlot)
         pokemon = Party:getPokemonAtIndex(newPokemonSlot)
         pokemon.caught = true
         Bot:reportEncounter(pokemon)
+        Log:debug("Bot:runModeStaticEncounter logged encounter for " .. staticEncounter)
         if pokemon.isShiny then
             break
         end

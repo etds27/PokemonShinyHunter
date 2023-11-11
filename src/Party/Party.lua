@@ -85,10 +85,11 @@ function Party:navigateToPokemon(num)
     Input:pressButtons{buttonKeys={Buttons.A},
                     duration=Duration.PRESS,
                     waitFrames=60}
-    Menu:navigateMenuFromTable(MenuCursor, num)
+    Menu:navigateMenuFromTable(Menu.Cursor, num)
 
     Input:repeatedlyPressButton{buttonKeys={Buttons.A},
                                 duration=Duration.PRESS,
                                 waitFrames=25,
                                 iterations=3}
+    Common:waitFrames(30)
 end

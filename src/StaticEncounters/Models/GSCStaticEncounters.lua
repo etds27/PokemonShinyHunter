@@ -37,7 +37,7 @@ Model[BotModes.EEVEE_GSC] = function()
     Input:pressButtons{buttonKeys={Buttons.A}, duration=14, waitFrames=2}
 
     -- Press A until confirmation menu appears
-    while not Positioning:inOverworld() and not (Memory:readFromTable(MenuCursor) == 1)
+    while not Positioning:inOverworld() and not (Memory:readFromTable(Menu.Cursor) == 1)
     do
         Input:pressButtons{buttonKeys={Buttons.A}, duration=14, waitFrames=2}
     end

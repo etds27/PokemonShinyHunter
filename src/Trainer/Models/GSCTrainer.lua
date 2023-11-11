@@ -1,3 +1,4 @@
+require "Memory"
 local Model = {
     ID = {
         addr = 0xD47B,
@@ -19,6 +20,12 @@ local Model = {
     Name = {
         addr = 0xD47D,
         maxLength = 7,
+    },
+
+    Coins = {
+        addr = 0xD855,
+        size = 2,
+        memdomain = Memory.WRAM
     }
 }
 return Model

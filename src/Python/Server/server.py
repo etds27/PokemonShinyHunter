@@ -8,7 +8,7 @@ import socket
 import signal
 import argparse
 
-BUF_SIZE = 4096
+BUF_SIZE = 1024
 
 parser = argparse.ArgumentParser()
 
@@ -35,6 +35,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
     server.listen()
     inputs = [server]
 
+    logging.basicConfig(level=logging.DEBUG)
     while inputs:
         readable, _, _ = select.select(inputs, [], [])
 
@@ -75,7 +76,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
                         logging.error(f"Unable to parse data: {data_str}")
                     
                     event_handler.handle_event(event_json)
-
                 else:
                     logging.info(f"Removing socket {s.fileno()}")
                     inputs.remove(s)

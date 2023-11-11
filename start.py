@@ -46,7 +46,7 @@ print(args)
 if not args.emu_only:
     server_start_command = ["python3", os.path.join(os.environ["PSH_ROOT"], "src", "Python", "Server", "server.py"), args.host, str(args.port)]
     print(server_start_command)
-    server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True)
+    server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
     time.sleep(1)
 
 if args.emu_only:
@@ -106,6 +106,6 @@ else:
     emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if not args.emu_only:
-    for line in iter(server_p.stderr.readline, ""):
+    for line in iter(server_p.stdout.readline, ""):
         sys.stdout.write(line)
         sys.stdout.flush()

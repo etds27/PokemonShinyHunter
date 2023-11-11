@@ -23,6 +23,10 @@ function Trainer:getTrainerMoney()
     return Memory:readFromTable(Trainer.Money)
 end 
 
+function Trainer:getTrainerCoins()
+    return Memory:readFromTable(Trainer.Coins)
+end
+
 function Trainer:getPlayTime()
     hr = Memory:read(Trainer.PlayTime.hrAddr, Trainer.PlayTime.size)
     min = Memory:read(Trainer.PlayTime.minAddr, Trainer.PlayTime.size)
