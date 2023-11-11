@@ -4,6 +4,7 @@ Memory = {
 	CARTRAM = 0xA0,
 	WRAM = 0xC0,
 	OAM = 0xFE,
+	HRAM = 0xFF,
 	SYS_BUS = 0xFF
 }
 
@@ -45,7 +46,7 @@ function Memory:read(addr, size, memdomain)
 	elseif memdomain == 0xFE then
 		mem = "OAM"
     elseif memdomain == 0xFF then
-        mem = "System Bus"
+        mem = "HRAM"
 	end
 	addr = (addr & 0xFFFF)
 	if size == 1 then
