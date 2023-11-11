@@ -41,6 +41,3 @@ function RockSmash:smashRock()
 
     return Memory:readFromTable(RockSmash) ~= RockSmash.NO_ENCOUNTER
 end
-
-
-print(RockSmash:smashRock())

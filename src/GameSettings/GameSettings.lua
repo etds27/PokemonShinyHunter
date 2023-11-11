@@ -68,7 +68,7 @@ local function determineIfGame(gameTable)
 		end
 	end
 	Log:debug("Verified " .. gameTable.name .. " is loaded")
-
+	Log:info("Detected Game: " .. gameTable.name)
 	return true
 end
 
@@ -119,8 +119,5 @@ function GameSettings.initialize()
 		GameSettings.gamename = "Unsupported game"
 		GameSettings.encountertable = 0
 	end
-	
-	console.log("Detected game: " .. GameSettings.gamename)
-
 end
 GameSettings.initialize()

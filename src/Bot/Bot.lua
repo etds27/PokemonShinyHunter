@@ -61,9 +61,9 @@ function Bot:runModeWildPokemon()
 
         local wildPokemon = Pokemon:new(Pokemon.PokemonType.WILD, GameSettings.wildpokemon)
         Log:info(tostring(encounters) .." is shiny: " .. tostring(wildPokemon.isShiny))
-        
-        Bot:handleWildPokemon(wildPokemon)
         Bot:reportEncounter(wildPokemon)
+
+        Bot:handleWildPokemon(wildPokemon)
 
         if Box:isCurrentBoxFull() then
             Log:info("Current box is full")
@@ -336,7 +336,8 @@ function Bot:handleShiny(pokemonTable)
         Responsible for handling whatever needs to be done after catching a shiny
     ]]
     if pokemonTable.caught then
-        savestatePath = Bot.SAVESTATE_PATH .. "shiny_save_"  .. tostring(os.clock() .. ".State")
+        timestamp = os.date("%Y%m_T%H%M%S")
+        savestatePath = Bot.SAVESTATE_PATH  .. timestamp"shiny_save" .. ".State"
         savestate.save(savestatePath)
 
         pokemon = Collection:getAllShinyPokemon()
@@ -349,7 +350,7 @@ function Bot:initializeBot()
         Needs to be ran when the game has started and has named the character
     ]]
     Bot.botId = Bot:getBotId()
-    Bot.BOT_STATE_PATH = "BotStates\\" .. Bot.botId .. "\\"
+    Bot.BOT_STATE_PATH = os.getenv("PSH_ROOT") .. "BotStates\\" .. Bot.botId .. "\\"
     Bot.SAVESTATE_PATH = Bot.BOT_STATE_PATH .. "ShinyStates\\"
     os.execute("mkdir " .. Bot.BOT_STATE_PATH)
     os.execute("mkdir " .. Bot.SAVESTATE_PATH)

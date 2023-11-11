@@ -2,6 +2,7 @@ import argparse
 import os
 import shutil
 import subprocess
+import sys
 import time
 
 bot_id_save_states = {
@@ -14,6 +15,7 @@ os.environ["LUA_PATH"] = ""
 # Sets the root environment to be the directory of this script
 # Therefore this script should always be at the top level of the project
 os.environ["PSH_ROOT"] = os.path.dirname(os.path.abspath(__file__))
+
 ROOT_DIR = os.environ["PSH_ROOT"]
 SRC_DIR = os.path.join(ROOT_DIR, "src")
 TEST_DIR = os.path.join(ROOT_DIR, "Tests")
@@ -40,17 +42,17 @@ def update_lua_path(lua_files):
 
 print(args)
 if not args.emu_only:
-    server_start_command = ["python3", os.path.join(os.environ["PSH_ROOT"], "\\src\\PythonServer\\server.py"), args.host, str(args.port)]
+    server_start_command = ["python3", os.path.join(os.environ["PSH_ROOT"], "src", "Python", "Server", "server.py"), args.host, str(args.port)]
     print(server_start_command)
-    server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True)
     time.sleep(1)
 
 if args.emu_only:
     port_arg = ""
     ip_arg = ""
 else:
-    port_arg = "--socket_port={args.port}"
-    ip_arg = "--socket_ip={args.host}"
+    port_arg = f"--socket_port={args.port}"
+    ip_arg = f"--socket_ip={args.host}"
 
 lua_files = []
 test_lua_files = []
@@ -89,7 +91,7 @@ if args.bot_ids:
                                   f"--load-state={bot_id_save_states[bot_id]}",
                                   args.game]
         print(emulator_start_command)
-        emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True)
 
 else:
     emulator_start_command = [
@@ -101,6 +103,6 @@ else:
     emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if not args.emu_only:
-    for line in iter(server_p.stdout.readline, ''):
-        print(line)
-    server_p.stdout.close()
+    for line in iter(server_p.stderr.readline, ""):
+        sys.stdout.write(line)
+        sys.stdout.flush()
