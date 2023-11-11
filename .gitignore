@@ -8,3 +8,4 @@ Shortcuts/*
 src/PythonServer/.env
 *.luases
 Test/*
+*.env
