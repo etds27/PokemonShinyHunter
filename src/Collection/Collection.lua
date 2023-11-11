@@ -81,12 +81,51 @@ function Collection:numberOfShiniesCaught(species, pokemonData)
         pokemonData = Collection:getAllShinyPokemon()
     end
 
-    PokemonData:getPokemonByNumber(species)
+    local currentPokemonData = PokemonData:getPokemonByNumber(species)
+
+    local futurePokemonSpecies = Common:shallowcopy(currentPokemonData.evolution.post)
+    local previousPokemonSpecies = Common:shallowcopy(currentPokemonData.evolution.pre)
+    local evolutionSpecies = {species}
+
+     -- Determine all of the pokemon ahead of it in the evolutionary line
+     if futurePokemonSpecies ~= nil then
+        for i, futurePokemon in ipairs(futurePokemonSpecies)
+        do
+            table.insert(evolutionSpecies, futurePokemon)
+            local currentPokemonData = PokemonData:getPokemonByNumber(futurePokemon)
+            if currentPokemonData.evolution.post ~= nil then
+                for i, futureFuturePokemon in ipairs(currentPokemonData.evolution.post)
+                do
+                    if not Common:contains(evolutionSpecies, futureFuturePokemon) then
+                        table.insert(evolutionSpecies, futureFuturePokemon)
+                    end
+                end
+            end
+        end
+    end
+
+    -- Determine all of the pokemon behind of it in the evolutionary line
+    if previousPokemonSpecies ~= nil then
+        for i, pastPokemon in ipairs(previousPokemonSpecies)
+        do
+            table.insert(evolutionSpecies, pastPokemon)
+            local currentPokemonData = PokemonData:getPokemonByNumber(pastPokemon)
+            if currentPokemonData.evolution.pre ~= nil then
+                for i, pastPastPokemon in ipairs(currentPokemonData.evolution.pre)
+                do
+                    if not Common:contains(evolutionSpecies, pastPastPokemon) then
+                        table.insert(evolutionSpecies, pastPastPokemon)
+                    end
+                end
+            end
+        end
+    end
+
     local currentCount = 0
 
     for i, currentPokemon in ipairs(pokemonData)
     do
-        if currentPokemon.species == species and currentPokemon.isShiny and not currentPokemon:isEgg() then
+        if Common:contains(evolutionSpecies, currentPokemon.species) and currentPokemon.isShiny and not currentPokemon:isEgg() then
             currentCount = currentCount + 1
         end
     end

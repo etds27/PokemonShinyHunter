@@ -59,6 +59,8 @@ function Pokemon:update()
         offset = value[1]
         size = value[2]
         memValue = Memory:read(self.addr + offset, size, self.memdomain)
+
+        if key == "species" then memValue = tostring(memValue) end
         self[key] = memValue
     end
 end
