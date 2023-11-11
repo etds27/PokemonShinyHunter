@@ -56,15 +56,16 @@ class EncounterManager:
         logging.debug(f"{self.bot_id}: received encounter event")
 
         content_json = encounter_json["content"]
-        species = content_json["species"]
+        species = str(content_json["species"])
         new_encounter_dict = {k: content_json[k] for k in self.encounter_keys if k in content_json}
         new_encounter_dict["time"] = encounter_json["playTime"]
         new_encounter_dict["strength"] = self.calculate_encounter_strength(new_encounter_dict)
         new_encounter_dict["shiny_proximity"] = self.calculate_shinines_proximity(new_encounter_dict)
 
         logging.info(self.encounter_string(species, new_encounter_dict))
-
+        
         if species not in self.encounters["species"]:
+            logging.info(f"Found new species: {pokemon.pokemon_names[species]}")
             self.create_new_encounter_species(species=species)
 
 
@@ -100,6 +101,7 @@ class EncounterManager:
 
         # Update the strongest pokemon
         if not species_dict["strongest_pokemon"] or new_encounter_dict["strength"] > species_dict["strongest_pokemon"]["strength"]:
+            logging.debug(str(species_dict))
             logging.info(f"Found the strongest {pokemon.pokemon_names[str(species)]}: {new_encounter_dict['strength']}")
             species_dict["strongest_pokemon"] = new_encounter_dict
         if not self.encounters["strongest_pokemon"] or new_encounter_dict["strength"] > self.encounters["strongest_pokemon"]["strength"]:
@@ -108,6 +110,7 @@ class EncounterManager:
 
         # Update the weakest pokemon
         if not species_dict["weakest_pokemon"] or new_encounter_dict["strength"] < species_dict["weakest_pokemon"]["strength"]:
+            logging.debug(str(species_dict))
             logging.info(f"Found the weakest {pokemon.pokemon_names[str(species)]}: {new_encounter_dict['strength']}")
             species_dict["weakest_pokemon"] = new_encounter_dict
         if not self.encounters["weakest_pokemon"] or new_encounter_dict["strength"] < self.encounters["weakest_pokemon"]["strength"]:

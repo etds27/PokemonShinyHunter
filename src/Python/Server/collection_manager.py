@@ -9,13 +9,13 @@ class CollectionManager:
             self.initialize_collection_table()
 
     def initialize_collection_table(self):
-        self.encounters = file_manager.load_file(self.bot_id, self.filename)
+        self.collection = file_manager.load_file(self.bot_id, self.filename)
 
-    def save_encounter_table(self):
-        file_manager.save_file(self.bot_id, filename=self.filename, data=self.encounters)
+    def save_collection_table(self):
+        file_manager.save_file(self.bot_id, filename=self.filename, data=self.collection)
 
     def update_collection(self, event_json):
         logging.info(f"Updating collection with {len(event_json['content'])} pokemon")
         self.collection = event_json["content"]
 
-        self.save_encounter_table()
+        self.save_collection_table()

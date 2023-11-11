@@ -15,6 +15,7 @@ os.environ["LUA_PATH"] = ""
 # Sets the root environment to be the directory of this script
 # Therefore this script should always be at the top level of the project
 os.environ["PSH_ROOT"] = os.path.dirname(os.path.abspath(__file__))
+os.environ["PSH_GAME_DATA_ROOT"] = os.path.join(os.environ["PSH_ROOT"], "GameData")
 
 ROOT_DIR = os.environ["PSH_ROOT"]
 SRC_DIR = os.path.join(ROOT_DIR, "src")
@@ -31,10 +32,11 @@ parser.add_argument("-e", "--emulator", nargs=1, default="C:\Emulators\Bizhawk\E
 parser.add_argument("--bot-ids", nargs="+")
 args = parser.parse_args()
 
-def create_luases(lua_files, path):
+def create_luases(lua_files, path, auto_start: [str] = []):
     print(f"Creating .luases for {path}")
     with open(path, "w") as f:
-        [f.write(f"0 {lua_file}\n") for lua_file in lua_files]
+        [f.write(f"{1 if os.path.basename(lua_file) in auto_start else 0} {lua_file}\n")
+                        for lua_file in lua_files]
 
 def update_lua_path(lua_files):     
     for lua_file in lua_files:
@@ -78,8 +80,9 @@ for dirpaths, _, filenames in os.walk(TEST_DIR):
         test_lua_files.append(path)
 
 update_lua_path(lua_files)
-create_luases(lua_files, os.path.join(SHORTCUTS_DIR, "session.luases"))
-create_luases(test_lua_files, os.path.join(SHORTCUTS_DIR, "test_session.luases"))
+create_luases(lua_files, os.path.join(ROOT_DIR, "session.luases"))
+create_luases(test_lua_files, os.path.join(ROOT_DIR, "test_session.luases"))
+create_luases(lua_files, os.path.join(ROOT_DIR, "main_session.luases"), auto_start=["Main.lua"])
 
 # lua_args = ["--lua=C:\\Users\\etds2\\Programming\\PokemonLua\\src\\Positioning\\Positioning.lua,C:\\Users\\etds2\\Programming\\PokemonLua\\src\\Memory\\Memory.lua"]       
 if args.bot_ids:

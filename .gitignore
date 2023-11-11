@@ -6,3 +6,5 @@ BotStates/*
 Shortcuts/*
 .venv/*
 src/PythonServer/.env
+*.luases
+Test/*

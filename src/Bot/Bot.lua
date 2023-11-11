@@ -337,7 +337,7 @@ function Bot:handleShiny(pokemonTable)
     ]]
     if pokemonTable.caught then
         timestamp = os.date("%Y%m_T%H%M%S")
-        savestatePath = Bot.SAVESTATE_PATH  .. timestamp"shiny_save" .. ".State"
+        savestatePath = Bot.SAVESTATE_PATH  .. timestamp .."shiny_save" .. ".State"
         savestate.save(savestatePath)
 
         pokemon = Collection:getAllShinyPokemon()
@@ -354,6 +354,9 @@ function Bot:initializeBot()
     Bot.SAVESTATE_PATH = Bot.BOT_STATE_PATH .. "ShinyStates\\"
     os.execute("mkdir " .. Bot.BOT_STATE_PATH)
     os.execute("mkdir " .. Bot.SAVESTATE_PATH)
+
+    pokemon = Collection:getAllShinyPokemon()
+    PokemonSocket:logCollection(pokemon)
 end
 
 function Bot:getBotId()
