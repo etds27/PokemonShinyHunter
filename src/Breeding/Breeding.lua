@@ -82,7 +82,7 @@ function Breeding:determineHatchedPokemon(previousEggSlots, newEggSlots)
 end
 
 ---Complete the animation for egg hatching and skip nicknaming
----@param pressLimit integer Maximum number of button presses
+---@param pressLimit integer? Maximum number of button presses
 ---@return boolean true if the player is back in the overworld after inputs
 function Breeding:hatchEgg(pressLimit)
     Log:debug("Breeding:hatchEgg - init")
@@ -136,7 +136,7 @@ function Breeding:eggReadyForPickup()
 end
 
 ---Interact with the Day Care person and accepts the egg
----@param pressLimit integer Maximum number of presses to take to complete interaction
+---@param pressLimit integer? Maximum number of presses to take to complete interaction
 ---@return boolean true if an egg is no longer available to be picked up
 function Breeding:pickUpEggs(pressLimit)
     if pressLimit == nil then

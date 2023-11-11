@@ -14,23 +14,21 @@ Collection = {}
 function Collection:getAllPokemon()
     local allPokemon = Box:getAllPokemonInPC()
     local partyPokemon = Party:getAllPokemonInParty()
-    for i, pokemon in ipairs(partyPokemon) 
+    for _, pokemon in ipairs(partyPokemon) 
     do
         table.insert(allPokemon, pokemon)
     end
     return allPokemon
 end
 
-function Collection:getAllShinyPokemon()
-    --[[
-        Get all of the shiny pokemon owned by the player
 
-        Return: A table of shiny pokemon
-            - {<species>: <num_caught>}
-    ]]
+---Get all of the shiny pokemon owned by the player
+---@return table shinyPokemon A table of shiny pokemon
+---     {<species>: <num_caught>}
+function Collection:getAllShinyPokemon()
     local shinyPokemon = {}
 
-    for i, pokemon in pairs(Collection:getAllPokemon())
+    for _, pokemon in pairs(Collection:getAllPokemon())
     do
         if pokemon.isShiny and not pokemon:isEgg() then
             table.insert(shinyPokemon, pokemon)
@@ -39,11 +37,11 @@ function Collection:getAllShinyPokemon()
     return shinyPokemon
 end
 
-function Collection:isNewShinyPokemon(species, pokepokemonDatamon)
-    --[[
-        Determine if the pokemon found is a new shiny
-    ]]
-
+---Determine if the pokemon found is a new shiny
+---@param species string A string of the pokemon's ID
+---@param pokemonData table A table of pokemon
+---@return boolean true If the shiny pokemon has not been seen
+function Collection:isNewShinyPokemon(species, pokemonData)
     if pokemonData == nil then
         pokemonData = Collection:getAllShinyPokemon()
     end
@@ -57,30 +55,33 @@ function Collection:isNewShinyPokemon(species, pokepokemonDatamon)
     return true
 end
 
+---Determine if we already have the needed amount of pokemon to complete the evolutionary line
+---@param species string A string of the pokemon's ID
+---@param pokemonData table A table of pokemon
+---@return boolean true If the shiny pokemon is needed
 function Collection:isShinyPokemonNeeded(species, pokemonData)
-    --[[
-        Determine if we already have the needed amount of pokemon to complete the evolutionary line
-    ]]
     return Collection:requiredShiniesRemaining(species, pokemonData) > 0
 end
 
+---Determine the number of shinies needed for the evolutionary line
+---@param species string A string of the pokemon's ID
+---@param pokemonData table A table of pokemon
+---@return integer numRemaining The number of remaining shinies required to complete evolutionary line
 function Collection:requiredShiniesRemaining(species, pokemonData)
-    --[[
-        Determine the number of shinies needed for the evolutionary line
-    ]]
     if pokemonData == nil then
         pokemonData = Collection:getAllShinyPokemon()
     end
     local reqCount = PokemonData:getPokemonByNumber(species).required
 
     local numOfShinies = Collection:numberOfShiniesCaught(species, pokemonData)
-    return reqCount - numOfShinies    
+    return reqCount - numOfShinies
 end
 
+---Determine the number of shinies needed for the evolutionary line
+---@param species string A string of the pokemon's ID
+---@param pokemonData table A table of pokemon
+---@return integer The number of shinies caught in the evolutionary line
 function Collection:numberOfShiniesCaught(species, pokemonData)
-    --[[
-        Determine the number of shinies needed for the evolutionary line
-    ]]
     if pokemonData == nil then
         pokemonData = Collection:getAllShinyPokemon()
     end
