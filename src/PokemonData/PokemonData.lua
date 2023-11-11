@@ -11,7 +11,7 @@ local function readJson(filepath)
 end
 
 PokemonData = {}
-Common:tableMerge(PokemonData, readJson(os.getenv("PSH_ROOT") .. "\\GameData\\Pokemon\\Pokemon.json"))
+Common:tableMerge(PokemonData, readJson(os.getenv("PSH_ROOT") .. "\\GameData\\Pokemon\\" .. GameSettings.game.pokemonData))
 
 function PokemonData:getPokemonByNumber(pokemonNumber)
 	return PokemonData[tostring(pokemonNumber)]

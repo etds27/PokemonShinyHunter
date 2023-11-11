@@ -294,7 +294,7 @@ function Bot:handleWildPokemon(pokemon)
     local ret = 0
     local i = 0
         
-    if pokemon.isShiny then
+    if pokemon.isShiny and Collection:isShinyPokemonNeeded(pokemon) then
 
         while BallPocket:hasPokeballs() and i < 10
         do

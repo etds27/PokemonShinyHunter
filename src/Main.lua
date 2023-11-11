@@ -1,4 +1,5 @@
 require "Bot"
+print("TEST")
 require "Common"
 require "GameSettings"
 
@@ -18,7 +19,6 @@ local defaultSettings = readJson("..\\BotConfigs\\default.json")
 -- local gameSettings = readJson("BotConfigs\\game.json")
 local botSettings = readJson("..\\BotConfigs\\" .. Bot:getBotId() .. ".json")
 local settings = Common:tableMerge(defaultSettings, botSettings)
-
 Log.loggingLevel = Log:intToLogLevel(settings.LogLevel)
 Bot.mode = settings.BotMode
 Bot:run()

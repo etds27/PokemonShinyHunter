@@ -1,26 +1,37 @@
-require "Memory"
+CRYSTAL_NAME = "PM_CRYSTAL"
+GOLD_NAME = "POKEMON_GLD"
+SILVER_NAME = "POKEMON_SLV"
 
-GameID = {
-	CRYSTAL = {name = "PM_CRYSTAL",
+Games = {
+	CRYSTAL = {name = CRYSTAL_NAME,
 			   hex = {0x50, 0x4D, 0x5F, 0x43, 0x52, 0x59, 0x53, 0x54, 0x41, 0x4C}, -- PM_CRYSTAL
 			   addr = 0x134,
 			   size = 10,
-			   memdomain = "ROM"},
-	GOLD = {name = "POKEMON_GLD",
+			   memdomain = "ROM",
+			   pokemonData = "pokemon_gen2.json",
+			   routeEncounterData = "route_encounter_crystal.json"
+			},
+	GOLD = {name = GOLD_NAME,
 			hex = {0x50, 0x4F, 0x4B, 0x45, 0x4D, 0x4F, 0x4E, 0x5F, 0x47, 0x4C, 0x44}, -- POKEMON_GLD
 			addr = 0x134,
 			size = 11,
-			memdomain = "ROM"},
-	SILVER = {name = "POKEMON_SLV",
-			hex = {0x50, 0x4F, 0x4B, 0x45, 0x4D, 0x4F, 0x4E, 0x5F, 0x53 , 0x4C, 0x56}, -- POKEMON_GLD
-			addr = 0x134,
-			size = 11,
-			memdomain = "ROM"},
+			memdomain = "ROM",
+			pokemonData = "pokemon_gen2.json",
+			routeEncounterData = "route_encounter_gold.json"
+			},
+	SILVER = {name = SILVER_NAME,
+			  hex = {0x50, 0x4F, 0x4B, 0x45, 0x4D, 0x4F, 0x4E, 0x5F, 0x53 , 0x4C, 0x56}, -- POKEMON_GLD
+			  addr = 0x134,
+			  size = 11,
+			  memdomain = "ROM",
+			  pokemonData = "pokemon_gen2.json",
+			  routeEncounterData = "route_encounter_silver.json"
+			},
 }
 
 -- Convenience groups to associate similar games
 GameGroups = {
-	GEN_2 = {GameID.CRYSTAL, GameID.GOLD, GameID.SILVER},
+	GEN_2 = {Games.CRYSTAL, Games.GOLD, Games.SILVER},
 }
 
 GameSettings = {
@@ -86,15 +97,12 @@ function GameSettings.initialize()
 	local trainerpointer = {0xDCDF, 0xDD0F, 0xDD3F, 0xDD6F, 0xDD9F, 0xDDCF} -- Trainer Data Pointer
 	local roamerpokemonoffset = {0x39D4, 0x4188, 0x4074, 0x39D4, 0x4188, 0x4074}
 	
-	for name, game in pairs(GameID)
+	for name, game in pairs(Games)
 	do
 		if determineIfGame(game) then
 			GameSettings.game = game
 		end
 	end
-
-
-
 
 	if gamecode == 0x4E5F474C then -- N_GL
 		GameSettings.game = 1

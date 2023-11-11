@@ -68,6 +68,7 @@ function Collection:requiredShiniesRemaining(species, pokemonData)
         pokemonData = Collection:getAllShinyPokemon()
     end
     local reqCount = PokemonData:getPokemonByNumber(species).required
+
     local numOfShinies = Collection:numberOfShiniesCaught(species, pokemonData)
     return reqCount - numOfShinies    
 end
@@ -85,15 +86,9 @@ function Collection:numberOfShiniesCaught(species, pokemonData)
 
     for i, currentPokemon in ipairs(pokemonData)
     do
-        if currentPokemon.species == species and currentPokemon.isShiny then
+        if currentPokemon.species == species and currentPokemon.isShiny and not currentPokemon:isEgg() then
             currentCount = currentCount + 1
         end
     end
     return currentCount
 end
-
--- Log.loggingLevel = LogLevels.INFO
--- print(Collection:getAllPokemon())
--- print(Collection:getAllShinyPokemon())
--- print(Collection:requiredShiniesRemaining(158))
--- print(Collection:isShinyPokemonNeeded(159))

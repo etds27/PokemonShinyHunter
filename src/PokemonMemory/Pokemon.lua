@@ -92,8 +92,10 @@ function Pokemon:determineShininess()
     return speedReq and attackReq and defenseReq and specialReq
 end
 
-function Pokemon:isEgg()
-    self:update()
+function Pokemon:isEgg(update)
+    if update then
+        self:update()
+    end
     return self.caughtData == 0
 end
 
