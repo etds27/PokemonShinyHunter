@@ -7,13 +7,17 @@ require "Log"
 require "Memory"
 require "Party"
 require "Pokemon"
+require "PokemonData"
 
 Collection = {}
 
 function Collection:getAllPokemon()
     local allPokemon = Box:getAllPokemonInPC()
     local partyPokemon = Party:getAllPokemonInParty()
-    Common:tableMerge(allPokemon, partyPokemon)
+    for i, pokemon in ipairs(partyPokemon) 
+    do
+        table.insert(allPokemon, pokemon)
+    end
     return allPokemon
 end
 
@@ -28,23 +32,23 @@ function Collection:getAllShinyPokemon()
 
     for i, pokemon in pairs(Collection:getAllPokemon())
     do
-        if pokemon.isShiny then
+        if pokemon.isShiny and not pokemon:isEgg() then
             table.insert(shinyPokemon, pokemon)
         end
     end
     return shinyPokemon
 end
 
-function Collection:isNewShinyPokemon(species, pokemon)
+function Collection:isNewShinyPokemon(species, pokepokemonDatamon)
     --[[
         Determine if the pokemon found is a new shiny
     ]]
 
-    if pokemon == nil then
-        pokemon = Collection:getAllShinyPokemon()
+    if pokemonData == nil then
+        pokemonData = Collection:getAllShinyPokemon()
     end
 
-    for i, currentPokemon in ipairs(pokemon)
+    for i, currentPokemon in ipairs(pokemonData)
     do
         if currentPokemon.species == species and currentPokemon.isShiny then
             return false

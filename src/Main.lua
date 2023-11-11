@@ -1,5 +1,4 @@
 require "Bot"
-print("TEST")
 require "Common"
 require "GameSettings"
 

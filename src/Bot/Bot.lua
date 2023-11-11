@@ -48,7 +48,7 @@ end
 
 function Bot:runModeWildPokemon()
     local encounters = 1
-    while true
+    while not Box:isCurrentBoxFull()
     do
         if Bot.mode == BotModes.WILD_GRASS then
             Bot:searchForWildPokemon()
@@ -65,12 +65,9 @@ function Bot:runModeWildPokemon()
 
         Bot:handleWildPokemon(wildPokemon)
 
-        if Box:isCurrentBoxFull() then
-            Log:info("Current box is full")
-            break
-        end
         encounters = encounters + 1
     end
+    Log:info("Current box is full")
 end
 
 function Bot:runModeStaticEncounter(staticEncounter)
@@ -192,6 +189,7 @@ function Bot:runModeHatchEggs()
                 Breeding:hatchEgg()
                 local hatchedPokemon = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAddress(index), Memory.WRAM)
                 Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species))
+                hatchedPokemon.caught = true
                 Bot:reportEncounter(hatchedPokemon)
                 if hatchedPokemon.isShiny then
                     table.insert(pcActionList, {index = index, action = BoxUI.Action.DEPOSIT})
@@ -244,10 +242,11 @@ function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
 
         -- Wait to return to overworld after not hooking a fish
         Log:debug("Waiting to return to overworld after fishing")
-        while not Positioning:inOverworld()
-        do
-            emu.frameadvance()
+        if not Positioning:waitForOverworld(600) then
+            Log:error("Did not return to overworld after not catching fish")
+            return false
         end
+        
         i = i + 1
     end
 end
@@ -256,10 +255,11 @@ function Bot:searchForWildPokemon()
     local i = 0
     while Positioning:inOverworld() and i < Bot.SEARCH_SPIN_MAXIMUM
     do
+        local direction = Positioning:getDirection()
         -- If we are facing north, spin in a circle starting from the south
         -- If we are facing not north, spin in a circle starting from the north
         Log:debug("Searching for pokemon " .. i .. " Dir: " .. direction)
-        if direction == Direction.NORTH then
+        if direction == Positioning.Direction.NORTH then
             Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_S)
         else
             Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_N)
@@ -293,9 +293,9 @@ end
 function Bot:handleWildPokemon(pokemon)
     local ret = 0
     local i = 0
-        
-    if pokemon.isShiny and Collection:isShinyPokemonNeeded(pokemon) then
-
+    local isNeeded = Collection:isShinyPokemonNeeded(pokemon.species)
+    Log:debug("Bot:handleWildPokemon: isNeeded " .. tostring(isNeeded))
+    if pokemon.isShiny and isNeeded then
         while BallPocket:hasPokeballs() and i < 10
         do
             Battle:openPack()
@@ -315,6 +315,7 @@ function Bot:handleWildPokemon(pokemon)
             pokemon.caught = false
             Log:info("You did not catch the shiny pokemon")
         end
+        Bot:handleShiny(pokemonTable)
         -- Bot:waitForHuman() 
     else
         pokemon.caught = false
@@ -326,23 +327,21 @@ end
 
 function Bot:reportEncounter(pokemonTable)
     PokemonSocket:logEncounter(pokemonTable)
-    if pokemonTable.isShiny then
-        Bot:handleShiny(pokemonTable)
-    end
 end
 
 function Bot:handleShiny(pokemonTable)
     --[[
         Responsible for handling whatever needs to be done after catching a shiny
     ]]
-    if pokemonTable.caught then
-        timestamp = os.date("%Y%m_T%H%M%S")
-        savestatePath = Bot.SAVESTATE_PATH  .. timestamp .."shiny_save" .. ".State"
-        savestate.save(savestatePath)
+    Log:debug("Caught: " .. tostring(pokemonTable.caught))
+    local timestamp = os.date("%Y%m_T%H%M%S")
+    local savestatePath = Bot.SAVESTATE_PATH  .. timestamp .."_shiny_save" .. ".State"
+    Log:debug("Bot:handleShiny: savestatePath: " .. savestatePath)
+    savestate.save(savestatePath)
+    Log:debug("Bot:handleShiny: saved game")
 
-        pokemon = Collection:getAllShinyPokemon()
-        PokemonSocket:logCollection(pokemon)
-    end
+    pokemon = Collection:getAllShinyPokemon()
+    PokemonSocket:logCollection(pokemon)
 end
 
 function Bot:initializeBot()
@@ -350,7 +349,7 @@ function Bot:initializeBot()
         Needs to be ran when the game has started and has named the character
     ]]
     Bot.botId = Bot:getBotId()
-    Bot.BOT_STATE_PATH = os.getenv("PSH_ROOT") .. "BotStates\\" .. Bot.botId .. "\\"
+    Bot.BOT_STATE_PATH = os.getenv("PSH_ROOT") .. "\\BotStates\\" .. Bot.botId .. "\\"
     Bot.SAVESTATE_PATH = Bot.BOT_STATE_PATH .. "ShinyStates\\"
     os.execute("mkdir " .. Bot.BOT_STATE_PATH)
     os.execute("mkdir " .. Bot.SAVESTATE_PATH)

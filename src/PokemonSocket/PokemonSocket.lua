@@ -33,7 +33,9 @@ function PokemonSocket:logEncounter(pokemonTable)
 end
 
 function PokemonSocket:logCollection(pokemonTable)
+    Log:debug("PokemonSocket:logCollection: init")
     PokemonSocket:sendTable(pokemonTable, EventTypes.COLLECTION)
+    Log:debug("PokemonSocket:logCollection: complete")
 end
 
 -- PokemonSocket:logEncounter({test = "TEST"})

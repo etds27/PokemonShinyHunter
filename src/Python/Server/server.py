@@ -8,6 +8,8 @@ import socket
 import signal
 import argparse
 
+BUF_SIZE = 4096
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument("host", type=str, help="Enter host IP (usually 127.0.0.1)")
@@ -44,7 +46,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
                 inputs.append(conn)
             else: # Read data from one of the connected sockets
                 try:
-                    data = s.recv(4096)
+                    chunks = []
+                    while True:
+                        chunk = s.recv(BUF_SIZE)
+                        chunks.append(chunk)
+                        if len(chunk) < BUF_SIZE:
+                            break
+                    data = b''.join(chunks)
                 except ConnectionResetError as e:
                     logging.error("Lost connection to client")
                     logging.error(e)

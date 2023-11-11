@@ -42,6 +42,22 @@ function Positioning:inOverworld()
     return Memory:readFromTable(Positioning.MovementEnabled) == Positioning.MovementEnabled.MOVEMENT_ENABLED
 end
 
+function Positioning:getX()
+    return Memory:readFromTable(Positioning.PositionX)
+end
+
+function Positioning:getY()
+    return Memory:readFromTable(Positioning.PositionY)
+end
+
+function Positioning:getDirection()
+    return Memory:readFromTable(Positioning.Direction)
+end
+
+function Positioning:getMap()
+    Memory:readFromTable(Positioning.Map)
+end
+
 function Positioning:getPosition()
     --[[
         Get all position data for the player
@@ -49,12 +65,12 @@ function Positioning:getPosition()
         Returns: Table with position data
             {x: y: direction: map:}
     ]]
-    t = {}
-    t.x = Memory:readFromTable(Positioning.PositionX)
-    t.y = Memory:readFromTable(Positioning.PositionY)
-    t.direction = Memory:readFromTable(Positioning.Direction)
-    t.map = Memory:readFromTable(Positioning.Map)
-    return t
+    return {
+        x = Positioning:getX(),
+        y = Positioning:getY(),
+        direction = Positioning:getDirection(),
+        map = Positioning:getMap()
+    }
 end
 
 function Positioning:faceDirection(direction)
