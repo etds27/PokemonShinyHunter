@@ -58,11 +58,10 @@ function Battle:attackByIndex(moveIndex)
     Input:pressButtons{buttonKeys = {Buttons.A}}
 end
 
+    --- Run from the current pokemon battle
+    --- This assumes that the battle menu has or is loading
 function Battle:runFromPokemon()
-    --[[
-        Run from the current pokemon battle
-        This assumes that the battle menu has or is loading
-    ]]
+
     Battle:waitForBattleMenu(100)
     Input:performButtonSequence(ButtonSequences.BATTLE_RUN)
     Input:pressButtons{buttonKeys={Buttons.B}, duration=80, waitFrames=1}

@@ -30,21 +30,6 @@ Bot = {
 }
 
 function Bot:run() 
-    local savestatePath = "StaticEncounter.State"
-    local i = 1
-    savestate.save(savestatePath)
-
-    while true
-    do
-        print(i)
-        savestate.load(savestatePath)
-        for i=1,10 do emu.frameadvance() end
-        savestate.save(savestatePath)
-        for i=1,10 do emu.frameadvance() end
-        i = i + 1
-    end
-
-
     Bot:initializeBot()
     if Common:contains({BotModes.WILD_GRASS, 
                         BotModes.FISHING,
@@ -89,14 +74,14 @@ function Bot:runModeStaticEncounter(staticEncounter)
     --[[
         Assumes that we are standing in front of a pokemon that is given to player and not caught
     ]]
-    staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter1.State"
+    local staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter1.State"
     savestate.save(staticEncounterSave)
     local newPokemonSlot = Party:numOfPokemonInParty() + 1
     if newPokemonSlot == Party.maxPokemon + 1 then 
         Log:error("Already at max pokemon") 
         return 
     end
-    resets = 1
+    local resets = 1
     while true
     do
         Log:info("Reset number: " .. tostring(resets))
@@ -112,7 +97,7 @@ function Bot:runModeStaticEncounter(staticEncounter)
         Log:debug("Bot:runModeStaticEncounter running static encounter")
         StaticEncounters[staticEncounter]()
         Party:navigateToPokemon(newPokemonSlot)
-        pokemon = Party:getPokemonAtIndex(newPokemonSlot)
+        local pokemon = Party:getPokemonAtIndex(newPokemonSlot)
         pokemon.caught = true
         Bot:reportEncounter(pokemon)
         Log:debug("Bot:runModeStaticEncounter logged encounter for " .. staticEncounter)
@@ -129,32 +114,6 @@ function Bot:runModeStaticWildEncounter(staticEncounter)
     --[[
         Assumes that we are standing in front of a pokemon that needs to be caught
     ]]
-    local staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter.State"
-    savestate.save(staticEncounterSave)
-    local resets = 1
-    while true
-    do
-        Log:info("Reset number: " .. tostring(resets))
-        savestate.load(staticEncounterSave)
-        -- Need to advance the game one frame each reset so that 
-        -- the random seed can update and Pokemon values will be 
-        -- different
-        emu.frameadvance()
-        savestate.save(staticEncounterSave)
-        CustomSequences:starterEncounter()
-        local wildPokemon = Pokemon:new(Pokemon.PokemonType.WILD, GameSettings.wildpokemon)
-        Log:info(tostring(resets) .." is shiny: " .. tostring(Pokemon:isShiny(wildPokemon)))
-        
-        Bot:handleWildPokemon(wildPokemon)
-        Bot:reportEncounter(wildPokemon)
-
-        if pokemon.isShiny then
-            break
-        end
-        resets = resets + 1
-    end
-
-    Log:info("Found shiny pokemon after: " .. tostring(resets) .. " resets")
 end    
 
 function Bot:runModeHatchEggs()

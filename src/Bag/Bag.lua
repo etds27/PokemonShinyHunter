@@ -35,13 +35,10 @@ KeyPocket = {}
 TMHMPocket = {}
 BallPocket = {}
 
+---Moves the bag cursor to the specified item
+---@param pocket integer The pocket that the item will be in
+---@param item integer The item to select 
 function Bag:navigateToItem(pocket, item)
-    --[[
-        Moves the bag cursor to the specified item
-        Arguments:
-            - pocket: The pocket that the item will be in
-            - item: The item to select 
-    ]]
     if pocket == Bag.Pocket.ITEMS then
         tab = ItemPocket:containsItem(item)
         location = tab[1]
@@ -68,13 +65,11 @@ function Bag:navigateToItem(pocket, item)
     return Memory:readFromTable(Bag.Cursor) == location
 end
 
+---Use the item specified both in and out of battle
+---@param pocket integer The pocket that the item will be in
+---@param item integer The item to select 
+---@return boolean
 function Bag:useItem(pocket, item)
-    --[[
-        Use the item specified both in and out of battle
-        Arguments:
-            - pocket: The pocket that the item will be in
-            - item: The item to select 
-    ]]
     if not Bag:navigateToItem(pocket, item) then
         return false
     end
@@ -86,10 +81,9 @@ function Bag:useItem(pocket, item)
     return true
 end
 
+
+---Uses the best available pokeball
 function Bag:useBestBall()
-    --[[
-        Uses the best available pokeball
-    ]]
     for i, ball in ipairs(Bag.BallPriority)
     do
         if BallPocket:containsItem(ball)[1] ~= 0 then
@@ -101,29 +95,37 @@ function Bag:useBestBall()
     return false
 end
 
+---Change the bag view to the specified pocket
+---@param pocket integer The pocket value to change the bag view to
+---@return boolean `true` if the correct pocket is displayed
 function Bag:navigateToPocket(pocket)
-    i = 0
-    while Memory:readFromTable(Bag.Pocket) ~= pocket and i < 10
+    local i = 0
+    while  i < 10
     do
+        if Memory:readFromTable(Bag.Pocket) == pocket then
+            return true
+        end
         Input:pressButtons{buttonKeys={Buttons.RIGHT}, duration=Duration.TAP}
         i = i + 1
     end
-    return i ~= 10
+    return false
 end
 
+--- Generic method to determine if the player has a certain item
+---
+---Use for: Item, and Ball pockets
+---@param pocket integer The pocket value to change the bag view to
+---@param item integer The item to select 
+---@return table
+---| 0: Location of item in the bag, 0 if not found
+---| 1: Quantity of item, 0 if not found or same as location addr if key item
 function Bag:doesPocketContain(pocket, item) 
-    --[[
-        Generic method to determine if the player has a certain item
-        Use for: Item, and Ball pockets
+    local pocketTable = {}
+    local numOfItemsInPocket = 0
+    local itemAddr = 0x0
+    local quantityAddr = 0x0
+    local currentItem = 0
 
-        Arguments: 
-            - pocket: Pocket table
-            - item: The value of the item that is being searched for
-
-        Returns: Tuple:
-            - Location of item in the bag, 0 if not found
-            - Quantity of item, 0 if not found or same as location addr if key item
-    ]]
     if pocket == Bag.Pocket.ITEMS then
         pocketTable = Bag.ItemPocket
     elseif pocket == Bag.Pocket.BALLS then
@@ -172,12 +174,11 @@ function Bag:closePack()
     Input:repeatedlyPressButton{buttonKeys={Buttons.B}, duration=Duration.PRESS, iterations=6}
 end
 
+---Determine if the bag is currently open
+---I'm a little iffy on if this is the right address
+---but it worked across like 5-6 different states
+---@return boolean `true` if bag is open
 function Bag:isOpen()
-    --[[
-        Determine if the bag is currently open
-        I'm a little iffy on if this is the right address
-        but it worked across like 5-6 different states
-    ]]
     return Memory:readFromTable(Bag.BagOpen) == Model.BagOpen.OPEN
 end
 
@@ -197,10 +198,10 @@ function KeyPocket:containsItem(item)
     return Bag:doesPocketContain(Bag.Pocket.KEY_ITEMS, item)
 end
 
+---Registers an item in the key pocket
+---@param item integer Key item to register
+---@return boolean `true` if item was successfully registered
 function KeyPocket:selectItem(item)
-    --[[
-        Registers an item in the key pocket
-    ]]
     if Bag:getSelectedItem() == item then
         return true
     end
@@ -215,16 +216,12 @@ function KeyPocket:selectItem(item)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
 end
 
+---Determine if the user has any pokeballs left
+---@return boolean true if there are any amount of any type of pokeball
 function BallPocket:hasPokeballs()
-    --[[
-        Determine if the user has any pokeballs left
-
-        Returns:
-            - true if there are any amount of any type of pokeball
-    ]]
     for i, ball in ipairs(Bag.BallPriority)
     do
-        tab = BallPocket:containsItem(ball)
+        local tab = BallPocket:containsItem(ball)
         if tab[1] ~= 0 then
             return true
         end

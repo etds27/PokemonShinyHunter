@@ -8,22 +8,33 @@ Memory = {
 	SYS_BUS = 0xFF
 }
 
+---@class MemoryTable
+---@field addr integer Address to read from
+---@field size integer Number of bytes to read
+---@field memdomain integer? The memory domain to read from
+---@field bit integer? The bit within the mem value to read
+local MemoryTable = {
+	addr = 0,
+	size = 1,
+	memdomain = nil,
+	bit = nil,
+}
+
+
 -- Pokemon Crystal Memory Accessor
+---Access data from the game's memory
+---
+---In most cases, you are good to pass in the memory address and the memdomain 
+---can be determined by the MSB of the address. This isn't always the case with
+---CartRAM and WRAM which have 2KiB swappable partitions that may contain addresses
+---that exceed their usual bounds. In this case, then the memdomain will need to be 
+---set through the arguments
+---
+---@param addr integer
+---@param size integer
+---@param memdomain integer?
+---@return integer
 function Memory:read(addr, size, memdomain)
-	--[[
-		Access data from the game's memory
-
-		In most cases, you are good to pass in the memory address and the memdomain 
-		can be determined by the MSB of the address. This isn't always the case with
-		CartRAM and WRAM which have 2KiB swappable partitions that may contain addresses
-		that exceed their usual bounds. In this case, then the memdomain will need to be 
-		set through the arguments
-
-		Arguments:
-			- addr: Global addr to read from
-			- size: Number of bytes to read
-			- memdomain (optional): The memory domain to read from
-	]]
 	local mem = ""
 	local value = 0
 
@@ -62,34 +73,32 @@ function Memory:read(addr, size, memdomain)
 	return value
 end
 
+---Read from memory given a table
+---@param args MemoryTable Memory table to read from
+---@return integer memValue The value at the memory address
 function Memory:readFromTable(args)
-	--[[
-		Read from memory given a table
-
-		Arguments:
-			- addr: Address to read from
-			- size: Number of bytes to read
-			- memdomain (optional): The memory domain to read from
-	]]
+	local addr = 0
+	local size = 0
+	local memdomain = args.memdomain
+	
 	-- Reroute request to readBitFromTable
 	if args.bit ~= nil then
 		return Memory:readBitFromTable(args)
 	end
 	if args.addr == nil then
 		Log:error("No property 'addr' in table")
-		return nil
+		return -1
 	else
 		addr = args.addr
 	end
 
 	if args.size == nil then
 		Log:error("No property 'size' in table")
-		return nil
+		return -1
 	else
 		size = args.size
 	end
 
-	local memdomain = args.memdomain
 	return Memory:read(addr, size, memdomain)
 end
 
@@ -110,19 +119,22 @@ function Memory:readBit(addr, bit, memdomain)
 	return (value >> bit) & 0x1
 end
 
+---Read a bit from memory given a table
+---@param args MemoryTable Memory table to read from
+---@return integer memValue The value at the memory address
 function Memory:readBitFromTable(args)
 	local addr = 0
 	local bit = 0
 	if args.addr == nil then
 		Log:error("No property 'addr' in table")
-		return nil
+		return -1
 	else
 		addr = args.addr
 	end
 
 	if args.bit == nil then
 		Log:error("No property 'bit' in table")
-		return nil
+		return -1
 	else
 		bit = args.bit
 	end
