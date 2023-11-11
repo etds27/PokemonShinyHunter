@@ -96,8 +96,8 @@ function Box:getAllPokemonInPC()
     local pokemon = {}
     for i = 1, Box.numBoxes
     do
-        currentBox = Box:getBox(i)
-        for i, pokemonTable in ipairs(currentBox)
+        local currentBox = Box:getBox(i)
+        for _, pokemonTable in ipairs(currentBox)
         do
             table.insert(pokemon, pokemonTable)
         end
@@ -119,7 +119,7 @@ function Box:isCurrentBoxFull()
 end
 
 ---Search through the boxes to find one that has enough open space
----@param capacity integer? [1] the minimum open space required for a box
+---@param capacity integer [1] the minimum open space required for a box
 ---@return integer boxNumber Number of box with available capacity
 function Box:findFirstBoxWithCapacity(capacity)
     if capacity == nil then capacity = 1 end
@@ -129,7 +129,6 @@ function Box:findFirstBoxWithCapacity(capacity)
             return i
         end
     end
-
     return -1
 end
 
@@ -156,7 +155,7 @@ function BoxUI:performDepositMenuActions(boxActions)
     end
 
     -- Find a box capable of storing enough pokemon
-    local index = Box.findFirstBoxWithCapacity(numActions)
+    local index = Box:findFirstBoxWithCapacity(numActions)
     BoxUI:changeBox(index)
 
     BoxUI:bootUpPC()

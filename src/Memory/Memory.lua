@@ -13,12 +13,7 @@ Memory = {
 ---@field size integer Number of bytes to read
 ---@field memdomain integer? The memory domain to read from
 ---@field bit integer? The bit within the mem value to read
-local MemoryTable = {
-	addr = 0,
-	size = 1,
-	memdomain = nil,
-	bit = nil,
-}
+---@field frameLimit integer? Number of frames to wait to find value
 
 
 -- Pokemon Crystal Memory Accessor

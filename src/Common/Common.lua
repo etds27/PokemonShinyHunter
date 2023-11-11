@@ -4,10 +4,15 @@
 
 Common = {}
 
+---Advance the emulator a specified amount of frames
+---@param number integer Number of frames to advance
 function Common:waitFrames(number)
     for _ = 1, number, 1 do emu.frameadvance() end
 end
 
+---Shallow copy a table
+---@param orig any Item to copy
+---@return any newItem A copy of the original item
 function Common:shallowcopy(orig)
     local orig_type = type(orig)
     local copy
@@ -22,8 +27,12 @@ function Common:shallowcopy(orig)
     return copy
 end
 
-function Common:find(table, value)
-    for index, item in ipairs(table) do
+---Find a value in a list
+---@param tab table Table to search in
+---@param value any Value to search for in table
+---@return integer index Index of item in table if found. -1 if not found
+function Common:find(tab, value)
+    for index, item in ipairs(tab) do
         if item == value then
             return index
         end
@@ -31,22 +40,32 @@ function Common:find(table, value)
     return -1
 end
 
-function Common:contains(table, value)
-    if Common:find(table, value) ~= -1 then
-        return true
-    end
-    return false
+---Check if a table contains a certain item
+---@param tab table Table to search in
+---@param value any Value to search for in table
+---@return boolean true if the item was found
+function Common:contains(tab, value)
+    return Common:find(tab, value) ~= -1
 end
 
-function Common:tableLength(table)
-    i = 0
-    for _ in pairs(table)
+
+---Determine the length of a table
+---@param tab table Table to search in
+---@return integer count The number of items in the table
+function Common:tableLength(tab)
+    local i = 0
+    for _ in pairs(tab)
     do
         i = i + 1
     end
     return i
 end
 
+
+---Merge t2 into t1
+---@param t1 table
+---@param t2 table
+---@return table mergedTable The merged table
 function Common:tableMerge(t1, t2)
     for k,v in pairs(t2) do
         if type(v) == "table" then
@@ -62,18 +81,12 @@ function Common:tableMerge(t1, t2)
     return t1
 end
 
+---General function to advance frames until a specific memory address is set to a value
+---@param addrTab MemoryTable table to look up in memory
+---@param desiredState integer|table Expected value to wait for. Can be list of values
+---@param frameLimit integer? [1000] Maximum number of frames to wait
+---@return boolean true if the desired state is found in memory
 function Common:waitForState(addrTab, desiredState, frameLimit)
-    --[[
-        General function to advance frames until a specific memory address is set to a value
-
-        Arguments:
-            - addrTab: Address table to look up in memory
-                {addr: size: memdomain: frameLimit:}
-            - desiredState: Expected value to wait for
-            - frameLimit: Maximum number of frames to wait
-                Default: 1000 (frames)
-        Returns: true if the desired state is found in memory
-    ]]
     if frameLimit == nil then
         if addrTab.frameLimit == nil then
             frameLimit = 1000
@@ -86,7 +99,7 @@ function Common:waitForState(addrTab, desiredState, frameLimit)
         desiredState = {desiredState}
     end
 
-    for i = 1, frameLimit 
+    for _ = 1, frameLimit 
     do
         if Common:contains(desiredState, Memory:readFromTable(addrTab)) then
             return true
@@ -96,18 +109,13 @@ function Common:waitForState(addrTab, desiredState, frameLimit)
     return false
 end
 
-function Common:waitForNotState(addrTab, undesiredState, frameLimit)
-    --[[
-        General function to advance frames until a specific memory address is set to a value
 
-        Arguments:
-            - addrTab: Address table to look up in memory
-                {addr: size: memdomain: frameLimit:}
-            - desiredState: Expected value to wait for
-            - frameLimit: Maximum number of frames to wait
-                Default: 1000 (frames)
-        Returns: true if the desired state is found in memory
-    ]]
+---General function to advance frames until a specific memory address is not set to a value
+---@param addrTab MemoryTable table to look up in memory
+---@param undesiredState integer|table Expected value to wait for. Can be list of values
+---@param frameLimit integer [1000] Maximum number of frames to wait
+---@return boolean true if the desired state is found in memory
+function Common:waitForNotState(addrTab, undesiredState, frameLimit)
     if frameLimit == nil then
         if addrTab.frameLimit == nil then
             frameLimit = 1000
@@ -120,7 +128,7 @@ function Common:waitForNotState(addrTab, undesiredState, frameLimit)
         undesiredState = {undesiredState}
     end
 
-    for i = 1, frameLimit 
+    for _ = 1, frameLimit
     do
         if not Common:contains(undesiredState, Memory:readFromTable(addrTab)) then
             return true
@@ -130,11 +138,10 @@ function Common:waitForNotState(addrTab, undesiredState, frameLimit)
     return false
 end
 
+---Reset the specified required modules so that `require` will load them again
+---@param list table List of modules to reset
 function Common:resetRequires(list)
-    --[[
-        Reset the specified required modules so that `require` will load them again
-    ]]
-    for i, packageName in ipairs(list)
+    for _, packageName in ipairs(list)
     do
         if package.loaded[packageName] ~= nil then
             package.loaded[packageName] = nil
@@ -142,10 +149,15 @@ function Common:resetRequires(list)
     end
 end
 
+---The current system time
+---@return number current system time
 function Common:currentTime()
     return os.clock()
 end
 
+---Convert coordinate or position to a string
+---@param coord Coordinate|Position
+---@return string
 function Common:coordinateToString(coord)
     return "x: " .. tostring(coord.x) .. ", y: " .. tostring(coord.y) 
 end
