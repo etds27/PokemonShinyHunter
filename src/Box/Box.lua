@@ -65,7 +65,7 @@ end
 
 ---Collect the Pokemon data in the box
 ---@param boxNumber integer between 1 and 14
----@return table pokemon Table of `Pokemon` from the box
+---@return Pokemon[] pokemon Table of `Pokemon` from the box
 function Box:getBox(boxNumber)
     -- First Byte is always the number of Pokemon in the box
     local box = {}
@@ -84,13 +84,13 @@ end
 
 
 ---Get the currently loaded box
----@return table pokemon Table of `Pokemon` from the box
+---@return Pokemon[] pokemon Table of `Pokemon` from the box
 function Box:getCurrentBox()
     return Box:getBox(Box:getCurrentBoxNumber())
 end
 
 ---Get all the pokemon in the PC
----@return table pokemon Table of `Pokemon` from the PC
+---@return Pokemon[] pokemon Table of `Pokemon` from the PC
 function Box:getAllPokemonInPC()
     local pokemon = {}
     for i = 1, Box.numBoxes

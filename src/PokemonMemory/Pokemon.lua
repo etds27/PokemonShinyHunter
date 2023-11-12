@@ -37,6 +37,7 @@ require "PokemonFactory"
 ---@field spDefenseStat number 
 ---@field isShiny boolean
 ---@field caught boolean
+---@field isEgg function
 
 Pokemon = {
     address = -1,
