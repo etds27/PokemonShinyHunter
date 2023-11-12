@@ -109,14 +109,6 @@ end
 ---Perform a sequence of button actions
 ---@param args ButtonPresses
 function Input:performButtonSequence(args)
-    --[[
-        
-        
-        Arguments:
-            - buttonSequence: A table of tables where each leaf table holds the Button identifer to press
-            - waitEnd: Frames to wait after all presses have been performed
-            - SEE Input:pressButtons
-    ]]
     Log:debug("Input:performButtonSequence init")
 
     local waitEnd = args.waitEnd or 0
@@ -134,10 +126,8 @@ function Input:performButtonSequence(args)
     Common:waitFrames(waitEnd)
 end
 
+---Release all keys
 function Input:releaseAllKeys()
-    --[[
-        Release all set keys
-    ]]
     local input = joypad.get()
     for key in pairs(input) do
         input[key] = false

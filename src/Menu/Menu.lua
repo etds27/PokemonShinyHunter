@@ -13,47 +13,34 @@ Model.MultiCursor = {
     X = {},
     Y = {}
 }
-local Model = MenuFactory:loadModel()
+Model = MenuFactory:loadModel()
 
 -- Load in default tables
 
 -- Merge model into class
 Menu = Common:tableMerge(Menu, Model)
 
+---Get the current cursor position of the generic menu
+---@return integer position Position of the cursor as int
 function Menu:getCursorPosition()
-    --[[
-        Get the position of the standard menu cursor
-
-        Returns: position of cursor as int
-    ]]
     return Memory:readFromTable(Menu.Cursor)
 end
 
-function Menu:getMultiCursorPosition(args)
-    --[[
-        Get the position of the 2 dimensional menu cursor
-
-        Arguments
-
-        Returns: Table of cursor coordinates
-            {x: y:}
-    ]]
+---Get the position of the 2 dimensional menu cursor
+---@return Coordinate position The 2-D position of the cursor
+function Menu:getMultiCursorPosition()
     return {
         x = Memory:readFromTable(Menu.MultiCursor.X),
         y = Memory:readFromTable(Menu.MultiCursor.Y)
     }
 end
 
-function Menu:navigateMenu(currentLocation, endLocation, options)
-    --[[
-        Navigates a menu to the desired index
 
-        Arguments:
-            - currentLocation: Current cursor position
-            - endLocation: End value of the cursor position
-            - options: Options to control the inputs for menu navigation
-                {duration: waitFrames:}
-    ]]
+---Navigates a menu to the desired index
+---@param currentLocation integer Current cursor position
+---@param endLocation integer End value of the cursor position
+---@param options ButtonPress? Options to control the inputs for menu navigation
+function Menu:navigateMenu(currentLocation, endLocation, options)
     local button = ""
     local delta = 0
     local duration = Duration.MENU_TAP
@@ -83,30 +70,22 @@ function Menu:navigateMenu(currentLocation, endLocation, options)
     end
 end
 
+---Navigates a menu to the desired index from a table
+---@param cursorTable MemoryTable: Cursor table where the cursor position is held
+---@param endLocation integer End value for the cursor address
+---@param options ButtonPress? Options to control the inputs for menu navigation
+---@return boolean true if the memory address is at the desired location
 function Menu:navigateMenuFromTable(cursorTable, endLocation, options)
-    --[[
-        Navigates a menu to the desired index
-
-        Arguments:
-            - cursorTable: Cursor table where the cursor position is held
-            - endLocation: End value for the cursor address
-            - options: Options to control the inputs for menu navigation
-                {duration: waitFrames:}
-    ]]
-    currentLocation = Memory:readFromTable(cursorTable)
+    local currentLocation = Memory:readFromTable(cursorTable)
     Menu:navigateMenu(currentLocation, endLocation, options)
     return Memory:readFromTable(cursorTable) == endLocation
 end
 
+---Navigates a menu to the desired index from an address
+---@param cursorAddress address 1 Byte address where the cursor position is held
+---@param endLocation integer  Desired location for the menu
+---@param options ButtonPress? Options to control the inputs for menu navigation
+---@return boolean true if the memory address is at the desired location
 function Menu:navigateMenuFromAddress(cursorAddress, endLocation, options)
-    --[[
-        Navigates a menu to the desired index
-
-        Arguments:
-            - cursorAddress: 1 Byte address where the cursor position is held
-            - endLocation: End value for the cursor address
-            - options: Options to control the inputs for menu navigation
-                {duration: waitFrames:}
-    ]]
     return Menu:navigateMenuFromTable({addr = cursorAddress, size = 1}, endLocation, options)
 end

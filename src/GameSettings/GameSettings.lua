@@ -71,8 +71,8 @@ GameSettings.LANGUAGES = {
 local function determineIfGame(gameTable)
 	for i = 0, gameTable.size - 1
 	do
-		currentMemByte =  memory.readbyte(gameTable.addr + i, gameTable.memdomain)
-		currentGameByte = gameTable.hex[i + 1]
+		local currentMemByte =  memory.readbyte(gameTable.addr + i, gameTable.memdomain)
+		local currentGameByte = gameTable.hex[i + 1]
 		if currentMemByte ~= currentGameByte then
 			Log:debug("Game is not " .. gameTable.name .. ". " .. tostring(currentGameByte) .. " ~= " .. tostring(currentMemByte))
 			return false

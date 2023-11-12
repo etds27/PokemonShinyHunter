@@ -15,6 +15,7 @@ Memory = {
 ---@field bit integer? The bit within the mem value to read
 ---@field frameLimit integer? Number of frames to wait to find value
 
+---@alias address integer Memory Address
 
 -- Pokemon Crystal Memory Accessor
 ---Access data from the game's memory
