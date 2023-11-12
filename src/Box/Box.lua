@@ -12,7 +12,7 @@ Box = {}
 local Model = {}
 Model.CurrentBoxNumber = {}
 Model.LoadedBox = {}
-local Model = BoxFactory:loadModel()
+Model = BoxFactory:loadModel()
 
 -- Load in default tables
 
@@ -30,7 +30,7 @@ end
 ---@return integer numPokemonInBox Number of pokemon in the box
 function Box:getNumberOfPokemonInBox(boxNumber)
     local startingAddress = Box:getBoxStartingAddress(boxNumber)
-    return Memory:read(startingAddress, size, Memory.CARTRAM) % 255 -- Value may be 255
+    return Memory:read(startingAddress, 1, Memory.CARTRAM) % 255 -- Value may be 255
 end
 
 ---Get the number of pokemon in the current box
@@ -55,7 +55,6 @@ function Box:getBoxStartingAddress(boxNumber)
     end
 end
 
----
 ---@param startingAddress integer The starting address of the box the pokemon is in
 ---@param pokemonPosition integer The index of the pokemon (Start at 1)
 ---@return integer pokemonAddress Location of the pokemon within the box
@@ -260,20 +259,23 @@ function BoxUI:exitPC()
     return Positioning:inOverworld()
 end
 
+---Get the current focused pokemon in the BoxUI
+---@return integer index
 function BoxUI:currentPokemonIndex()
     --[[
         ABSTRACT FUNCTION. Will differ between games 
         Determine the index of the currently focused pokemon in the box
     ]]
+    return 0
 end
 
 -- Abstract tables
-local Model = {}
+Model = {}
 Model.PCMainMenu = {}
 Model.PCBillsMenu = {}
 Model.PCBoxCursor = {}
 Model.PCBoxEdit = {}
-local Model = BoxUIFactory:loadModel()
+Model = BoxUIFactory:loadModel()
 
 -- Load in default tables
 

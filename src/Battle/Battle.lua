@@ -48,7 +48,7 @@ function Battle:waitForBattleMenu(bIterations)
     local cursor = {x = 0, y = 0}
     while i < bIterations
     do
-        cursor = Menu:getMultiCursorPosition(Battle.MenuCursor)
+        cursor = Menu:getMultiCursorPosition()
         if cursor.x == Battle.MenuCursor.FIGHT.x and cursor.y == Battle.MenuCursor.FIGHT.y then
             return true
         end

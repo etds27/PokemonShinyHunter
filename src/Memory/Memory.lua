@@ -1,3 +1,4 @@
+---@enum Memory
 Memory = {
 	ROM = 0x0,
 	VRAM = 0x80,

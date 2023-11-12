@@ -39,7 +39,7 @@ end
 ---Navigates a menu to the desired index
 ---@param currentLocation integer Current cursor position
 ---@param endLocation integer End value of the cursor position
----@param options ButtonPress? Options to control the inputs for menu navigation
+---@param options ButtonDuration? Options to control the inputs for menu navigation
 function Menu:navigateMenu(currentLocation, endLocation, options)
     local button = ""
     local delta = 0
@@ -73,7 +73,7 @@ end
 ---Navigates a menu to the desired index from a table
 ---@param cursorTable MemoryTable: Cursor table where the cursor position is held
 ---@param endLocation integer End value for the cursor address
----@param options ButtonPress? Options to control the inputs for menu navigation
+---@param options ButtonDuration? Options to control the inputs for menu navigation
 ---@return boolean true if the memory address is at the desired location
 function Menu:navigateMenuFromTable(cursorTable, endLocation, options)
     local currentLocation = Memory:readFromTable(cursorTable)
@@ -84,7 +84,7 @@ end
 ---Navigates a menu to the desired index from an address
 ---@param cursorAddress address 1 Byte address where the cursor position is held
 ---@param endLocation integer  Desired location for the menu
----@param options ButtonPress? Options to control the inputs for menu navigation
+---@param options ButtonDuration? Options to control the inputs for menu navigation
 ---@return boolean true if the memory address is at the desired location
 function Menu:navigateMenuFromAddress(cursorAddress, endLocation, options)
     return Menu:navigateMenuFromTable({addr = cursorAddress, size = 1}, endLocation, options)

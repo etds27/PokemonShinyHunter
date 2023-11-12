@@ -19,27 +19,26 @@ function Party:numOfPokemonInParty()
     return Memory:readFromTable(Party)
 end
 
+
+---Get the starting address of a pokemon in the trainers party.
+---Index starts at 1
+---@param index integer The position of the pokemon in the party
+---@return address address The address of the pokemon in the party
 function Party:getPokemonAddress(index)
-    --[[
-        Get the starting address of a pokemon in the trainers party.
-        Index starts at 1
-        Returns: addr
-    ]]
     return Party.addr + 8 + (index - 1) * Party.pokemonSize
 end
 
+---Get the pokemonTable for a pokemon in the party at a specific index
+---@param index integer The position of the pokemon in the party
+---@return Pokemon pokemon The pokemon at the specified index
 function Party:getPokemonAtIndex(index)
-    --[[
-        Return the pokemonTable for a pokemon in the party at a specific index
-    ]]
     local addr = Party:getPokemonAddress(index)
     return Pokemon:new(Pokemon.PokemonType.TRAINER, addr)
 end
 
+---Get a table of all of the pokemon tables in your party
+---@return table table A table of `Pokemon` 
 function Party:getAllPokemonInParty()
-    --[[
-        Get a table of all of the pokemon tables in your party
-    ]]
     local tab = {}
     for i = 1, Party:numOfPokemonInParty()
     do
@@ -48,12 +47,11 @@ function Party:getAllPokemonInParty()
     return tab
 end
 
+---Get a table containing all of the eggs in the party
+---@return table table A table of the egg pokemon in your party
 function Party:getAllEggsInParty()
-    --[[
-        Get a table containing all of the eggs in the party
-    ]]
     local tab = {}
-    for i, pokemon in pairs(Party:getAllPokemonInParty())
+    for _, pokemon in pairs(Party:getAllPokemonInParty())
     do
         if pokemon:isEgg() then
             table.insert(tab, pokemon)
@@ -62,6 +60,8 @@ function Party:getAllEggsInParty()
     return tab
 end
 
+---Get a table that specifies true or false for egg status of each slot in your party
+---@return table
 function Party:getEggMask()
     local tab = {}
     for i, pokemon in pairs(Party:getAllPokemonInParty())
@@ -75,11 +75,15 @@ function Party:getEggMask()
     return tab
 end
 
+---Determine the current number of eggs in your party
+---@return integer eggs Number of eggs in your party
 function Party:getNumberOfEggsInParty()
     return Common:tableLength(Party:getAllEggsInParty())
-end 
+end
 
-function Party:navigateToPokemon(num)    
+---Open the party menu and move cursor to the specified pokemon
+---@param num integer Index of the pokemon to navigate to within your party
+function Party:navigateToPokemon(num)
     StartMenu:open()
     StartMenu:navigateToOption(StartMenu.POKEMON)
     Input:pressButtons{buttonKeys={Buttons.A},

@@ -23,6 +23,9 @@ Duration = {
     STEP = 19,
     MENU_TAP = 5
 }
+---@class ButtonDuration
+---@field duration integer? [20] Int to determine how long to press the buttons for
+---@field waitFrames number? [20] Number frames to wait after the action to resolve animations
 
 ---@class ButtonPress
 ---@field buttonKeys table A list of Buttons enums to press

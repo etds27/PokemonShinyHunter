@@ -3,6 +3,41 @@ require "Log"
 require "Memory"
 require "PokemonFactory"
 
+---@class Pokemon
+---@field address number 
+---@field species number
+---@field heldItem number 
+---@field move1 number 
+---@field move2 number 
+---@field move3 number 
+---@field move4 number 
+---@field trainerId number 
+---@field expPoints number 
+---@field hpEv number 
+---@field attackEv number 
+---@field defenseEv number 
+---@field speedEv number 
+---@field specialEv number 
+---@field ivData number 
+---@field movePp1 number 
+---@field movePp2 number 
+---@field movePp3 number 
+---@field movePp4 number 
+---@field friendship number 
+---@field pokerus number 
+---@field caughtData number 
+---@field level number 
+---@field status number 
+---@field currentHp number 
+---@field hpStat number 
+---@field attackStat number 
+---@field defenseStat number 
+---@field speedStat number 
+---@field spAttackStat number 
+---@field spDefenseStat number 
+---@field isShiny boolean
+---@field caught boolean
+
 Pokemon = {
     address = -1,
     species = -1,
@@ -37,12 +72,16 @@ Pokemon = {
     spDefenseStat = -1
 }
 
-
+---Create a new pokemon table
+---@param pokemonType PokemonType Where the pokemon is. Party, Wild, Box
+---@param startingAddress address Starting address of the pokemon
+---@param memdomain Memory? Domain of pokemon
+---@return Pokemon
 function Pokemon:new(pokemonType, startingAddress, memdomain)
-    o = {
-        memoryType = pokemonType, 
-        addr = startingAddress, 
-        memdomain = memdomain
+    local o = {
+            memoryType = pokemonType, 
+            addr = startingAddress, 
+            memdomain = memdomain
     }
     
     self.__index = self
@@ -56,9 +95,13 @@ end
 
 function Pokemon:update()
     for key, value in pairs(self.memoryType) do
-        offset = value[1]
-        size = value[2]
-        memValue = Memory:read(self.addr + offset, size, self.memdomain)
+        local offset = value[1]
+        local size = value[2]
+
+        ---@type string|number
+        local key = key
+        ---@type string|number
+        local memValue = Memory:read(self.addr + offset, size, self.memdomain)
 
         if key == "species" then memValue = tostring(memValue) end
         self[key] = memValue
@@ -66,12 +109,12 @@ function Pokemon:update()
 end
 
 function Pokemon:determineIvs() 
-    ivData = self.ivData
-    attackIv = (ivData >> 12) & 0x000F
-    defenseIv = (ivData >> 8) & 0x000F
-    speedIv = (ivData >> 4) & 0x000F
-    specialIv = ivData & 0x000F
-    hpIv = (attackIv & 0x1) * 8 + (defenseIv & 0x1) * 4 + (speedIv & 0x1) * 2 + (specialIv & 0x1)
+    local ivData = self.ivData
+    local attackIv = (ivData >> 12) & 0x000F
+    local defenseIv = (ivData >> 8) & 0x000F
+    local speedIv = (ivData >> 4) & 0x000F
+    local specialIv = ivData & 0x000F
+    local hpIv = (attackIv & 0x1) * 8 + (defenseIv & 0x1) * 4 + (speedIv & 0x1) * 2 + (specialIv & 0x1)
 
     self.attackIv = attackIv
     self.defenseIv = defenseIv
@@ -81,15 +124,10 @@ function Pokemon:determineIvs()
 end
 
 function Pokemon:determineShininess()
-    attackReq = Common:contains({2, 3, 6, 7, 10, 11, 14, 15}, self.attackIv)
-    defenseReq = self.defenseIv == 10
-    speedReq = self.speedIv == 10
-    specialReq = self.specialIv == 10
-
-    -- Log:debug("Shiny Attack:  " .. tostring(attackReq))
-    -- Log:debug("Shiny Defense: " .. tostring(defenseReq))
-    -- Log:debug("Shiny Speed:   " .. tostring(speedReq))
-    -- Log:debug("Shiny Special: " .. tostring(specialReq))
+    local attackReq = Common:contains({2, 3, 6, 7, 10, 11, 14, 15}, self.attackIv)
+    local defenseReq = self.defenseIv == 10
+    local speedReq = self.speedIv == 10
+    local specialReq = self.specialIv == 10
 
     return speedReq and attackReq and defenseReq and specialReq
 end
@@ -101,6 +139,10 @@ function Pokemon:isEgg(update)
     return self.caughtData == 0
 end
 
+---Determine how many egg cycles remain for the current pokemon
+---
+---This value is determined from the friendship memory address
+---@return integer cycles Number of remaining egg cycles
 function Pokemon:eggCyclesRemaining()
     self:update()
     if self:isEgg() then
@@ -120,6 +162,7 @@ local Model = PokemonFactory:loadModel()
 -- Merge model into class
 Pokemon = Common:tableMerge(Pokemon, Model)
 
+---@enum PokemonType
 Pokemon.PokemonType = {
     TRAINER = Pokemon.TrainerPokemonOffsets,
     WILD = Pokemon.WildPokemonOffsets,
