@@ -6,12 +6,14 @@ require "Positioning"
 local Model = {}
 Model.size = 0
 Model.addr = 0
-local Model = StartMenuFactory:loadModel()
+Model = StartMenuFactory:loadModel()
 
 -- 
 StartMenu = {}
 StartMenu = Common:tableMerge(StartMenu, Model)
 
+---Open the start menu
+---@return boolean true if the user is no longer in the overworld
 function StartMenu:open()
     if not Positioning:inOverworld() then
         Log:error("Not in overworld")
@@ -23,10 +25,11 @@ function StartMenu:open()
     return not Positioning:inOverworld()
 end
 
+---Move the cursor to the desired option. Assumes the menu is open
+---@param option integer Menu Option to naivgate to
+---@param maxAttempts integer? Total number of button presses to take to reach the desired option
+---@return boolean true if the option was reached
 function StartMenu:navigateToOption(option, maxAttempts)
-    --[[
-        Move the cursor to the desired option. Assumes the menu is open
-    ]]
     if maxAttempts == nil then maxAttempts = 20 end
     local i = 0
     while i < maxAttempts
@@ -41,6 +44,10 @@ function StartMenu:navigateToOption(option, maxAttempts)
     return false
 end
 
+---Navigate to option and select it
+---@param option integer Menu Option to naivgate to
+---@param maxAttempts integer? Total number of button presses to take to reach the desired option
+---@return boolean true if the option was reached
 function StartMenu:selectOption(option, maxAttempts)
     if not StartMenu:navigateToOption(option, maxAttempts) then
         Log:error("Unable to find menu option: " .. tostring(option))

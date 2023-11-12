@@ -9,7 +9,7 @@ PostCatch = {
 }
 
 function PostCatch:continueUntilOverworld() 
-    i = 0
+    local i = 0
     Log:debug("PostCatch:continueUntilOverworld - init")
     while not Positioning:inOverworld() and i < PostCatch.iterations
     do

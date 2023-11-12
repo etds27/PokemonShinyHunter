@@ -125,8 +125,8 @@ end
 
 ---Move the character to a specified position
 ---@param newPos Coordinate|Position
----@param maxSteps integer Number of turns the trainer will attempt to make when pathing
----@param releaseEnd boolean Bool to have frames at the end of the movement without any input
+---@param maxSteps integer? Number of turns the trainer will attempt to make when pathing
+---@param releaseEnd boolean? Bool to have frames at the end of the movement without any input
 ---@return MovementReturn
 function Positioning:moveToPosition(newPos, maxSteps, releaseEnd)
     return Positioning:moveToPoint(newPos.x, newPos.y, maxSteps, releaseEnd)
@@ -137,8 +137,8 @@ end
 ---Very dumb walk from one position to another method.
 ---@param newX integer X coordinate to move to
 ---@param newY integer Y coordinate to move to
----@param maxSteps integer Number of turns the trainer will attempt to make when pathing
----@param releaseEnd boolean Bool to have frames at the end of the movement without any input
+---@param maxSteps integer? Number of turns the trainer will attempt to make when pathing
+---@param releaseEnd boolean? Bool to have frames at the end of the movement without any input
 ---@return MovementReturn
 function Positioning:moveToPoint(newX, newY, maxSteps, releaseEnd)
     if maxSteps == nil then
@@ -210,7 +210,7 @@ end
 ---
 ---@param maxSteps integer Maximum number of steps to take before returning
 ---@param direction integer Direction to walk towards
----@param releaseEnd boolean [true] Bool to have frames at the end of the movement without any input
+---@param releaseEnd boolean? [true] Bool to have frames at the end of the movement without any input
 ---@return MovementReturn
 function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd)
     local position = Positioning:getPosition()
