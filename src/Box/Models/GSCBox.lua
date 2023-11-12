@@ -10,7 +10,8 @@ local Model = {
 
     CurrentBoxNumber = {
         addr = 0xDB72,
-        size = 1
+        size = 1,
+        memdomain = Memory.WRAM
     },
 
     LoadedBox = {

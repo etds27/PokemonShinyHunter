@@ -13,16 +13,16 @@ end
 
 function BoxTest:testGetCurrentBox()
     savestate.load(TestStates.BOX_1_6)
-    box = Box:getCurrentBox()
-    pokemon = box[1]
-    return pokemon.species == 167
+    local box = Box:getCurrentBox()
+    local pokemon = box[1]
+    return pokemon.species == "167"
 end
 
 function BoxTest:testGetBox()
     savestate.load(TestStates.BOX_1_6)
-    box = Box:getBox(1)
-    pokemon = box[2]
-    return pokemon.species == 163
+    local box = Box:getBox(1)
+    local pokemon = box[2]
+    return pokemon.species == "163"
 end
 
 function BoxUITest:testChangeBox()
@@ -48,7 +48,6 @@ function BoxUITest:testPerformDepositMenuActions()
 
 end
 
-Log.loggingLevel = LogLevels.DEBUG
 print("BoxTest:testCurrentBoxNumber()", BoxTest:testCurrentBoxNumber())
 print("BoxTest:testGetCurrentBox()", BoxTest:testGetCurrentBox())
 print("BoxTest:testGetBox()", BoxTest:testGetBox())
