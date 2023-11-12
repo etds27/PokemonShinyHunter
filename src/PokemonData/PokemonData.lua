@@ -13,12 +13,19 @@ end
 PokemonData = {}
 Common:tableMerge(PokemonData, readJson(os.getenv("PSH_ROOT") .. "\\GameData\\Pokemon\\" .. GameSettings.game.pokemonData))
 
+---Get the pokemon's data from its ID
+---@param pokemonNumber string Pokemon's ID as a string
+---@return unknown
 function PokemonData:getPokemonByNumber(pokemonNumber)
-	return PokemonData[tostring(pokemonNumber)]
+	return PokemonData[pokemonNumber]
 end
 
+
+---Get the pokemon's data from its name
+---@param pokemonName string Name of pokemon
+---@return table pokemonData Game data of pokemon
 function PokemonData:getPokemonByName(pokemonName)
-	for pokemonNumber, currentName in ipairs(PokemonData)
+	for pokemonNumber, currentName in pairs(PokemonData)
 	do
 		if currentName == pokemonName then
 			return PokemonData:getPokemonByNumber(pokemonNumber)

@@ -31,54 +31,58 @@ Positioning = Common:tableMerge(Positioning, Model)
 ---@field ret boolean
 ---@field steps integer
 
+---Calculate the Manhattan distance between 2 points
+---This is useful to determine the number of steps travelled
+---between two points assuming an optimal path
+---@param pos1 Position|Coordinate Starting point
+---@param pos2 Position|Coordinate End point
+---@return integer distance The Manhattan distance between the two points
 function Positioning:manhattanDistance(pos1, pos2)
-    --[[
-        Calculate the Manhattan distance between 2 points
-
-        This is useful to determine the number of steps travelled
-        between two points assuming an optimal path
-    ]]
     return math.abs(pos1.x - pos2.x) + math.abs(pos1.y - pos2.y)
 end
 
+---Advance frames until the player is in the overworld
+---This does not guarantee that movement is available 
+---@param frameLimit integer Maximum number of frames to wait
+---@return boolean true if trainer is in the overworld
 function Positioning:waitForOverworld(frameLimit)
-    --[[
-        Advance frames until the player is in the overworld
-
-        This does not guarantee that movement is available 
-        Arguments:
-            - frameLimit: Maximum number of frames to wait
-    ]]
     return Common:waitForState(Positioning.MovementEnabled, Positioning.MovementEnabled.MOVEMENT_ENABLED, frameLimit)
 end
 
+---Check if trainer is in the overworld
+---@return boolean true if trainer is in the overworld
 function Positioning:inOverworld()
     return Memory:readFromTable(Positioning.MovementEnabled) == Positioning.MovementEnabled.MOVEMENT_ENABLED
 end
 
+---Get trainer's current X position
+---@return integer x
 function Positioning:getX()
     return Memory:readFromTable(Positioning.PositionX)
 end
 
+---Get trainer's current Y position
+---@return integer y
 function Positioning:getY()
     return Memory:readFromTable(Positioning.PositionY)
 end
 
+---Get trainer's current direction
+---@return integer direction
 function Positioning:getDirection()
     return Memory:readFromTable(Positioning.Direction)
 end
 
+
+---Get trainer's current map ID
+---@return integer mapID
 function Positioning:getMap()
-    Memory:readFromTable(Positioning.Map)
+    return Memory:readFromTable(Positioning.Map)
 end
 
+---Get all position data for the player
+---@return Position position Current position of the player
 function Positioning:getPosition()
-    --[[
-        Get all position data for the player
-
-        Returns: Table with position data
-            {x: y: direction: map:}
-    ]]
     return {
         x = Positioning:getX(),
         y = Positioning:getY(),
@@ -87,10 +91,10 @@ function Positioning:getPosition()
     }
 end
 
+---Turn to face the specified direction
+---@param direction integer Direction to face
+---@return boolean true if the trainer faces the correct direction
 function Positioning:faceDirection(direction)
-    --[[
-        Turn to face the specified direction
-    ]]
     if Memory:readFromTable(Positioning.Direction) == direction then
         return true
     end
@@ -119,25 +123,24 @@ function Positioning:faceDirection(direction)
     return Memory:readFromTable(Positioning.Direction) == direction
 end
 
+---Move the character to a specified position
+---@param newPos Coordinate|Position
+---@param maxSteps integer Number of turns the trainer will attempt to make when pathing
+---@param releaseEnd boolean Bool to have frames at the end of the movement without any input
+---@return MovementReturn
 function Positioning:moveToPosition(newPos, maxSteps, releaseEnd)
-    --[[
-        Move the character to a specified position
-
-        Arguments:
-            - newPos: Position table with the following structure
-                {x: y: ...}
-            - maxSteps: Number of turns the trainer will attempt to make when pathing
-            - releaseEnd: Bool to have frames at the end of the movement without any input
-                def: true
-    ]]
     return Positioning:moveToPoint(newPos.x, newPos.y, maxSteps, releaseEnd)
 end
 
+---Move the character to a specified position
+---
+---Very dumb walk from one position to another method.
+---@param newX integer X coordinate to move to
+---@param newY integer Y coordinate to move to
+---@param maxSteps integer Number of turns the trainer will attempt to make when pathing
+---@param releaseEnd boolean Bool to have frames at the end of the movement without any input
+---@return MovementReturn
 function Positioning:moveToPoint(newX, newY, maxSteps, releaseEnd)
-    --[[
-        Very dumb walk from one position to another method.
-    ]]
-
     if maxSteps == nil then
         maxSteps = 100
     end
@@ -199,22 +202,17 @@ function Positioning:moveToPoint(newX, newY, maxSteps, releaseEnd)
     return {ret = false, steps = totalSteps}
 end
 
+---Move N steps in a particular direction
+---
+--- will attempt to take a maximum number of steps in a specified direction
+---If a collision is detected, it will immediately return
+---If the trainer leaves the current map area, it will immediately return
+---
+---@param maxSteps integer Maximum number of steps to take before returning
+---@param direction integer Direction to walk towards
+---@param releaseEnd boolean [true] Bool to have frames at the end of the movement without any input
+---@return MovementReturn
 function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd)
-    --[[
-        Move N steps in a particular direction
-
-        This will attempt to take a maximum number of steps in a specified direction
-        If a collision is detected, it will immediately return
-        If the trainer leaves the current map area, it will immediately return
-
-        Arguments:
-            - maxSteps: Maximum number of steps to take before returning
-            - direction: Direction to walk towards
-            - releaseEnd: Bool to have frames at the end of the movement without any input
-                def: true
-        Returns: Table with a return value and the number of steps taken
-            {ret: steps:}
-    ]]
     local position = Positioning:getPosition()
     local startX = position.x
     local startY = position.y
