@@ -1,3 +1,4 @@
+---@enum TestStates
 TestStates = {
     POST_CATCH_TEST = "States\\PostCatchTests.State",
     AUTO_CATCH_SAVE_STATE = "States\\AutoCatch.State",
@@ -28,5 +29,6 @@ TestStates = {
     MENU_OPEN = "States\\MenuOpen.State",
     POKEDEX = "States\\Pokedex.State",
     HEADBUTT_ENCOUNTER = "States\\HeadbuttEncounter.State",
-    HEADBUTT_NO_ENCOUNTER = "States\\HeadbuttNoEncounter.State"
+    HEADBUTT_NO_ENCOUNTER = "States\\HeadbuttNoEncounter.State",
+    POKE_GEAR_MENU = "States\\PokegearMenuTest.State"
 }

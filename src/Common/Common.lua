@@ -1,5 +1,5 @@
--- require "Log"
--- require "Memory"
+require "Log"
+require "Memory"
 -- require "Input"
 
 Common = {}

@@ -14,7 +14,7 @@ Model.Catch = {}
 Model.PokemonTurnCounter = {}
 Model.EnemyPokemonTurnCounter = {}
 Model.MenuPointer = {}
-local Model = BattleFactory:loadModel()
+Model = BattleFactory:loadModel()
 
 -- Load in default tables
 

@@ -128,7 +128,7 @@ function Collection:numberOfShiniesCaught(species, pokemonData)
 
     local currentCount = 0
 
-    for i, currentPokemon in ipairs(pokemonData)
+    for _, currentPokemon in ipairs(pokemonData)
     do
         if Common:contains(evolutionSpecies, currentPokemon.species) and currentPokemon.isShiny and not currentPokemon:isEgg() then
             currentCount = currentCount + 1

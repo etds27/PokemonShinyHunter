@@ -1,3 +1,4 @@
+---@class StartMenu.Option
 local Model = {
     addr = 0xCF74,
     size = 1,

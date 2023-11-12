@@ -1,3 +1,4 @@
+---@enum LogLevels
 LogLevels = {
     OFF = {4, "OFF"},
     ERROR = {3, "ERROR"},
@@ -10,6 +11,9 @@ Log = {
     loggingLevel = LogLevels.OFF
 }
 
+---Log message to the console
+---@param type LogLevels
+---@param message string Message to write
 function Log:message(type, message) 
     -- Skip if the logging level is too high
     if type[1] < Log.loggingLevel[1] then return end  

@@ -3,6 +3,7 @@ require "Log"
 
 Input = {}
 
+---@enum Buttons
 Buttons = {
     A = "A",
     B = "B",
@@ -15,6 +16,7 @@ Buttons = {
     UP = "Up"
 }
 
+---@enum Duration integer
 Duration = {
     TAP = 1,
     PRESS = 15,
@@ -23,16 +25,15 @@ Duration = {
     STEP = 19,
     MENU_TAP = 5
 }
+
 ---@class ButtonDuration
 ---@field duration integer? [20] Int to determine how long to press the buttons for
 ---@field waitFrames number? [20] Number frames to wait after the action to resolve animations
 
----@class ButtonPress
+---@class ButtonPress: ButtonDuration
 ---@field buttonKeys table A list of Buttons enums to press
----@field duration integer? [20] Int to determine how long to press the buttons for
 ---@field releaseStart boolean? to release all keys before pressing the buttons
 ---@field releaseEnd boolean? to release all keys after they have been pressed
----@field waitFrames number? [20] Number frames to wait after the action to resolve animations
 ---@field iterations integer? Number of times to perform action for repeatedlyPressButton
 ---@field waitEnd integer? Number of frames to wait after perform action sequence
 

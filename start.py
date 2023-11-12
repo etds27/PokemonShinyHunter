@@ -40,6 +40,7 @@ def create_luases(lua_files, path, auto_start: [str] = []):
 
 def update_lua_path(lua_files):     
     for lua_file in lua_files:
+        print(lua_file)
         os.environ["LUA_PATH"] = f"{os.environ['LUA_PATH']};{os.path.dirname(lua_file)}\\?.lua"
 
 print(args)
@@ -79,7 +80,7 @@ for dirpaths, _, filenames in os.walk(TEST_DIR):
         path = os.path.join(dirpaths, filename)
         test_lua_files.append(path)
 
-update_lua_path(lua_files)
+update_lua_path([SRC_DIR] + lua_files)
 create_luases(lua_files, os.path.join(ROOT_DIR, "session.luases"))
 create_luases(test_lua_files, os.path.join(ROOT_DIR, "test_session.luases"))
 create_luases(lua_files, os.path.join(ROOT_DIR, "main_session.luases"), auto_start=["Main.lua"])

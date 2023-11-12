@@ -15,7 +15,7 @@ Model.KeyPocket = {}
 Model.TMHMPocket = {}
 Model.BallPocket = {}
 Model.ItemPocket = {}
-local Model = BagFactory:loadModel()
+Model = BagFactory:loadModel()
 
 -- Load in default tables
 local BallPriority = {
@@ -29,6 +29,7 @@ local BallPriority = {
 Bag = {
     BallPriority = BallPriority
 }
+
 Bag = Common:tableMerge(Bag, Model)
 ItemPocket = {}
 KeyPocket = {}
@@ -39,6 +40,8 @@ BallPocket = {}
 ---@param pocket integer The pocket that the item will be in
 ---@param item integer The item to select 
 function Bag:navigateToItem(pocket, item)
+    local tab
+    local location
     if pocket == Bag.Pocket.ITEMS then
         tab = ItemPocket:containsItem(item)
         location = tab[1]
@@ -61,7 +64,7 @@ function Bag:navigateToItem(pocket, item)
         return false
     end 
     Menu:navigateMenuFromTable(Bag.Cursor, location)
- 
+
     return Memory:readFromTable(Bag.Cursor) == location
 end
 
@@ -75,7 +78,7 @@ function Bag:useItem(pocket, item)
     end
 
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS} -- TAP is too short
-    currentLocation = Memory:readFromTable(Bag.Cursor)
+    Memory:readFromTable(Bag.Cursor)
     Menu:navigateMenuFromTable(Bag.Cursor, Bag.BattleItem.USE)
     Input:pressButtons{buttonKeys={Buttons.A}, duration=Duration.PRESS}
     return true
