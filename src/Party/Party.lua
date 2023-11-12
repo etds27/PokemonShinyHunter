@@ -83,17 +83,21 @@ end
 
 ---Open the party menu and move cursor to the specified pokemon
 ---@param num integer Index of the pokemon to navigate to within your party
+---@return boolean true if the pokemon was successfully navigated to
 function Party:navigateToPokemon(num)
-    StartMenu:open()
-    StartMenu:navigateToOption(StartMenu.POKEMON)
+    if not StartMenu:open() then return false end
+    if not StartMenu:navigateToOption(StartMenu.POKEMON) then return false end
     Input:pressButtons{buttonKeys={Buttons.A},
-                    duration=Duration.PRESS,
-                    waitFrames=60}
-    Menu:navigateMenuFromTable(Menu.Cursor, num)
+                       duration=Duration.PRESS,
+                       waitFrames=60}
+
+    if not Menu:activeNavigateMenuFromTable(Menu.Cursor, num) then return false end
 
     Input:repeatedlyPressButton{buttonKeys={Buttons.A},
                                 duration=Duration.PRESS,
                                 waitFrames=25,
                                 iterations=3}
     Common:waitFrames(30)
+    return true
 end
+

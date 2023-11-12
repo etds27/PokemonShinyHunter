@@ -7,14 +7,15 @@ end
 
 function PartyTest:testGetPokemonAtIndex()
     savestate.load(TestStates.POKEMON_PARTY)
-    tab = Party:getPokemonAtIndex(5)
-    return tab.species == 155 and tab.isShiny
+    local tab = Party:getPokemonAtIndex(5)
+    return tab.species == "155" and tab.isShiny
 end
 
 function PartyTest:testGetAllPokemonInParty()
     savestate.load(TestStates.POKEMON_PARTY)
-    tab = Party:getAllPokemonInParty()
-    species = {161, 165, 010, 019, 155}
+    local tab = Party:getAllPokemonInParty()
+    local species = {"161", "165", "10", "19", "155"}
+
     for i, pokemonTable in ipairs(tab)
     do
         if pokemonTable.species ~= species[i] then
@@ -24,6 +25,12 @@ function PartyTest:testGetAllPokemonInParty()
     return true
 end
 
+function PartyTest:testNavigateToPokemon()
+    savestate.load(TestStates.SHUCKLE_PARTY_TEST)
+    return Party:navigateToPokemon(6)
+end
+
 print("PartyTest:testNumPokemonInParty()", PartyTest:testNumPokemonInParty())
 print("PartyTest:testGetPokemonAtIndex()", PartyTest:testGetPokemonAtIndex())
 print("PartyTest:testGetAllPokemonInParty()", PartyTest:testGetAllPokemonInParty())
+print("PartyTest:testNavigateToPokemon()", PartyTest:testNavigateToPokemon())

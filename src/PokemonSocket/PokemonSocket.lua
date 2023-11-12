@@ -1,11 +1,10 @@
-json = require "json"
+local json = require "json"
 
 PokemonSocket = {
     host = "127.0.0.1",
     port = 57373,
     timeout = 1000
 }
-
 
 ---@enum EventType
 EventType = {
@@ -26,7 +25,6 @@ EventType = {
 ---@param eventType EventType What event was sent to the server 
 ---@return Payload payload Payload that was sent to the server
 function PokemonSocket:sendTable(tab, eventType)
-    local trainerId = Trainer:getTrainerID()
     local time = Trainer:getPlayTime()
 
     -- Add meta data to the package before sending over

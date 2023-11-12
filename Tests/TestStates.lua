@@ -30,5 +30,6 @@ TestStates = {
     POKEDEX = "States\\Pokedex.State",
     HEADBUTT_ENCOUNTER = "States\\HeadbuttEncounter.State",
     HEADBUTT_NO_ENCOUNTER = "States\\HeadbuttNoEncounter.State",
-    POKE_GEAR_MENU = "States\\PokegearMenuTest.State"
+    POKE_GEAR_MENU = "States\\PokegearMenuTest.State",
+    SHUCKLE_PARTY_TEST = "States\\ShucklePartyTest.State"
 }

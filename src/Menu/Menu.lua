@@ -47,10 +47,10 @@ end
 ---@param options MenuOption? Options to control the inputs for menu navigation
 function Menu:navigateMenu(currentLocation, endLocation, options)
     local button = ""
-    local delta =0
+    local delta = 0
     local duration = Duration.MENU_TAP
     local waitFrames = 10
-    local maximumPresses
+    local maximumPresses = 100
 
     if options ~= nil then
         duration = options.duration or Duration.MENU_TAP
@@ -61,7 +61,6 @@ function Menu:navigateMenu(currentLocation, endLocation, options)
     delta =  math.min(math.abs(endLocation - currentLocation), maximumPresses)
 
     button = Menu:getButtonForMenuNavigation(currentLocation, endLocation, options)
-
     Log:debug("Searching " .. tostring(button) .. " in menu")
     Log:debug("Pressing " .. button .. " " .. tostring(delta) .. " times")
     for _ = 1, math.abs(delta)
@@ -102,7 +101,7 @@ function Menu:activeNavigateMenuFromTable(cursorTable, endLocation, options)
     local button = ""
     local duration = Duration.MENU_TAP
     local waitFrames = 10
-    local maximumPresses = 0
+    local maximumPresses = 100
     if options ~= nil then
         duration = options.duration or Duration.MENU_TAP
         waitFrames = options.waitFrames or 10
@@ -111,7 +110,6 @@ function Menu:activeNavigateMenuFromTable(cursorTable, endLocation, options)
 
     local currentLocation = Memory:readFromTable(cursorTable)
     button = Menu:getButtonForMenuNavigation(currentLocation, endLocation, options)
-
     for _ = 1, maximumPresses
     do
         currentLocation = Memory:readFromTable(cursorTable)
