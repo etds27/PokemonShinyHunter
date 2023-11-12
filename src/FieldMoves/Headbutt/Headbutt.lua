@@ -13,14 +13,9 @@ Model = HeadbuttFactory:loadModel()
 -- Merge model into class
 Headbutt = Common:tableMerge(Headbutt, Model)
 
+---Headbutt the tree that the trainer is facing
+---@return boolean True If an encounter was found False, if we were unable to headbutt or no encounter was started
 function Headbutt:headbuttTree() 
-    --[[
-        Headbutt the tree that the trainer is facing
-
-        Returns:
-            True, if an encounter was found
-            False, if we were unable to headbutt or no encounter was started
-    ]]
     -- Initiate headbutt
     Input:pressButtons{buttonKeys={Buttons.A}, duration=14, waitFrames=2}
     -- Press A until Yes/No prompt comes up

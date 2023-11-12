@@ -25,9 +25,8 @@ function BreedingTest:testEggReadyForPickup()
         {false, TestStates.EGG_RESET_POINT},
         {true, TestStates.EGG_READY}
     }
-    for i, pair in ipairs(testTable)
+    for _, pair in ipairs(testTable)
     do
-        print(state)
         local result = pair[1]
         local state = pair[2]
         savestate.load(state)

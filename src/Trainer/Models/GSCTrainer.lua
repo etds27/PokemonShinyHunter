@@ -11,10 +11,18 @@ local Model = {
     },
 
     PlayTime = {
-        hrAddr = 0xD4C5,
-        minAddr = 0xD4C6,
-        secAddr = 0xD4C7,
-        size = 1
+        Hour = {
+            addr = 0xD4C5,
+            size = 1
+        },
+        Minute = {
+            addr = 0xD4C6,
+            size = 1
+        },
+        Second = {
+            addr = 0xD4C7,
+            size = 1
+        }
     },
 
     Name = {

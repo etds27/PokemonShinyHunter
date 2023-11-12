@@ -16,13 +16,10 @@ local Model = FishingFactory:loadModel()
 -- Merge model into class
 Fishing = Common:tableMerge(Fishing, Model)
 
-function Fishing:fish() 
-    --[[
-        Handle all interation after the rod has been selected from the bag
-
-        Returns: true if a fish was hooked, false, if it didnt fish or nothing was caught
-    ]]
-    catchStatus = Memory:readFromTable(Fishing)
+---Handle all interation after the rod has been selected from the bag
+---@return boolean true if a fish was hooked, false, if it didnt fish or nothing was caught
+function Fishing:fish()
+    local catchStatus = Memory:readFromTable(Fishing)
     Log:debug("Fishing status " .. tostring(catchStatus))
     if catchStatus == Fishing.FISH then
         Common:waitFrames(305)

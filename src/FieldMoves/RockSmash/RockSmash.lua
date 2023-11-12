@@ -13,14 +13,10 @@ Model = RockSmashFactory:loadModel()
 -- Merge model into class
 RockSmash = Common:tableMerge(RockSmash, Model)
 
-function RockSmash:smashRock() 
-    --[[
-        RockSmash the tree that the trainer is facing
 
-        Returns:
-            True, if an encounter was found
-            False, if we were unable to rock smash or no encounter was started
-    ]]
+---Rock smash the tree that the trainer is facing
+---@return boolean True if an encounter was found, False, if we were unable to rock smash or no encounter was started
+function RockSmash:smashRock()
     -- Initiate rock smash
     Input:pressButtons{buttonKeys={Buttons.A}, duration=14, waitFrames=2}
     -- Press A until Yes/No prompt comes up

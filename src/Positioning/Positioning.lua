@@ -119,7 +119,7 @@ function Positioning:faceDirection(direction)
     return Memory:readFromTable(Positioning.Direction) == direction
 end
 
-function Positioning:moveToPosition(newPos, maxSteps)
+function Positioning:moveToPosition(newPos, maxSteps, releaseEnd)
     --[[
         Move the character to a specified position
 
@@ -230,7 +230,7 @@ function Positioning:moveStepsInDirection(maxSteps, direction, releaseEnd)
 
     -- If this changes, then we collided. This value isn't constant for some reason
     local initialCollision = Memory:readFromTable(Positioning.Collision)
-    local button = 0
+    local button = ""
     if direction == Positioning.Direction.NORTH then
         Log:debug("Moving N")
         button = Buttons.UP

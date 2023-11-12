@@ -40,9 +40,10 @@ function Battle:openPack()
 end
 
 ---comment
----@param bIterations integer Maximum number of times to press button before battle menu appears
+---@param bIterations integer? Maximum number of times to press button before battle menu appears
 ---@return boolean true if the battle menu appears
 function Battle:waitForBattleMenu(bIterations)
+    bIterations = bIterations or 1000
     local i = 0
     local cursor = {x = 0, y = 0}
     while i < bIterations

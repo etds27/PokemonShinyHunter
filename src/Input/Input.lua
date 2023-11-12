@@ -24,26 +24,34 @@ Duration = {
     MENU_TAP = 5
 }
 
-function Input:pressButtons(args) 
-    --[[
-    Press the given button combination
+---@class ButtonPress
+---@field buttonKeys table A list of Buttons enums to press
+---@field duration integer? [20] Int to determine how long to press the buttons for
+---@field releaseStart boolean? to release all keys before pressing the buttons
+---@field releaseEnd boolean? to release all keys after they have been pressed
+---@field waitFrames number? [20] Number frames to wait after the action to resolve animations
+---@field iterations integer? Number of times to perform action for repeatedlyPressButton
+---@field waitEnd integer? Number of frames to wait after perform action sequence
 
-    Arguments:
-        - buttonKeys: A list of Buttons enums to press
-        - duration: Int to determine how long to press the buttons for
-        - releaseStart: Bool to release all keys before pressing the buttons
-        - releaseEnd: Bool to release all keys after they have been pressed
-        - waitFrames: Number of frames to wait after the action to resolve animations
-    --]]
-    -- Log:debug("Input:pressButtons init")
-    input = joypad.get()
-    buttonKeys = args.buttonKeys
+---@class ButtonPresses
+---@field duration integer? [20] Int to determine how long to press the buttons for
+---@field releaseStart boolean? to release all keys before pressing the buttons
+---@field releaseEnd boolean? to release all keys after they have been pressed
+---@field waitFrames number? [20] Number frames to wait after the action to resolve animations
+---@field buttonSequence table? Sequence of buttons as list of list
+---@field waitEnd integer? Number of frames to wait after perform action sequence
 
-    if args.duration == nil then
-        duration = Duration.PRESS
-    else 
-        duration = args.duration 
-    end
+---Press the given button combination
+---@param args ButtonPress
+function Input:pressButtons(args)
+    local input = joypad.get()
+    local buttonKeys = args.buttonKeys
+    local duration = 0
+    local releaseEnd = true
+    local releaseStart = true
+    local waitFrames = 0
+
+    duration = args.duration or Duration.PRESS
 
     if args.releaseStart == nil then
         releaseStart = true
@@ -57,11 +65,7 @@ function Input:pressButtons(args)
         releaseEnd = args.releaseEnd
     end
 
-    if args.waitFrames == nil then
-        waitFrames = 20
-    else
-        waitFrames = args.waitFrames
-    end
+    waitFrames = args.waitFrames or 20
 
     if releaseStart then
         Input:releaseAllKeys()
@@ -71,7 +75,7 @@ function Input:pressButtons(args)
         input[buttonKey] = true
     end
 
-    for i = 1, duration, 1 do
+    for _ = 1, duration, 1 do
         joypad.set(input)
         emu.frameadvance()
     end
@@ -84,26 +88,14 @@ function Input:pressButtons(args)
     Common:waitFrames(waitFrames)
 end
 
-function Input:repeatedlyPressButton(args) 
-    --[[
-        Press a button combination repeatedly
+---Press a button combination repeatedly
+---@param args ButtonPress
+function Input:repeatedlyPressButton(args)
+    local iterations
+    local waitEnd
 
-        Arguments:
-            - iterations: Number of times to press the button combination
-            - waitEnd: Frames to wait after all presses have been performed
-    ]]
-    -- Log:debug("Input:repeatedlyPressButton init")
-    if args.iterations == nil then
-        iterations = 1
-    else
-        iterations = args.iterations
-    end
-
-    if args.waitEnd == nil then
-        waitEnd = 0
-    else
-        waitEnd = args.waitEnd
-    end
+    iterations = args.iterations or 1
+    waitEnd = args.waitEnd or 0
 
     for _ = 1, iterations do
         Input:pressButtons(args)
@@ -113,9 +105,12 @@ function Input:repeatedlyPressButton(args)
     Common:waitFrames(waitEnd)
 end
 
+
+---Perform a sequence of button actions
+---@param args ButtonPresses
 function Input:performButtonSequence(args)
     --[[
-        Perform a sequence of button actions
+        
         
         Arguments:
             - buttonSequence: A table of tables where each leaf table holds the Button identifer to press
@@ -124,13 +119,10 @@ function Input:performButtonSequence(args)
     ]]
     Log:debug("Input:performButtonSequence init")
 
-    if args.waitEnd == nil then
-        waitEnd = 0
-    else
-        waitEnd = args.waitEnd
-    end
+    local waitEnd = args.waitEnd or 0
 
     if args.buttonSequence == nil then Log:error("Button sequence not provided") end
+
     for _, buttonKeys in pairs(args.buttonSequence) do
         arg = Common:shallowcopy(args)
         arg.buttonSequence = nil
@@ -142,82 +134,13 @@ function Input:performButtonSequence(args)
     Common:waitFrames(waitEnd)
 end
 
-function Input:performButtonSequenceUntil(args)
-    --[[
-        Perform a sequence of button actions until a criteria is met
-        
-        Arguments:
-            - buttonSequence: A table of tables where each leaf table holds the Button identifer to press
-            - waitEnd: Frames to wait after all presses have been performed
-            - addrTan: Function to run and compare return result
-            - expectedResult: Object to compare the callback functions return status to
-            - timeout: Maximum number of times to run the callback function
-            - SEE Input:pressButtons
-    ]]
-    i = 0
-
-    if args.waitEnd == nil then
-        waitEnd = 0
-    else
-        waitEnd = args.waitEnd
-    end
-
-    if args.timeout == nil then
-        timeout = 1
-    else
-        timeout = args.timeout
-    end
-
-    if args.addrTab == nil then
-        Log:error("No callback function provided")
-        return false
-    end
-
-    addrTab = args.addrTab
-
-    while i < timeout do
-        if Memory:readFromTable() == expectedResult then
-            return true
-        end
-        Input:performButtonSequence{args}
-    end
-
-    return false
-end
-
-    
-
 function Input:releaseAllKeys()
     --[[
         Release all set keys
     ]]
-    input = joypad.get()
+    local input = joypad.get()
     for key in pairs(input) do
         input[key] = false
     end
     joypad.set(input)
 end
-
-
--- TESTS
-
---[[
-Input:performButtonSequence{
-    buttonSequence={{Buttons.START}, {Buttons.DOWN}, {Buttons.A}}
-}
-
-Input:releaseAllKeys()
-
-Input:pressButtons{buttonKeys={Buttons.START}}
-Input:pressButtons{buttonKeys={Buttons.DOWN}}
-Input:pressButtons{buttonKeys={Buttons.A}}
-
---Input:pressButtons{buttonKeys={Buttons.LEFT}}
-
---[[
-Input:repeatedlyPressButton{buttonKeys={Buttons.RIGHT}, 
-                            releaseEnd=false, 
-                            duration=Duration.PRESS, 
-                            iterations=10,
-                            waitFrames=10}
---]]

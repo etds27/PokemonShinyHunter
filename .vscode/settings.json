@@ -9,6 +9,8 @@
         "memory",
         "calculateItemBallAddress",
         "calculateKeyItemAddress",
-        "emu"
+        "emu",
+        "joypad",
+        "comm"
     ]
 }

@@ -8,7 +8,11 @@ Trainer = {}
 local Model = {}
 Model.ID = {}
 Model.Money = {}
-Model.PlayTime = {}
+Model.PlayTime = {
+    Hour = {},
+    Minute = {},
+    Second = {}
+}
 Model.Name = {}
 Model = TrainerFactory:loadModel()
 
@@ -27,11 +31,13 @@ function Trainer:getTrainerCoins()
     return Memory:readFromTable(Trainer.Coins)
 end
 
+---Get the current play time for the trainer
+---@return Time
 function Trainer:getPlayTime()
-    hr = Memory:read(Trainer.PlayTime.hrAddr, Trainer.PlayTime.size)
-    min = Memory:read(Trainer.PlayTime.minAddr, Trainer.PlayTime.size)
-    sec = Memory:read(Trainer.PlayTime.secAddr, Trainer.PlayTime.size)
-    return {hr, min, sec}
+    return {hour = Memory:readFromTable(Trainer.PlayTime.Hour),
+            minute = Memory:readFromTable(Trainer.PlayTime.Minute),
+            second = Memory:readFromTable(Trainer.PlayTime.Second)
+    }
 end
 
 function Trainer:getName()
