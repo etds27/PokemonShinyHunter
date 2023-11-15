@@ -2,6 +2,12 @@ require "Common"
 require "Factory"
 require "Memory"
 
+---@type FactoryMap
+local factoryMap = {
+    GSClock = GameGroups.GOLD_SILVER,
+    CrystalClock = {Games.CRYSTAL}
+}
+
 Clock = {}
 
 -- Abstract tables
@@ -16,7 +22,7 @@ Model.TimeOfDay = {
     Day = {},
     Night = {},
 }
-Model = ClockFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 ---@class Time
 ---@field day integer
