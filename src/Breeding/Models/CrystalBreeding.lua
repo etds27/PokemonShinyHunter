@@ -1,10 +1,8 @@
-require "Memory"
-
 local Model = {
     EggCycleCounter = {
-        addr = 0xD9BD,
+        addr = 0xDC73,
         size = 1,
-        memdomain = Memory.WRAM,
+        memdomain = "WRAM",
         RESET = 128 -- Eggs only hatch on 
     },
 
@@ -28,7 +26,7 @@ local Model = {
     },
 
     EggAvailable = {
-        addr = 0xDC40,
+        addr = 0xDEF5,
         size = 1,
         bit = 6,
         EGG_READY = 1,
