@@ -1,7 +1,13 @@
 require "Common"
+require "Factory"
 require "Input"
 require "Memory"
-require "MenuFactory"
+
+---@type FactoryMap
+local factoryMap = {
+    GSMenu = GameGroups.GOLD_SILVER,
+    CrystalMenu = {Games.CRYSTAL}
+}
 
 Menu = {}
 
@@ -18,7 +24,7 @@ Model.MultiCursor = {
     X = {},
     Y = {}
 }
-Model = MenuFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Load in default tables
 
