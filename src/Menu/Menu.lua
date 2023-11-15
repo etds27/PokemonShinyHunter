@@ -16,6 +16,14 @@ Menu = {}
 ---@field downIsUp boolean? [true] If set to true, Down/Right goes up in cursor index
 ---@field maximumPresses integer? [100] Maximum number of times to press a button when navigating
 
+---@class MultiCursor
+---@field X MemoryTable Memory table of the X component of the 2D cursor
+---@field Y MemoryTable Memory Table of the Y component of the 2D cursor
+
+---@class ViewOffsetCursor
+---@field ViewOffset MemoryTable Memory table of the address that increments when the view shifts
+---@field CursorOffset MemoryTable Memory table of the address that increments when the cursor moves within the view
+
 -- Abstract tables
 local Model = {}
 Model.Cursor = {}
