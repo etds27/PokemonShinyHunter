@@ -8,7 +8,7 @@ import socket
 import signal
 import argparse
 
-BUF_SIZE = 32,768
+BUF_SIZE = 1024
 
 parser = argparse.ArgumentParser()
 
@@ -47,14 +47,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
                 inputs.append(conn)
             else: # Read data from one of the connected sockets
                 try:
-                    """chunks = []
+                    chunks = []
                     while True:
                         chunk = s.recv(BUF_SIZE)
                         chunks.append(chunk)
                         if len(chunk) < BUF_SIZE:
                             break
-                    data = b''.join(chunks)"""
-                    data = s.recv(BUF_SIZE)
+                    data = b''.join(chunks)
                 except ConnectionResetError as e:
                     logging.error("Lost connection to client")
                     logging.error(e)

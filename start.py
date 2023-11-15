@@ -40,7 +40,6 @@ def create_luases(lua_files, path, auto_start: [str] = []):
 
 def update_lua_path(lua_files):     
     for lua_file in lua_files:
-        print(lua_file)
         os.environ["LUA_PATH"] = f"{os.environ['LUA_PATH']};{os.path.dirname(lua_file)}\\?.lua"
 
 print(args)
