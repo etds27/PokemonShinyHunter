@@ -1,5 +1,5 @@
-require "ClockFactory"
 require "Common"
+require "Factory"
 require "Memory"
 
 Clock = {}

@@ -1,9 +1,15 @@
-require "BreedingFactory"
 require "Common"
+require "Factory"
+require "Input"
 require "Log"
 require "Memory"
-require "Input"
 require "Positioning"
+
+---@type FactoryMap
+local factoryMap = {
+    GSBreeding = GameGroups.GOLD_SILVER,
+    CrystalBreeding = {Games.CRYSTAL}
+}
 
 Breeding = {}
 
@@ -198,12 +204,11 @@ function Breeding:walkToResetFromDayCareMan()
     return false
 end
 
--- Abstract tables
 local Model = {}
 Model.EggCycleCounter = {}
 Model.MovementResetPoint = {}
 Model.MovementTurnAroundPoint = {}
 Model.EggAvailable = {}
-local Model = BreedingFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 Breeding = Common:tableMerge(Breeding, Model)

@@ -96,19 +96,9 @@ function GameSettings.initialize()
 	end
 
 	if gamecode == 0x4E5F474C then -- N_GL
-		GameSettings.game = 1
-		GameSettings.gamename = "Pokemon Gold (U)"
-		GameSettings.gamecolor = 0xFFF01810
-		GameSettings.encountertable = 0x839D454
-		GameSettings.version = GameSettings.VERSIONS.G
-		GameSettings.language = GameSettings.LANGUAGES.U
+
 	elseif gamecode == 0x4E5F534C then -- N_SL
-		GameSettings.game = 2
-		GameSettings.gamename = "Pokemon Silver (U)"
-		GameSettings.gamecolor = 0xFF123AE5
-		GameSettings.encountertable = 0x839D29C
-		GameSettings.version = GameSettings.VERSIONS.S
-		GameSettings.language = GameSettings.LANGUAGES.U
+
 
 	-- https://archives.glitchcity.info/forums/board-76/thread-1342/page-0.html
 	elseif gamecode == 0x5354414C then -- STAL

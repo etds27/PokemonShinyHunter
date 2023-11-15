@@ -1,9 +1,15 @@
-require "BattleFactory"
 require "Common"
+require "Factory"
 require "GameSettings"
+require "Input"
 require "Log"
 require "Memory"
-require "Input"
+
+---@type FactoryMap
+local factoryMap = {
+    CrystalBattle = {Games.CRYSTAL},
+    GSBattle = GameGroups.GOLD_SILVER
+}
 
 Battle = {}
 
@@ -14,7 +20,7 @@ Model.Catch = {}
 Model.PokemonTurnCounter = {}
 Model.EnemyPokemonTurnCounter = {}
 Model.MenuPointer = {}
-Model = BattleFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Load in default tables
 

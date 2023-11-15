@@ -1,18 +1,31 @@
-require "BoxFactory"
 require "Common"
+require "Factory"
 require "Log"
 require "Memory"
 require "Menu"
 require "Party"
 require "Pokemon"
 require "Input"
+
+---@type FactoryMap
+local boxFactoryMap = {
+    CrystalBox = {Games.CRYSTAL},
+    GSBox = GameGroups.GOLD_SILVER
+}
+
+---@type FactoryMap
+local boxUIFactoryMap = {
+    CrystalBoxUI = {Games.CRYSTAL},
+    GSBoxUI = GameGroups.GOLD_SILVER
+}
+
 Box = {}
 
 -- Abstract tables
 local Model = {}
 Model.CurrentBoxNumber = {}
 Model.LoadedBox = {}
-Model = BoxFactory:loadModel()
+Model = Factory:loadModel(boxFactoryMap)
 
 -- Load in default tables
 
@@ -275,7 +288,7 @@ Model.PCMainMenu = {}
 Model.PCBillsMenu = {}
 Model.PCBoxCursor = {}
 Model.PCBoxEdit = {}
-Model = BoxUIFactory:loadModel()
+Model = Factory:loadModel(boxUIFactoryMap)
 
 -- Load in default tables
 
