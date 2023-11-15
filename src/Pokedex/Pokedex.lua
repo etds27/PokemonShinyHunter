@@ -4,12 +4,18 @@ require "Memory"
 require "Menu"
 require "PokedexFactory"
 
+---@type FactoryMap
+local factoryMap = {
+    GSPokedex = GameGroups.GOLD_SILVER,
+    CrystalPokedex = {Games.CRYSTAL}
+}
+
 Pokedex = {}
 
 -- Abstract tables
 local Model = {}
 Model.currentPosition = function() end
-local Model = PokedexFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Load in default tables
 
