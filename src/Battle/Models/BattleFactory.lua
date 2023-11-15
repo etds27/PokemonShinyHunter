@@ -1,12 +1,17 @@
 BattleFactory = {}
 
 function BattleFactory:loadModel()
-    Common:resetRequires({"GSCBattle"})
-    if Games.CRYSTAL == GameSettings.game then
-        return require("CrystalBattle")
-    end
-    if Common:contains(GameGroups.GOLD_SILVER, GameSettings.game) then
-        return require("GSBattle")
+    local factoryMap = {
+        CrystalBattle = {Games.CRYSTAL},
+        GSBattle = GameGroups.GOLD_SILVER
+    }
+    for library, compatibleGames in pairs(factoryMap)
+    do
+        Common:resetRequires({library})
+
+        if Common:contains(compatibleGames, GameSettings.game) then
+            return require(library)
+        end
     end
     return {}
 end
