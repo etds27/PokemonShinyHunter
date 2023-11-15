@@ -1,15 +1,22 @@
 require "Common"
+require "Factory"
 require "Log"
-require "StartMenu"
 require "Memory"
 require "Menu"
-require "PartyFactory"
 require "Pokemon"
+require "StartMenu"
+
+---@type FactoryMap
+local factoryMap = {
+    GSParty = GameGroups.GOLD_SILVER,
+    CrystalParty = {Games.CRYSTAL}
+}
 
 Party = {
     numEggs = 0
 }
-local Model = PartyFactory:loadModel()
+
+local Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Party = Common:tableMerge(Party, Model)
