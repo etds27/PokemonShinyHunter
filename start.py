@@ -27,7 +27,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--emu-only", action="store_true")
 parser.add_argument("-p", "--port", nargs=1, default=57375, type=int)
 parser.add_argument("--host", nargs=1, default="127.0.0.1", type=str)
-parser.add_argument("-g", "--game", nargs=1, default="C:\Emulators\GBC\Pokemon Crystal.gbc", type=str)
+parser.add_argument("-g", "--game", default="C:\Emulators\GBC\Pokemon Crystal.gbc", type=str)
 parser.add_argument("-e", "--emulator", nargs=1, default="C:\Emulators\Bizhawk\EmuHawk.exe", type=str)
 parser.add_argument("--bot-ids", nargs="+")
 args = parser.parse_args()
@@ -39,9 +39,7 @@ def create_luases(lua_files, path, auto_start: [str] = []):
                         for lua_file in lua_files]
 
 def update_lua_path(lua_files):     
-    for lua_file in lua_files:
-        print(lua_file)
-        os.environ["LUA_PATH"] = f"{os.environ['LUA_PATH']};{os.path.dirname(lua_file)}\\?.lua"
+    for lua_file in lua_files:        os.environ["LUA_PATH"] = f"{os.environ['LUA_PATH']};{os.path.dirname(lua_file)}\\?.lua"
 
 print(args)
 if not args.emu_only:
@@ -85,7 +83,6 @@ create_luases(lua_files, os.path.join(ROOT_DIR, "session.luases"))
 create_luases(test_lua_files, os.path.join(ROOT_DIR, "test_session.luases"))
 create_luases(lua_files, os.path.join(ROOT_DIR, "main_session.luases"), auto_start=["Main.lua"])
 
-# lua_args = ["--lua=C:\\Users\\etds2\\Programming\\PokemonLua\\src\\Positioning\\Positioning.lua,C:\\Users\\etds2\\Programming\\PokemonLua\\src\\Memory\\Memory.lua"]       
 if args.bot_ids:
     for bot_id in args.bot_ids:
         emulator_start_command = [
