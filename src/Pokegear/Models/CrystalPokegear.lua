@@ -1,5 +1,6 @@
 local Model = {}
----@enum Pokegear.Option
+
+---@type MemoryTable
 Model.Option = {
     addr = 0xCF64,
     size = 1,

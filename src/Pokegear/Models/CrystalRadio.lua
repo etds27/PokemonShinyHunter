@@ -2,7 +2,7 @@ require "Common"
 
 local Model = {}
 
----@enum Radio.Station
+---@type MemoryTable
 local Station = {
     addr = 0xC32A,
     size = 1,

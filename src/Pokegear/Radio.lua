@@ -1,15 +1,22 @@
+require "Factory"
 require "Memory"
 require "Menu"
 require "Pokegear"
-require "src.Pokegear.Models.RadioFactory"
 require "StartMenu"
+
+---@type FactoryMap
+local factoryMap = {
+    GSRadio = GameGroups.GOLD_SILVER,
+    CrystalRadio = {Games.CRYSTAL}
+}
 
 Radio = {}
 
 -- Abstract tables
 local Model = {}
+---@enum Radio.Station
 Model.Station = {}
-Model = RadioFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Radio = Common:tableMerge(Radio, Model)
@@ -22,6 +29,6 @@ function Radio:tuneToStation(station)
     Common:waitFrames(40)
 
     print(Radio.Station.POKE_FLUTE, Memory:readFromTable(Radio.Station))
-    Menu:activeNavigateMenuFromTable(Radio.Station, station, {duration = 2, waitFrames = 10, downIsUp = false})
+    Menu:activeNavigateMenuFromTable(Radio.Station, station --[[@as integer]], {duration = 2, waitFrames = 10, downIsUp = false})
     --
 end

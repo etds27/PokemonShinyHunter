@@ -1,17 +1,29 @@
+require "Factory"
 require "Input"
 require "Memory"
-require "src.Pokegear.Models.PokegearFactory"
 require "StartMenu"
+
+---@type FactoryMap
+local factoryMap = {
+    GSPokegear = GameGroups.GOLD_SILVER,
+    CrystalPokegear = {Games.CRYSTAL}
+}
 
 Pokegear = {}
 
 -- Abstract tables
 local Model = {}
+---@enum Pokegear.Option
 Pokegear.Option = {
     addr = -1,
-    size = -1
+    size = -1,
+    BACK = 0,
+    PHONE = 0,
+    RADIO = 0,
+    MAP = 0
 }
-Model = PokegearFactory:loadModel()
+
+Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Pokegear = Common:tableMerge(Pokegear, Model)
