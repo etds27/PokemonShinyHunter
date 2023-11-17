@@ -1,8 +1,14 @@
 require "Common"
+require "Factory"
 require "Input"
 require "Log"
 require "Memory"
-require "PositioningFactory"
+
+---@type FactoryMap
+local factoryMap = {
+    GSPositioning = GameGroups.GOLD_SILVER,
+    CrystalPositioning = {Games.CRYSTAL}
+}
 
 Positioning = {}
 
@@ -12,7 +18,7 @@ Model.Direction = {}
 Model.PositionX = {}
 Model.PositionY = {}
 Model.Map = {}
-local Model = PositioningFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Positioning = Common:tableMerge(Positioning, Model)
