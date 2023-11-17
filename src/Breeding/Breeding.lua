@@ -40,7 +40,7 @@ function Breeding:completeEggCycle()
             Log:debug("Breeding:completeEggCycle - cycle reset found")
             return true
         end
-        
+
         if eggSteps >= Breeding.EggCycleCounter.RESET then
             remainingSteps = 0xFF - eggSteps
             eggSteps = 0
@@ -54,7 +54,7 @@ function Breeding:completeEggCycle()
         else
             newPos = Breeding:calculateAdjustedMovementPoint(remainingSteps, Breeding.MovementResetPoint)
         end
-        
+
         Log:debug("Adjusted egg point: " .. Common:coordinateToString(newPos))
         local tab = Positioning:moveToPoint(newPos.x, newPos.y, 100, false)
         if not tab.ret then
