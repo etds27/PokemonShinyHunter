@@ -39,12 +39,12 @@ local Model = {
 
     CurrentPokemonCursor = {
         ViewOffset = {
-            addr = 0xCB2A,
+            addr = 0xCA2B,
             size = 1,
             memdomain = Memory.WRAM
         },
         CursorOffset = {
-            addr = 0xCB2B,
+            addr = 0xCA2A,
             size = 1,
             memdomain = Memory.WRAM
         }

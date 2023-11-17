@@ -161,7 +161,7 @@ function BoxUI:performDepositMenuActions(boxActions)
 
     -- Determine how many deposit actions will be taken
     local numActions = 0
-    for i, actionPair in ipairs(boxActions)
+    for _, actionPair in ipairs(boxActions)
     do
         if actionPair.action == BoxUI.Action.DEPOSIT then numActions = numActions + 1 end
     end
@@ -269,7 +269,7 @@ end
 ---@return boolean true If overworld is back
 function BoxUI:exitPC()
     Input:performButtonSequence(ButtonSequences.EXIT_PC)
-    return Positioning:inOverworld()
+    return Positioning:waitForOverworld(120)
 end
 
 ---Get the current focused pokemon in the BoxUI
