@@ -1,6 +1,11 @@
 require "Common"
-require "SlotsFactory"
+require "Factory"
 
+---@type FactoryMap
+local factoryMap = {
+    GSSlots = GameGroups.GOLD_SILVER,
+    CrystalSlots = {Games.CRYSTAL}
+}
 
 Slots = {}
 
@@ -9,7 +14,7 @@ Model.ID = {}
 Model.Money = {}
 Model.PlayTime = {}
 Model.Name = {}
-Model = SlotsFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 ---Plays the slot machine a single time. Abstract method.
 ---
