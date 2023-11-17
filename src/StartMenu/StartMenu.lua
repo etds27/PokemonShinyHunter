@@ -1,6 +1,12 @@
-require "StartMenuFactory"
+require "Factory"
 require "Memory"
 require "Positioning"
+
+---@type FactoryMap
+local factoryMap = {
+    GSStartMenu = GameGroups.GOLD_SILVER,
+    CrystalStartMenu = {Games.CRYSTAL}
+}
 
 StartMenu = {}
 
@@ -8,7 +14,7 @@ StartMenu = {}
 local Model = {}
 Model.size = 0
 Model.addr = 0
-Model = StartMenuFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 StartMenu = Common:tableMerge(StartMenu, Model)
 
 ---Open the start menu
