@@ -1,13 +1,16 @@
-
 require "Common"
-require "StaticEncountersFactory"
+require "Factory"
 
-
+---@type FactoryMap
+local factoryMap = {
+    GSStaticEncounters = GameGroups.GOLD_SILVER,
+    CrystalStaticEncounters = {Games.CRYSTAL}
+}
 
 StaticEncounters = {}
 
 -- Abstract tables
-local Model = StaticEncountersFactory:loadModel()
+local Model = Factory:loadModel(factoryMap)
 
 StaticEncounters.standardWildEncounter = function()
     -- Start Dialog
