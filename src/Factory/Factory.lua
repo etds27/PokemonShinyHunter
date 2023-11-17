@@ -13,7 +13,7 @@ function Factory:loadModel(factoryMap)
     do
         Common:resetRequires({library})
         if Common:contains(compatibleGames, GameSettings.game) then
-            local model, _ = table.unpack(require(library))
+            local model = require(library)
             return model
         end
     end

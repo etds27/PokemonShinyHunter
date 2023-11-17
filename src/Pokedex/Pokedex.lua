@@ -1,8 +1,8 @@
 require "Common"
+require "Factory"
 require "Input"
 require "Memory"
 require "Menu"
-require "PokedexFactory"
 
 ---@type FactoryMap
 local factoryMap = {

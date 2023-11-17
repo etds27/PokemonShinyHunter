@@ -25,7 +25,7 @@ function StartMenu:open()
         return false
     end
 
-    Input:pressButtons{buttonKeys={Buttons.START}, duration=Duration.PRESS, waitFrames=30}
+    Input:pressButtons{buttonKeys={Buttons.START}, duration=Duration.PRESS, waitFrames=35}
 
     return not Positioning:inOverworld()
 end

@@ -128,7 +128,7 @@ end
 ---@return table
 ---| 0: Location of item in the bag, 0 if not found
 ---| 1: Quantity of item, 0 if not found or same as location addr if key item
-function Bag:doesPocketContain(pocket, item) 
+function Bag:doesPocketContain(pocket, item)
     local pocketTable = {}
     local numOfItemsInPocket = 0
     local itemAddr = 0x0

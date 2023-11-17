@@ -13,7 +13,7 @@ local Model = {
     Cursor = Menu.Cursor,
 
     ItemPocket = {
-        addr = 0xD5B9,
+        addr = 0xD5B7,
         size = 1
     },
 
@@ -23,7 +23,7 @@ local Model = {
     },
 
     KeyPocket = {
-        addr = 0xD616,
+        addr = 0xD5E1,
         size = 1
     },
 

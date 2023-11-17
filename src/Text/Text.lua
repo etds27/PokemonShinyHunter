@@ -3,7 +3,7 @@ require "Factory"
 
 ---@type FactoryMap
 local factoryMap = {
-    GSCTest = GameGroups.GEN_2,
+    GSCText = GameGroups.GEN_2,
 }
 
 Text = {}

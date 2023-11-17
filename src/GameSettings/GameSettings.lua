@@ -87,8 +87,7 @@ end
 function GameSettings.initialize()
 
 	local gamecode = memory.read_u32_be(0x013A, "ROM")
-	
-	for name, game in pairs(Games)
+	for _, game in pairs(Games)
 	do
 		if determineIfGame(game) then
 			GameSettings.game = game

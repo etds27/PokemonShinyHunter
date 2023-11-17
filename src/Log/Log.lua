@@ -8,7 +8,7 @@ LogLevels = {
 }
 
 Log = {
-    loggingLevel = LogLevels.OFF
+    loggingLevel = LogLevels.INFO
 }
 
 ---Log message to the console
