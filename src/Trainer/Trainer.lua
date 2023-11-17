@@ -1,7 +1,13 @@
 require "Common"
+require "Factory"
 require "Log"
 require "Memory"
-require "TrainerFactory"
+
+---@type FactoryMap
+local factoryMap = {
+    GSTrainer = GameGroups.GOLD_SILVER,
+    CrystalTrainer = {Games.CRYSTAL}
+}
 
 Trainer = {}
 
@@ -14,7 +20,7 @@ Model.PlayTime = {
     Second = {}
 }
 Model.Name = {}
-Model = TrainerFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Trainer = Common:tableMerge(Trainer, Model)
