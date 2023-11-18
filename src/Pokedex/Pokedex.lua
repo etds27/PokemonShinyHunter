@@ -27,13 +27,12 @@ function Pokedex:navigateToPosition(position)
     local currentPos = Pokedex:currentPosition()
     local small_button = ""
     local large_button = ""
-
     while true
     do
         currentPos = Pokedex:currentPosition()
         Log:debug("Current: " .. tostring(currentPos) .. " Dest: " .. tostring(position))
         if currentPos == position then 
-            return true
+            break
         elseif currentPos < position then
             small_button = Buttons.DOWN
             large_button = Buttons.RIGHT
@@ -66,7 +65,7 @@ function Pokedex:navigateToPokemon(pokemonNo)
     do
         currentPokemon = Pokedex:currentPokemonNo()
         currentPos = Pokedex:currentPosition()
-        if currentPos == previousPos then 
+        if currentPos == previousPos then
             -- If we already changed direction, then exit
             if not direction then
                 return false
@@ -75,14 +74,13 @@ function Pokedex:navigateToPokemon(pokemonNo)
         end
         previousPos = currentPos
         Log:debug("Current: " .. tostring(currentPokemon) .. " Dest: " .. tostring(pokemonNo) .. " Pos: " .. tostring(currentPos))
-        if currentPokemon == pokemonNo then 
+        if currentPokemon == pokemonNo then
             return true
         elseif direction then
             button = Buttons.DOWN
         else
             button = Buttons.UP
         end
-
         Input:pressButtons{buttonKeys={button}, duration=16, waitFrames=1}
     end
 end

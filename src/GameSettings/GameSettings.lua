@@ -95,10 +95,9 @@ function GameSettings.initialize()
 	end
 
 	if gamecode == 0x4E5F474C then -- N_GL
-
+		GameSettings.wildpokemon = 0xD0EF
 	elseif gamecode == 0x4E5F534C then -- N_SL
-
-
+		GameSettings.wildpokemon = 0xD0EF
 	-- https://archives.glitchcity.info/forums/board-76/thread-1342/page-0.html
 	elseif gamecode == 0x5354414C then -- STAL
 		GameSettings.wildpokemon = 0xD206
