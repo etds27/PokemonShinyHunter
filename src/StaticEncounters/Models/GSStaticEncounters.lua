@@ -3,6 +3,7 @@ require "Common"
 require "Input"
 require "StartMenu"
 require "Memory"
+require "Menu"
 require "Positioning"
 
 ---TODO: Fix this for Gold/Silver
@@ -56,93 +57,42 @@ end
 
 Model[BotModes.STARTER] = function() 
 
-    -- Initiate diaglog with pokeball
+    -- Press A until the prompt to accept the pokemon
+    while Memory:readFromTable(Menu.Cursor) == 0
+    do
+        Input:pressButtons{buttonKeys={Buttons.A}, 
+                           duration=16,
+                           waitFrames=2}
+    end
+
+    -- Press A to accept the pokemon
     Input:pressButtons{buttonKeys={Buttons.A}, 
-                       duration=20,
-                       waitFrames=100}
-    -- Dismiss Picture
-    -- You'll take ---, the
-    Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=80,
-                       waitFrames=8}
-    -- --- Pokemon
-    -- Gets to the Yes/No prompt
-    Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=44,
-                       waitFrames=8}
-    -- I think thats a great
-    Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=56,
-                       waitFrames=8}
-    -- Pokemon too!
-    Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=28,
-                       waitFrames=4}
-    -- Trainer received ---
-    Input:pressButtons{buttonKeys={Buttons.A},
-                       duration=250,
-                       waitFrames=4}
-    -- Do you want to give a name
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=42,
-                       waitFrames=4}
-    -- --- you received?
-    -- Gets to Yes/No prompt
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=25,
-                       waitFrames=4}
-    -- Walk to Prof Elm
-    -- MR.POKEMON lives a little bit beyond
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=240,
-                       waitFrames=4}
-    -- Cherrygrove the next city over
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=57,
-                       waitFrames=4}
-    -- It's almost a direct route
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=47,
-                       waitFrames=4}
-    -- so you can't miss it
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=48,
-                       waitFrames=4}
-    -- Heres my phone
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=54,
-                       waitFrames=4}
-    -- Call me if anything comes up
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=60,
-                       waitFrames=10}
+                       duration=16,
+                       waitFrames=2}
 
-    -- Trainer got Elm's phone number
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=280,
-                       waitFrames=10}
-    -- Elm looks around
-    -- If your pokemon is hurt
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=96,
-                       waitFrames=4}
+    -- Press B until we walk over to Prof Elm
+    while not Positioning:inOverworld()
+    do
+        Input:pressButtons{buttonKeys={Buttons.B},
+                            duration=16,
+                            waitFrames=2}
+    end
 
-    -- heal it with this machine
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=48,
-                       waitFrames=4}
-    -- Feel free to use it any time
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=50,
-                       waitFrames=10}
-    -- Im counting on you!
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=85,
-                       waitFrames=10}
-    -- Im counting on you!
-    Input:pressButtons{buttonKeys={Buttons.B},
-                       duration=10,
-                       waitFrames=30}
+    -- Press B until we get to Prof Elm
+    while Positioning:inOverworld()
+    do
+        Input:pressButtons{buttonKeys={Buttons.B},
+                            duration=16,
+                            waitFrames=2}
+    end
+
+    -- Press B until we are free
+    while not Positioning:inOverworld()
+    do
+        Input:pressButtons{buttonKeys={Buttons.B},
+                            duration=16,
+                            waitFrames=2}
+    end
 end
 
 return Model
