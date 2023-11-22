@@ -26,7 +26,7 @@ local Model = {
     },
 
     Name = {
-        addr = 0xC1AE,
+        addr = 0xD1A3,
         maxLength = 7,
     },
 
