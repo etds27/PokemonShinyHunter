@@ -71,11 +71,13 @@ end
 ---@return table
 function Party:getEggMask()
     local tab = {}
-    for _, pokemon in pairs(Party:getAllPokemonInParty())
+    local numPokemon = Party:numOfPokemonInParty()
+    for i = 1, numPokemon
     do
-        if pokemon:isEgg(true) then
+        local pokemonNum = Memory:readFromTable({addr=Party.addr + i, size=1})
+        if pokemonNum == Party.EGG_POKEMON then
             table.insert(tab, true)
-        else
+        elseif pokemonNum ~= Party.NO_POKEMON then
             table.insert(tab, false)
         end
     end
@@ -107,4 +109,3 @@ function Party:navigateToPokemon(num)
     Common:waitFrames(30)
     return true
 end
-

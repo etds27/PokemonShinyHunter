@@ -167,12 +167,14 @@ function Bot:runModeHatchEggs()
             for _, index in ipairs(hatchedEggs) do
                 Breeding:hatchEgg()
                 local hatchedPokemon = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAddress(index), Memory.WRAM)
-                Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species))
+                Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species) .. " at " .. tostring(index))
                 hatchedPokemon.caught = true
                 Bot:reportEncounter(hatchedPokemon)
                 if hatchedPokemon.isShiny then
+                    Log:debug("Added deposit action for index " .. tostring(index))
                     table.insert(pcActionList, {index = index, action = BoxUI.Action.DEPOSIT})
                 else
+                    Log:debug("Added release action for index " .. tostring(index))
                     table.insert(pcActionList, {index = index, action = BoxUI.Action.RELEASE})
                 end
             end
@@ -191,7 +193,12 @@ function Bot:runModeHatchEggs()
         end
 
         -- Determine if room in party
-        if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
+        if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then
+            for _, actionPair in pairs(pcActionList)
+            do
+                print(actionPair.index)
+                print(actionPair.action)
+            end
             if not Breeding:walkToDayCareManFromReset() then return false end
             -- Pick up new eggs
             if not Breeding:pickUpEggs() then return false end

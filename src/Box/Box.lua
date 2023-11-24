@@ -1,11 +1,11 @@
 require "Common"
 require "Factory"
+require "Input"
 require "Log"
 require "Memory"
 require "Menu"
 require "Party"
 require "Pokemon"
-require "Input"
 
 ---@type FactoryMap
 local boxFactoryMap = {
@@ -179,9 +179,10 @@ function BoxUI:performDepositMenuActions(boxActions)
         index = actionPair.index - 1 -- Indices start at 0
         local action = actionPair.action
         local numPokemon = Party:numOfPokemonInParty()
+
+        Log:debug("BoxUI:performDepositMenuActions: " .. action .. " " .. tostring(numPokemon))
         -- Move to pokemon at index
-        Menu:navigateMenu(BoxUI:currentPokemonIndex(), index, {duration = 1, waitFrames=20})
-        if BoxUI:currentPokemonIndex() ~= index then
+        if not Menu:activeNavigateScrollableMenuFromTable(BoxUI.CurrentPokemonCursor, index, {duration = 1, waitFrames=20}) then
             return false
         end
 
@@ -238,21 +239,21 @@ end
 ---No verification
 function BoxUI:selectBillsPC()
     Log:debug("BoxUI:selectBillsPC() - init")
-    Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCMainMenu.BILL)
+    Menu:activeNavigateMenuFromTable(Menu.Cursor, BoxUI.PCMainMenu.BILL)
     Input:performButtonSequence(ButtonSequences.PC_MENU_TO_BILLS)
 end
 
 ---Go from Bills PC to Change Box Menu.
 ---No verification
 function BoxUI:selectChangeBox()
-    Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.CHANGE_BOX)
+    Menu:activeNavigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.CHANGE_BOX)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
 ---Go from Box select screen to selecting the desired box.
 ---No verification
 function BoxUI:navigateToBox(boxNumber)
-    Menu:navigateMenuFromTable(BoxUI.PCBoxCursor, boxNumber)
+    Menu:activeNavigateMenuFromTable(BoxUI.PCBoxCursor, boxNumber)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
@@ -269,7 +270,7 @@ end
 ---@return boolean true If overworld is back
 function BoxUI:exitPC()
     Input:performButtonSequence(ButtonSequences.EXIT_PC)
-    return Positioning:waitForOverworld(120)
+    return Positioning:inOverworld()
 end
 
 ---Get the current focused pokemon in the BoxUI
