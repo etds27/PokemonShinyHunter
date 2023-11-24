@@ -1,5 +1,6 @@
 require "Common"
 require "Factory"
+require "GameSettings"
 require "Input"
 require "Memory"
 
@@ -10,6 +11,13 @@ local factoryMap = {
 }
 
 Menu = {}
+
+---@enum MenuType
+MenuType = {
+    Menu = "MENU",
+    MultiCursor = "MULTICURSOR",
+    ViewOffset = "VIEWOFFSET",
+}
 
 ---@class MenuOption: ButtonDuration
 ---@field vertical boolean? [true] Determines if to use up/down vs. left/right
@@ -103,15 +111,15 @@ function Menu:navigateMenuFromAddress(cursorAddress, endLocation, options)
     return Menu:navigateMenuFromTable({addr = cursorAddress, size = 1}, endLocation, options)
 end
 
----Actively navigates a menu to the desired index from a table
---- 
---- This is different from navigateMenu as it will check the value of the cursor after
---- each button press rather than precalculate the number of presses it should need
----@param cursorTable MemoryTable: Cursor table where the cursor position is held
+---@private
+---Actively navigate to the specified location
+---@param menuType MenuType
+---@param cursorTable MemoryTable|ViewOffsetCursor: Cursor table where the cursor position is held
 ---@param endLocation integer End value for the cursor address
 ---@param options MenuOption? Options to control the inputs for menu navigation
----@return boolean true if the memory address is at the desired location
-function Menu:activeNavigateMenuFromTable(cursorTable, endLocation, options)
+---@return boolean
+function Menu:activeNavigation(menuType, cursorTable, endLocation, options)
+    local currentLocation
     local button = ""
     local duration = Duration.MENU_TAP
     local waitFrames = 10
@@ -122,11 +130,17 @@ function Menu:activeNavigateMenuFromTable(cursorTable, endLocation, options)
         maximumPresses = options.maximumPresses or 100
     end
 
-    local currentLocation = Memory:readFromTable(cursorTable)
-    button = Menu:getButtonForMenuNavigation(currentLocation, endLocation, options)
     for _ = 1, maximumPresses
     do
-        currentLocation = Memory:readFromTable(cursorTable)
+        if menuType == MenuType.Menu then
+            ---@cast cursorTable MemoryTable
+            currentLocation = Menu:getMenuPosition(cursorTable)
+        elseif menuType == MenuType.ViewOffset then
+            ---@cast cursorTable ViewOffsetCursor
+            currentLocation = Menu:getScrollableMenuPosition(cursorTable)
+        end
+        
+        button = Menu:getButtonForMenuNavigation(currentLocation, endLocation, options)
         Log:debug("Menu:activeNavigateMenuFromTable: Current: " .. tostring(currentLocation) .. " End: " .. tostring(endLocation))
         if currentLocation == endLocation then
             return true
@@ -134,6 +148,61 @@ function Menu:activeNavigateMenuFromTable(cursorTable, endLocation, options)
         Input:pressButtons{buttonKeys={button}, duration=duration, waitFrames=waitFrames}
     end
     return false
+end
+
+---Get the current position from the cursor table
+---@param scrollableTableCursor ViewOffsetCursor
+---@return integer position Current position of the View Offset cursor
+function Menu:getScrollableMenuPosition(scrollableTableCursor)
+    return Memory:readFromTable(scrollableTableCursor.ViewOffset) + Memory:readFromTable(scrollableTableCursor.CursorOffset)
+end
+
+---@private
+---Get the current position from the cursor table
+---@param tableCursor MemoryTable
+---@return integer position Position of the table cursor
+function Menu:getMenuPosition(tableCursor)
+    return Memory:readFromTable(tableCursor)
+end
+
+---Actively navigates a menu to the desired index from a table
+--- 
+---This is different from navigateMenu as it will check the value of the cursor after
+---each button press rather than precalculate the number of presses it should need
+---@param cursorTable MemoryTable: Cursor table where the cursor position is held
+---@param endLocation integer End value for the cursor address
+---@param options MenuOption? Options to control the inputs for menu navigation
+---@return boolean true if the memory address is at the desired location
+function Menu:activeNavigateMenuFromTable(cursorTable, endLocation, options)
+    return Menu:activeNavigation(MenuType.Menu, cursorTable, endLocation, options)
+end
+
+---Actively navigates a scrollable menu to the desired index from a table
+--- 
+---This is different from navigateMenu as it will check the value of the cursor after
+---each button press rather than precalculate the number of presses it should need
+---@param scrollableTableCursor ViewOffsetCursor: Cursor table where the cursor position is held
+---@param endLocation integer End value for the cursor address
+---@param options MenuOption? Options to control the inputs for menu navigation
+---@return boolean true if the memory address is at the desired location
+function Menu:activeNavigateScrollableMenuFromTable(scrollableTableCursor, endLocation, options)
+    return Menu:activeNavigation(MenuType.ViewOffset, scrollableTableCursor, endLocation, options)
+end
+
+---Actively navigates a scrollable menu to the desired index from a table
+--- 
+--- This is different from navigateMenu as it will check the value of the cursor after
+--- each button press rather than precalculate the number of presses it should need
+---@param viewAddress address Address for the view offset of the scrollable frame
+---@param cursorAddress address Address for the current cursor inside the scrollable view
+---@param endLocation integer End value for the cursor address
+---@param options MenuOption? Options to control the inputs for menu navigation
+---@return boolean true if the memory address is at the desired location
+function Menu:activeNavigateScrollableMenuFromAddresses(viewAddress, cursorAddress, endLocation, options)
+    return Menu:activeNavigateScrollableMenuFromTable({ViewOffset = {addr = viewAddress, size = 1},
+                                                       CursorOffset = {addr = cursorAddress, size = 1}},
+                                                      endLocation,
+                                                      options)
 end
 
 ---Actively navigates a menu to the desired index from a table

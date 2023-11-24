@@ -6,6 +6,7 @@ require "Memory"
 ---@type FactoryMap
 local factoryMap = {
     GSCPokemon = GameGroups.GEN_2,
+    GSPokemon = GameGroups.GOLD_SILVER
 }
 
 ---@class Pokemon

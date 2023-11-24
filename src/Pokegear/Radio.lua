@@ -28,7 +28,6 @@ function Radio:tuneToStation(station)
     Pokegear:selectOption(Pokegear.Option.RADIO)
     Common:waitFrames(40)
 
-    print(Radio.Station.POKE_FLUTE, Memory:readFromTable(Radio.Station))
     Menu:activeNavigateMenuFromTable(Radio.Station, station --[[@as integer]], {duration = 2, waitFrames = 10, downIsUp = false})
     --
 end

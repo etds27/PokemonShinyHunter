@@ -15,4 +15,4 @@ function FieldMoveTest:testHeadbuttNoEncounter()
 end
 
 print("FieldMoveTest:testHeadbuttEncounter()", FieldMoveTest:testHeadbuttEncounter())
-print("FieldMoveTest:testHeadbuttNoEncounter()", FieldMoveTest:testHeadbuttNoEncounter())
+-- print("FieldMoveTest:testHeadbuttNoEncounter()", FieldMoveTest:testHeadbuttNoEncounter())

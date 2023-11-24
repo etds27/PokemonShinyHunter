@@ -1,14 +1,20 @@
 require "Common"
-require "HeadbuttFactory"
+require "Factory"
 require "Input"
 require "Memory"
+
+---@type FactoryMap
+local factoryMap = {
+    GSHeadbutt = GameGroups.GOLD_SILVER,
+    CrystalHeadbutt = {Games.CRYSTAL}
+}
 
 Headbutt = {}
 
 -- Abstract tables
 local Model = {}
 Model.Catch = {}
-Model = HeadbuttFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Headbutt = Common:tableMerge(Headbutt, Model)

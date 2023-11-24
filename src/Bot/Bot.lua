@@ -161,10 +161,10 @@ function Bot:runModeHatchEggs()
         -- Determine what eggs were hatched after the egg cycle
         if not Positioning:inOverworld() then
             -- About 30 frames to update the hatched pokemon after movement is disabled
-            Common:waitFrames(30)
+            Common:waitFrames(60)
             eggSlots = Party:getEggMask()
             hatchedEggs = Breeding:determineHatchedPokemon(previousEggSlots, eggSlots)
-            for i, index in ipairs(hatchedEggs) do
+            for _, index in ipairs(hatchedEggs) do
                 Breeding:hatchEgg()
                 local hatchedPokemon = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAddress(index), Memory.WRAM)
                 Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species))

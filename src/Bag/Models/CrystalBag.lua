@@ -47,6 +47,14 @@ local Model = {
         addr = 0xD95C,
         size = 1
     },
+
+    KeyMenu = {
+        addr = Menu.Cursor.addr,
+        size = Menu.Cursor.size,
+        USE = 1,
+        SEL = 2,
+        QUIT = 3,
+    }
 }
 
 return Model

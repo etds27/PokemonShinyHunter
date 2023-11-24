@@ -71,9 +71,9 @@ end
 ---@return table
 function Party:getEggMask()
     local tab = {}
-    for i, pokemon in pairs(Party:getAllPokemonInParty())
+    for _, pokemon in pairs(Party:getAllPokemonInParty())
     do
-        if pokemon:isEgg() then
+        if pokemon:isEgg(true) then
             table.insert(tab, true)
         else
             table.insert(tab, false)

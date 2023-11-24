@@ -9,13 +9,13 @@ Factory = {}
 ---@param factoryMap FactoryMap Mapping of library name to compatible games
 ---@return table model Desired loaded model
 function Factory:loadModel(factoryMap)
+    local model = {}
     for library, compatibleGames in pairs(factoryMap)
     do
         Common:resetRequires({library})
         if Common:contains(compatibleGames, GameSettings.game) then
-            local model = require(library)
-            return model
+            Common:tableMerge(model, require(library))
         end
     end
-    return {}
+    return model
 end
