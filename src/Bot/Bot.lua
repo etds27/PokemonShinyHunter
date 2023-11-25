@@ -237,18 +237,19 @@ function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
     end
 end
 
-function Bot:searchForWildPokemon() 
+function Bot:searchForWildPokemon()
     local i = 0
     while Positioning:inOverworld() and i < Bot.SEARCH_SPIN_MAXIMUM
     do
         local direction = Positioning:getDirection()
         -- If we are facing north, spin in a circle starting from the south
         -- If we are facing not north, spin in a circle starting from the north
-        Log:debug("Searching for pokemon " .. i .. " Dir: " .. direction)
-        if direction == Positioning.Direction.NORTH then
-            Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_S)
+        if Common:contains({Positioning.Direction.NORTH, Positioning.Direction.SOUTH}, direction) then
+            Log:debug("Searching E/W for pokemon " .. i .. " Dir: " .. direction)
+            Input:performButtonSequence(ButtonSequences.SEARCH_HORIZONTAL)
         else
-            Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_N)
+            Log:debug("Searching N/S for pokemon " .. i .. " Dir: " .. direction)
+            Input:performButtonSequence(ButtonSequences.SEARCH_VERTICAL)
         end
 
         i = i + 1

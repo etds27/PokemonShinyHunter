@@ -16,7 +16,7 @@ Log = {
 ---@param message string Message to write
 function Log:message(type, message) 
     -- Skip if the logging level is too high
-    if type[1] < Log.loggingLevel[1] then return end  
+    if type[1] < Log.loggingLevel[1] then return end
     local timestamp = os.date("%Y-%m-%d-T%H:%M:%S")
     print(timestamp .. ": " .. type[2] .. ": " .. " ".. message)
 end

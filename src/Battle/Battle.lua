@@ -35,7 +35,7 @@ function Battle:runFromPokemon()
     Input:performButtonSequence(ButtonSequences.BATTLE_RUN)
     Input:pressButtons{buttonKeys={Buttons.B}, duration=80, waitFrames=1}
     Input:pressButtons{buttonKeys={Buttons.B}, duration=Duration.TAP}
-    return Positioning:waitForOverworld(500)
+    return Positioning:waitForOverworld(2000)
 end
 
 ---Open the pack from the battle menu
