@@ -1,7 +1,7 @@
 local Model = {
-    addr = 0xD040,
+    addr = 0xD173,
     size = 1,
-    ENCOUNTER = 10,
+    ENCOUNTER = 1,
     NO_ENCOUNTER = 0,
 }
 
