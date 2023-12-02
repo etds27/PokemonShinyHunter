@@ -1,143 +1,158 @@
 "use strict";
 
 const maximumBotsAllowed = 3
-const pokemonTableLength = 5
+const pokemonTableLength = 10
+
+const host = "http://127.0.0.1:8000"
 
 // mapping of Bot ID to pokemon table
 let activePokemonBots = new Set([])
 
-function testFunction() {
-    let element = document.getElementById("butt")
-    element.innerText = "NEW"
-    console.log(element)
+/**
+ * Accepts new encounter data and populates the newest encounter row
+ */
+function encounter() {
+    $.ajax({
+        method: "GET",
+        url: host + "/encounters",
+        crossDomain: true,
+        dataType: "json",
+        format: "json",
+        timeout: 1000,
+        success: function(encounters) {
+            for (let botPayload of encounters) {
+                let botID = botPayload["bot_id"]
+                for (let encounter of botPayload["encounters"]) {
+                    if (!doesBotIDExist(botID)) {
+                        return false
+                    }
+                    encounter["bot_id"] = botID
+                    addEncounterRowToTable(encounter)
+                }
+            }
+        }
+    })
 }
 
 /**
- * Creates the pokemon table element for the bot ID
- * @param {string} botId 
- * @returns {HTMLTableElement}
+ * Accepts new encounter data and populates the newest encounter row
  */
-function createPokemonTable(botId) {
-    const fragment = document.createDocumentFragment()
-    fragment.class = "pokemon-row"
-
-    const pokemonTable = document.createElement("table")
-    pokemonTable.className = "pokemon-table"
-    pokemonTable.id = `pokemon-table-${botId}`
-    const header = document.createElement("thead")
-    header.className = "pokemon-table-header"
-    header.id = `pokemon-table-header-${botId}`
-
-    header.innerText = botId
-
-    const footer = document.createElement("tfoot")
-    footer.className = "pokemon-table-footer"
-    footer.id = `pokemon-table-footer-${botId}`
-
-    const body = document.createElement("tbody")
-    body.className = "pokemon-table-body"
-    body.id = `pokemon-table-body-${botId}`
-
-
-    pokemonTable.appendChild(header)
-    pokemonTable.appendChild(body)
-    pokemonTable.appendChild(footer)
-    fragment.appendChild(pokemonTable)
-    return fragment
+function shiny() {
+    $.ajax({
+        method: "GET",
+        url: host + "/shiny_log",
+        crossDomain: true,
+        dataType: "json",
+        format: "json",
+        timeout: 1000,
+        success: function(encounters) {
+            for (let botPayload of encounters) {
+                let botID = botPayload["bot_id"]
+                for (let encounter of botPayload["encounters"]) {
+                    if (!doesBotIDExist(botID)) {
+                        return false
+                    }
+                    encounter["bot_id"] = botID
+                    addShinyRowToTable(encounter)
+                }
+            }
+        }   
+    })
 }
 
 /**
- * Creates the pokemon row element
- * @param {string} name 
- * @param {string} id 
- * @param {*} health 
- * @param {*} power 
- * @returns {HTMLTableRowElement} Pokemon data as a row
+ * Accepts new request for pokemon table and creates html elements for it
  */
-function createPokemonRow(name, id, health, power) {
-    const fragment = document.createDocumentFragment()
-    fragment.class = "pokemon-row"
-    const pokemonRow = document.createElement("tr")
-    pokemonRow.id = "pokemon-row"
-    pokemonRow.className = "pokemon-row"
+function updateActiveBots() {
+    $.ajax({
+        method: "GET",
+        url: host + "/active_bots",
+        crossDomain: true,
+        dataType: "json",
+        format: "json",
+        timeout: 1000,
+        success: function(initData) {
+            const updatedBotIds = new Set(initData["bot_ids"])
+            for (let botID of updatedBotIds) {
+                if (doesBotIDExist(botID)) {
+                    continue
+                }
+                console.debug("updateActiveBots: Adding: " + botID)
+                addPokemonTable(botID)
+            }
+            console.log(activePokemonBots, updatedBotIds)
+            for (let botID of activePokemonBots) {
+                if (!updatedBotIds.has(botID)) {
+                    if (!doesBotIDExist(botID)) {
+                        continue
+                    }
+                    console.log("updateActiveBots: Removing: " + botID)
 
-    const pokemonName = document.createElement("td")
-    pokemonName.id = "pokemon-name"
-    pokemonName.className = "pokemon-name"
-    pokemonName.innerText = name
+                    removePokemonTable(botID)
+                }
+            }
+        }
+    })
+}
 
-    const pokemonId = document.createElement("td")
-    pokemonId.id = "pokemon-id"
-    pokemonId.className = "pokemon-id"
-    pokemonId.innerText = id
 
-    const pokemonHealth = document.createElement("td")
-    pokemonHealth.id = "pokemon-health"
-    pokemonHealth.className = "pokemon-health"
-    pokemonHealth.innerText = health
 
-    const pokemonPower = document.createElement("td")
-    pokemonPower.id = "pokemon-power"
-    pokemonPower.className = "pokemon-power"
-    pokemonPower.innerText = power
-
-    pokemonRow.appendChild(pokemonName)
-    pokemonRow.appendChild(pokemonId)
-    pokemonRow.appendChild(pokemonHealth)
-    pokemonRow.appendChild(pokemonPower)
-
-    fragment.appendChild(pokemonRow)
-    return fragment
+/**
+ * Determine if we already have a table for the specified bot
+ * @param {string} botID ID of bot to verify
+ * @returns {bool} If the bot ID already has a table
+ */
+function doesBotIDExist(botID) {
+    if (!botID.length) {
+        console.error("No bot ID specified")
+        return false
+    }
+    if (!(activePokemonBots.has(botID))) {
+        console.debug("Table doesnt exists")
+        return false
+    }
+    return true
 }
 
 /**
  * Create and add a new pokemon bot table to the pokemon table container
  */
-function addPokemonTable() {
-    let botId = document.getElementById("bot-id-entry").value
-    botId = botId.trim().toLowerCase()
-    if (!botId.length) {
-        console.log("No bot ID specified")
+function addPokemonTable(botID) {
+    botID = botID.trim()
+    if (doesBotIDExist(botID)) {
         return false
-    }
-    if (activePokemonBots.has(botId)) {
-        console.log("Table already exists")
-        return
     }
 
     if(activePokemonBots.size == maximumBotsAllowed) {
         console.log("Bot limit aleady reached")
         return
     }
-
-    const table = createPokemonTable(botId)
+    console.log(`Creating bot area for: ${botID}`)
+    const table = createPokemonBotArea(botID)
     const pokemonTableContainer = document.getElementById("pokemon-table-container")
     pokemonTableContainer.appendChild(table)
-
-    activePokemonBots.add(botId)
+    console.debug(table)
+    activePokemonBots.add(botID)
 }
 
 /**
  * Creates and adds a pokemon row to the appropriate pokemon bot dashboard
  */
-function addPokemonRowToTable() {
-    let botId = document.getElementById("bot-id-entry").value
-    botId = botId.trim().toLowerCase()
-    if (!botId.length) {
-        console.log("No bot ID specified")
+function addEncounterRowToTable(encounterData) {
+    let botID = encounterData["bot_id"]
+    botID = botID.trim()
+    if (!doesBotIDExist(botID)) {
         return false
     }
-    if (!(activePokemonBots.has(botId))) {
-        console.log("Table doesnt exists")
+    let table = document.getElementById(`encounter-table-${botID}`)
+    let tbody = table.getElementsByTagName('tbody')[0];
+    let row = createEncounterRow(encounterData)
+    if (!row) {
         return
     }
-    let tableID = `pokemon-table-${botId}`
-    console.log(tableID)
-    let tableContainer = document.getElementById("pokemon-table-container")
-    let table = tableContainer.querySelector(`#${tableID}`)
-    let tbody = table.getElementsByTagName('tbody')[0];
-    let row = createPokemonRow("Pikachu", 25, 50, 20)
-    tbody.prepend(row)
+
+    const headerRow = document.getElementById(`encounter-table-column-header-row-${botID}`)
+    tbody.insertBefore(row, headerRow.nextSibling)
     
     while (tbody.rows.length > pokemonTableLength) {
         tbody.deleteRow(pokemonTableLength)
@@ -145,37 +160,68 @@ function addPokemonRowToTable() {
 }
 
 /**
- * Remove the table from the DOM
- * @returns 
+ * Creates and adds a pokemon row to the appropriate pokemon bot dashboard
  */
-function removePokemonTable() {
-    let botId = document.getElementById("bot-id-entry").value
-    botId = botId.trim().toLowerCase()
-    if (!botId.length) {
-        console.log("No bot ID specified")
+function addShinyRowToTable(encounterData) {
+    let botID = encounterData["bot_id"]
+    botID = botID.trim()
+    if (!doesBotIDExist(botID)) {
         return false
     }
-    console.log(activePokemonBots)
-    if (!(activePokemonBots.has(botId))) {
-        console.log("Table doesnt exists")
+    let table = document.getElementById(`shiny-table-${botID}`)
+    let tbody = table.getElementsByTagName('tbody')[0];
+    let row = createShinyRow(encounterData)
+    if (!row) {
         return
     }
 
-    let tableID = `pokemon-table-${botId}`
+    const headerRow = document.getElementById(`shiny-table-column-header-row-${botID}`)
+    tbody.insertBefore(row, headerRow.nextSibling)
+    
+    while (tbody.rows.length > pokemonTableLength) {
+        tbody.deleteRow(pokemonTableLength)
+    }
+}
+
+/**
+ * Deletes the pokemon table when the bot terminates
+ * @param {string} botID 
+ * @returns 
+ */
+function removePokemonTable(botID) {
+    botID = botID.trim()
+    if (!doesBotIDExist(botID)) {
+        return false
+    }
+
+    let tableID = `bot-area-${botID}`
     let table = document.getElementById(tableID)
     table.remove()
-    activePokemonBots.delete(botId)
+    activePokemonBots.delete(botID)
 }
 
-function addElement() {
-    var  container = document.getElementById("tableID")
-    container = container.getElementById("mainBody")
-    var row = container.insertRow();
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-
-    cell1.innerText = "1"
-    cell2.innerText = "2"
-    cell3.innerText = "3"
+function updatePokemonTimestamps() {
+    for (let element of document.getElementsByClassName("shiny-time")) {
+        const timestamp = $(element).data("timestamp")
+        element.innerHTML = getElapsedTimeAsString(timestamp)
+    }
 }
+
+setInterval(() => {
+    // console.log(host + "/active_bots")
+    updateActiveBots()
+}, 2000);
+
+setInterval(() => {
+    // console.log(host + "/encounters")
+    encounter()
+}, 1000);
+
+setInterval(() => {
+    // console.log(host + "/shiny")
+    shiny()
+}, 1000);
+
+setInterval(() => {
+    updatePokemonTimestamps()
+}, 1000)
