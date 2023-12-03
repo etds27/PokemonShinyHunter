@@ -8,7 +8,7 @@ body {
   display: flex;
 
   font-family: silkScreen;
-  font-size: small;
+  font-size: medium;
   margin: 0;
   min-height: 100vh;
   min-width: 100vw;
@@ -16,34 +16,45 @@ body {
 }
 
 #pokemon-table-container {
-  align-items: flex-start;
+  flex: 1 1 auto;
+  align-items: flex-end;
   background-color: gray;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-  min-height: 100%;
-  min-width: 100%;
 }
 
 .pokemon-bot-area {
   align-items: flex-start;
   background-color: orange;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex: 1 1 auto;
-  justify-content: space-evenly;
-  min-height: 100%;
+  height: 100%;
   width: 100%;
+  justify-content: flex-end;
+}
+
+thead {
+  background-color: beige;
+  position: relative;
+  white-space: nowrap;
+}
+
+.pokemon-table-area {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: row;
+  background-color: black;
+
+  flex: 1 1 auto;
 }
 
 .encounter-table, .shiny-table {
-  flex: 1 1 auto;
-  font: 400;
-  height: min-content;
-  justify-content: space-evenly;
+  display: table;
   table-layout: fixed;
-  text-align: center;
-  width: 50%;
+  height: fit-content;
+  width: 100%;
 }
 
 .encounter-table {
@@ -51,23 +62,42 @@ body {
 }
 
 .shiny-table {
-  background-color: lightgreen;
+  background-color: (100, 100, 20, .4);
 }
 
 .encounter-row, .shiny-row, .shiny-table-column-header-row, .encounter-table-column-header-row {
-  position: relative;
+  background-color: aliceblue;
+  white-space: nowrap;
 }
 
 .encounter-row {
   background-color: lightblue;
-  font: 800;
 }
 
 .shiny-row {
   background-color: yellow;
 }
 
-
 .shiny-table-column-header-row, .encounter-table-column-header-row {
   font-size: x-small;
+}
+
+.shiny-time {
+  justify-content: left;
+}
+
+.scrolling-ticker {
+  flex: 0 0 auto;
+  background-color: cadetblue;
+}
+
+td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.stream-view-port {
+  width: 100%;
+  padding-top: 75%; /* 4:3 Aspect ratio */
+  background-color: lightseagreen;
 }

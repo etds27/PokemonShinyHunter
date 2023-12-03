@@ -1,5 +1,5 @@
-const shinyTableHeaders = ["Time", "", "Phase Len", "Phase Encounters", "Species Phase Encounters"]
-const encounterTableHeaders = ["ID", "", "Lvl", "HP", "Atk", "Def", "SPE", "SP"]
+const shinyTableHeaders = ["Time", "", "Phase", "Species", "Total"]
+const encounterTableHeaders = ["ID", "", "Lvl", "HP", "Atk", "Def", "SPE", "SP", "Sum"]
 
 
 
@@ -15,12 +15,28 @@ function createPokemonBotArea(botID) {
     const botAreaElement = document.createElement("div")
     botAreaElement.className = "pokemon-bot-area"
     botAreaElement.id = `bot-area-${botID}`
+
+    const streamViewPort = document.createElement("div")
+    streamViewPort.className = "stream-view-port"
+
+    const pokemonTableElement = document.createElement("div")
+    pokemonTableElement.classList = "pokemon-table-area"
     
     const shinyTable = createShinyTable(botID)
     const encounterTable = createEncounterTable(botID)
 
-    botAreaElement.appendChild(shinyTable)
-    botAreaElement.appendChild(encounterTable)
+    const scollingTicker = document.createElement("div")
+    scollingTicker.innerText = "SCROLLING BANNER"
+    scollingTicker.class = "scrolling-ticker"
+
+    pokemonTableElement.appendChild(shinyTable)
+    pokemonTableElement.appendChild(encounterTable)
+
+    botAreaElement.appendChild(streamViewPort)
+    botAreaElement.appendChild(pokemonTableElement)
+    botAreaElement.appendChild(scollingTicker)
+
+
 
     fragment.appendChild(botAreaElement)
     return fragment
@@ -33,7 +49,6 @@ function createPokemonBotArea(botID) {
  */
 function createShinyTable(botID) {
     const fragment = document.createDocumentFragment()
-    fragment.class = "shiny-table"
 
     const pokemonTable = document.createElement("table")
     pokemonTable.className = "shiny-table"
@@ -41,8 +56,12 @@ function createShinyTable(botID) {
     const header = document.createElement("thead")
     header.className = "shiny-table-header"
     header.id = `shiny-table-header-${botID}`
-    header.colSpan = 5
-    header.innerText = "SHINY " + botID
+    const headerTr = document.createElement("tr")
+
+    headerTr.colSpan = 5
+    headerTr.innerText = "SHINY " + botID
+
+    header.appendChild(headerTr)
 
     const footer = document.createElement("tfoot")
     footer.className = "shiny-table-footer"
@@ -65,7 +84,6 @@ function createShinyTable(botID) {
     }
 
     body.appendChild(columnHeaderRow)
-
 
     pokemonTable.appendChild(header)
     pokemonTable.appendChild(body)
@@ -188,6 +206,11 @@ function createEncounterRow(encounterObject) {
     pokemonSpecialIv.className = "encounter-health-iv"
     pokemonSpecialIv.innerText = pokemonObject["specialIv"]
 
+    const pokemonSumIv = document.createElement("td")
+    pokemonSumIv.id = `encounter-sum-iv-${encounterId}-${botId}`
+    pokemonSumIv.className = "encounter-sum-iv"
+    pokemonSumIv.innerText = pokemonObject["totalIv"]
+
     pokemonRow.appendChild(encounterIdElement)
     pokemonRow.appendChild(pokemonSpecies)
     pokemonRow.appendChild(pokemonId)
@@ -196,6 +219,7 @@ function createEncounterRow(encounterObject) {
     pokemonRow.appendChild(pokemonDefenseIv)
     pokemonRow.appendChild(pokemonSpeedIv)
     pokemonRow.appendChild(pokemonSpecialIv)
+    pokemonRow.appendChild(pokemonSumIv)
         
     fragment.appendChild(pokemonRow)
     return fragment
@@ -279,13 +303,14 @@ function updateShinyRowTime(id, timestamp) {
 function getElapsedTimeAsString(timestamp) {
     const now = new Date().getTime() / 1000
     const elapsedTime = now - timestamp
+    console.log(now, timestamp, elapsedTime)
     if (elapsedTime > 24 * 60 * 60) {
-        return `${Math.floor(elapsedTime / 24 * 60 * 60)} D`
+        return `${Math.floor(elapsedTime / (24 * 60 * 60))}D`
     } else if (elapsedTime > 60 * 60) {
-        return `${Math.floor(elapsedTime / 60 * 60)} H`
+        return `${Math.floor(elapsedTime / (60 * 60))}H`
     } else if (elapsedTime > 60) {
-        return `${Math.floor(elapsedTime / 60)} M`
+        return `${Math.floor(elapsedTime / 60)}M`
     } else {
-        return `${Math.floor(elapsedTime)} S`
+        return `${Math.floor(elapsedTime)}S`
     }
 }
