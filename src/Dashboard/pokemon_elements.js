@@ -22,6 +22,7 @@ function createPokemonBotArea(botID) {
     const pokemonTableElement = document.createElement("div")
     pokemonTableElement.classList = "pokemon-table-area"
     
+    const currentPhaseArea = createCurrentPhaseArea(botID)
     const shinyTable = createShinyTable(botID)
     const encounterTable = createEncounterTable(botID)
 
@@ -33,15 +34,144 @@ function createPokemonBotArea(botID) {
     pokemonTableElement.appendChild(encounterTable)
 
     botAreaElement.appendChild(streamViewPort)
+    botAreaElement.appendChild(currentPhaseArea)
     botAreaElement.appendChild(pokemonTableElement)
     botAreaElement.appendChild(scollingTicker)
-
-
 
     fragment.appendChild(botAreaElement)
     return fragment
 }
 
+/**
+ * Presents the following information
+ * Phase Time Duration
+ * Phase Encounter Total
+ * Current Bot Mode
+ * Phase IV Extremes
+ * Pokemon Seen In Phase
+ * 
+ * @param {string} botID 
+ * @returns 
+ */
+function createCurrentPhaseArea(botID) {
+    const fragment = document.createDocumentFragment()
+
+    const pokemonTable = document.createElement("table")
+    pokemonTable.className = "current-phase-table"
+    pokemonTable.id = `current-phase-table-${botID}`
+    const header = document.createElement("thead")
+    header.className = "current-phase-table-header"
+    header.id = `current-phase-table-header-${botID}`
+    const headerTr = document.createElement("tr")
+    const headerTd = document.createElement("td")
+
+    headerTd.innerText = "Current Phase " + botID
+    headerTd.colSpan = 2
+    headerTr.appendChild(headerTd)
+
+    header.appendChild(headerTr)
+
+    const footer = document.createElement("tfoot")
+    footer.className = "current-phase-table-footer"
+    footer.id = `current-phase-table-footer-${botID}`
+
+    const body = document.createElement("tbody")
+    body.className = "current-phase-table-body"
+    body.id = `current-phase-table-body-${botID}`
+
+    // Elapsed Phase Time
+    let row = body.insertRow()
+    let col = document.createElement("td")
+    col.className = "current-phase-header"
+    col.id = `current-phase-header-time-${botID}`
+    col.innerText = "Elapsed Phase Time:"
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    col.className = "current-phase-data"
+    col.id = `current-phase-time-${botID}`
+    col.innerText = "0s"
+    row.appendChild(col)
+
+    // Total Phase Encounters
+    row = body.insertRow()
+    col = document.createElement("td")
+    col.className = "current-phase-header"
+    col.id = `current-phase-header-encounters-${botID}`
+    col.innerText = "Total Phase Encounters:"
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    col.className = "current-phase-data"
+    col.id = `current-phase-encounters-${botID}`
+    col.innerText = "0"
+    row.appendChild(col)
+
+    // Current Bot Mode
+    row = body.insertRow()
+    col = document.createElement("td")
+    col.className = "current-phase-header"
+    col.id = `current-phase-header-mode-${botID}`
+    col.innerText = "Current Bot Mode:"
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    col.className = "current-phase-data"
+    col.id = `current-phase-mode-${botID}`
+    col.innerText = "Walking"
+    row.appendChild(col)
+
+    // IV Extremes
+    row = body.insertRow()
+    col = document.createElement("td")
+    col.className = "current-phase-data"
+    col.id = `current-phase-container-weak-${botID}`
+    let div = document.createElement("div")
+    div.className = "horizontal-phase-box"
+
+    const weakSpecies = document.createElement("div")
+    weakSpecies.className = "weak-pokemon-species"
+    weakSpecies.id = `weak-pokemon-species-${botID}`
+    const weakValue = document.createElement("div")
+    weakValue.classList = "weak-pokemon-value"
+    weakValue.id = `weak-pokemon-value-${botID}`
+    div.appendChild(weakSpecies)
+    div.appendChild(weakValue)
+    col.appendChild(div)
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    col.className = "current-phase-data"
+    col.id = `current-phase-container-strong-${botID}`
+    div = document.createElement("div")
+    div.className = "horizontal-phase-box"
+    const strongSpecies = document.createElement("div")
+    strongSpecies.className = "strong-pokemon-species"
+    strongSpecies.id = `strong-pokemon-species-${botID}`
+    const strongValue = document.createElement("div")
+    strongValue.classList = "strong-pokemon-value"
+    strongValue.id = `strong-pokemon-value-${botID}`
+    div.appendChild(strongSpecies)
+    div.appendChild(strongValue)
+    col.appendChild(div)
+    row.appendChild(col)
+
+    // Phase Pokemon Seen
+    row = body.insertRow()
+    col = document.createElement("td")
+    col.colSpan = 2
+    div = document.createElement("div")
+    div.id = `current-phase-container-pokemon-${botID}`
+    div.className = "horizontal-phase-box"
+    col.appendChild(div)
+    row.appendChild(col)
+
+    pokemonTable.appendChild(header)
+    pokemonTable.appendChild(body)
+    pokemonTable.appendChild(footer)
+    fragment.appendChild(pokemonTable)
+    return fragment
+}
 /**
  * Creates the shiny table element for the bot ID
  * @param {string} botID 
@@ -299,6 +429,20 @@ function updateShinyRowTime(id, timestamp) {
     timeElement.innerHTML = getElapsedTimeAsString(timestamp)
 }
 
+function createPokemonSprite(species, spriteType = DEFAULT_BATTLE_ICONS, size = 16, shiny = false) {
+    const image = document.createElement("img")
+    let filename = ""
+    if (shiny) {
+        filename = `${spriteType}_shiny.png`
+    } else {
+        filename = `${spriteType}.png`
+    }
+    image.src = `/resources/sprites/${species}/${filename}`
+    image.className = `pokemon-sprite-${size}`
+    image.alt = species
+    return image
+}
+
 
 function getElapsedTimeAsString(timestamp) {
     const now = new Date().getTime() / 1000
@@ -307,10 +451,48 @@ function getElapsedTimeAsString(timestamp) {
     if (elapsedTime > 24 * 60 * 60) {
         return `${Math.floor(elapsedTime / (24 * 60 * 60))}D`
     } else if (elapsedTime > 60 * 60) {
-        return `${Math.floor(elapsedTime / (60 * 60))}H`
+        return `${Math.floor(elapsedTime / (60 * 60))}h`
     } else if (elapsedTime > 60) {
-        return `${Math.floor(elapsedTime / 60)}M`
+        return `${Math.floor(elapsedTime / 60)}m`
     } else {
-        return `${Math.floor(elapsedTime)}S`
+        return `${Math.floor(elapsedTime)}s`
     }
+}
+
+function getFullElapsedTimeAsString(timestamp) {
+    const now = new Date().getTime() / 1000
+    let elapsedTime = now - timestamp
+    console.log(now, timestamp, elapsedTime)
+    const years = Math.floor(elapsedTime / (365 * 24 * 60 * 60))
+    elapsedTime = elapsedTime % (365 * 24 * 60 * 60)
+    const days = Math.floor(elapsedTime / (24 * 60 * 60))
+    elapsedTime = elapsedTime % (24 * 60 * 60)
+    const hours = Math.floor(elapsedTime / (60 * 60))
+    elapsedTime = elapsedTime % (60 * 60)
+    const minutes = Math.floor(elapsedTime / 60)
+    elapsedTime =  elapsedTime % (60)
+    const seconds = Math.floor(elapsedTime)
+
+    let string = ""
+
+    if (years > 0) {
+        string += `${years}Y `
+    }
+    if (string || days > 0) {
+        string += `${days}D `
+    }
+    
+    if (string || hours > 0) {
+        string += `${hours}h `
+    }
+
+    if (string || minutes > 0) {
+        string += `${minutes}m `
+    }
+
+    if (string || seconds >0 ) {
+        string += `${seconds}s `
+    }
+
+    return string
 }

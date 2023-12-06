@@ -101,3 +101,34 @@ td {
   padding-top: 75%; /* 4:3 Aspect ratio */
   background-color: lightseagreen;
 }
+
+.current-phase-table {
+  background-color: lightgrey;
+  height: fit-content;
+  table-layout: fixed;
+  width: 100%;}
+
+.horizontal-phase-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.pokemon-sprite-64 {
+  transform: scale(1.3);
+  height: 64px;
+  width: 64px;
+}
+
+.pokemon-sprite-32 {
+  transform: scale(1.3);
+  height: 32px;
+  width: 32px;
+}
+
+.pokemon-sprite-16 {
+  transform: scale(1.5);
+  height: 16px;
+  width: 16px;
+}

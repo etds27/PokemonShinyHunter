@@ -11,6 +11,7 @@ app = flask.Flask(__name__)
 CORS(app)
 
 _bot_ids = ["ETHAN12345", "HALEY12345", "MAX54321"]
+_seen_pokemon = [random.randint(0, 250) for _ in range(6)]
 
 @app.route("/active_bots")
 def provideBotIds() -> dict:
@@ -21,13 +22,25 @@ def provideBotIds() -> dict:
     sys.stdout.write(str(_bot_ids) + "\n")
     sys.stdout.flush()
     return {
-        "bot_ids": _bot_ids,
+        "bots": {
+            "ETHAN12345": {
+                "battle-icon": "battle",
+                "party-icon": "party"
+            },
+            "HALEY12345": {
+                "battle-icon": "battle",
+                "party-icon": "party"
+            },
+            "MAX54321": {
+                "battle-icon": "battle",
+                "party-icon": "party"
+            },
+        },
         "timestamp": time.time(),
     }
 
 @app.route("/encounters")
 def provideEncounters() -> dict:
-    hp, atk, defense, spd, spe = (random.randint(0, 16)  for _ in range(5))
     return randomEncounterPayload()
 
 @app.route("/shiny_log")
@@ -58,11 +71,45 @@ def provideShinyEncounters() -> list:
 
 @app.route("/phase_info")
 def providePhaseInfo() -> dict:
-    return {}
+    return randomPhasePayload()
 
 @app.route("/collection_info")
 def provideCollectionInfo() -> dict:
     return {}
+
+def randomPhasePayload():
+    return [
+        {
+            "bot_id": _bot_ids[0],
+            "timestamp": time.time(),
+            "start_timestamp": time.time() - random.randint(0, 7200),
+            "bot_mode": "WALKING",
+            "total_encounters": random.randint(0, 8192),
+            "pokemon_seen": _seen_pokemon,
+            "strongest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)},
+            "weakest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)}
+        },
+        {
+            "bot_id": _bot_ids[1],
+            "start_timestamp": time.time() - random.randint(0, 7200),
+            "timestamp": time.time(),
+            "bot_mode": "WALKING",
+            "total_encounters": random.randint(0, 8192),
+            "pokemon_seen": _seen_pokemon,
+            "strongest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)},
+            "weakest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)}
+        },
+        {
+            "bot_id": _bot_ids[2],
+            "start_timestamp": time.time() - random.randint(0, 7200),
+            "timestamp": time.time(),
+            "bot_mode": "WALKING",
+            "total_encounters": random.randint(0, 8192),
+            "pokemon_seen": _seen_pokemon,
+            "strongest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)},
+            "weakest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)}
+        },
+    ]
 
 def randomEncounterPayload():
     hp, atk, defense, spd, spe = (random.randint(0, 16)  for _ in range(5))

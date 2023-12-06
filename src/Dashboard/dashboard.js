@@ -5,8 +5,11 @@ const pokemonTableLength = 10
 
 const host = "http://127.0.0.1:8000"
 
+const DEFAULT_BATTLE_ICONS = ""
+const DEFAULT_PARTY_ICONS = ""
+
 // mapping of Bot ID to pokemon table
-let activePokemonBots = new Set([])
+let activePokemonBots = {}
 
 /**
  * Accepts new encounter data and populates the newest encounter row
@@ -61,6 +64,29 @@ function shiny() {
 }
 
 /**
+ * Accepts new encounter data and populates the newest encounter row
+ */
+function phase() {
+    $.ajax({
+        method: "GET",
+        url: host + "/phase_info",
+        crossDomain: true,
+        dataType: "json",
+        format: "json",
+        timeout: 1000,
+        success: function(phases) {
+            for (let botPayload of phases) {
+                let botID = botPayload["bot_id"]
+                if (!doesBotIDExist(botID)) {
+                    return false
+                }
+                updateCurrentPhaseInfo(botPayload)
+            }
+        }   
+    })
+}
+
+/**
  * Accepts new request for pokemon table and creates html elements for it
  */
 function updateActiveBots() {
@@ -72,16 +98,17 @@ function updateActiveBots() {
         format: "json",
         timeout: 1000,
         success: function(initData) {
-            const updatedBotIds = new Set(initData["bot_ids"])
-            for (let botID of updatedBotIds) {
+            const botData = initData["bots"]
+            const updatedBotIds = new Set(Object.keys(botData))
+            for (let botID in botData) {
+                const botOptions = botData[botID]
                 if (doesBotIDExist(botID)) {
                     continue
                 }
                 console.debug("updateActiveBots: Adding: " + botID)
-                addPokemonTable(botID)
+                addPokemonTable(botID, botOptions)
             }
-            console.log(activePokemonBots, updatedBotIds)
-            for (let botID of activePokemonBots) {
+            for (let botID in activePokemonBots) {
                 if (!updatedBotIds.has(botID)) {
                     if (!doesBotIDExist(botID)) {
                         continue
@@ -95,8 +122,6 @@ function updateActiveBots() {
     })
 }
 
-
-
 /**
  * Determine if we already have a table for the specified bot
  * @param {string} botID ID of bot to verify
@@ -107,7 +132,7 @@ function doesBotIDExist(botID) {
         console.error("No bot ID specified")
         return false
     }
-    if (!(activePokemonBots.has(botID))) {
+    if (!(botID in activePokemonBots)) {
         console.debug("Table doesnt exists")
         return false
     }
@@ -117,7 +142,7 @@ function doesBotIDExist(botID) {
 /**
  * Create and add a new pokemon bot table to the pokemon table container
  */
-function addPokemonTable(botID) {
+function addPokemonTable(botID, options) {
     botID = botID.trim()
     if (doesBotIDExist(botID)) {
         return false
@@ -132,7 +157,10 @@ function addPokemonTable(botID) {
     const pokemonTableContainer = document.getElementById("pokemon-table-container")
     pokemonTableContainer.appendChild(table)
     console.debug(table)
-    activePokemonBots.add(botID)
+    activePokemonBots[botID] = {
+        battleIconType: options["battle-icon"] || DEFAULT_BATTLE_ICONS,
+        partyIconType: options["party-icon"] || DEFAULT_PARTY_ICONS,
+    }
 }
 
 /**
@@ -207,6 +235,42 @@ function updatePokemonTimestamps() {
     }
 }
 
+function updateCurrentPhaseInfo(phaseData) {
+    let botID = phaseData["bot_id"]
+    let element = document.getElementById(`current-phase-time-${botID}`)
+    element.innerText = getFullElapsedTimeAsString(phaseData["start_timestamp"])
+
+    element = document.getElementById(`current-phase-encounters-${botID}`)
+    element.innerText = phaseData["total_encounters"].toLocaleString()
+    
+    element = document.getElementById(`current-phase-mode-${botID}`)
+    element.innerText = phaseData["bot_mode"]
+
+    element = document.getElementById(`weak-pokemon-species-${botID}`)
+    element.innerText = phaseData["weakest_pokemon"]["species"]
+
+    element = document.getElementById(`weak-pokemon-value-${botID}`)
+    element.innerText = phaseData["weakest_pokemon"]["iv"]
+
+    element = document.getElementById(`strong-pokemon-species-${botID}`)
+    element.innerText = phaseData["strongest_pokemon"]["species"]
+
+    element = document.getElementById(`strong-pokemon-value-${botID}`)
+    element.innerText = phaseData["strongest_pokemon"]["iv"]
+
+    element = document.getElementById(`current-phase-container-pokemon-${botID}`)
+    for (var i = 0; i < phaseData["pokemon_seen"].length; i++) {
+        const species = phaseData["pokemon_seen"][i]
+        let pokemonElement = document.getElementById(`current-phase-pokemon-${botID}-${species}`)
+        if (pokemonElement) {
+            continue
+        }
+        pokemonElement = createPokemonSprite(species, activePokemonBots[botID]["battleIconType"], 32)
+        pokemonElement.id = `current-phase-pokemon-${botID}-${species}`
+        element.appendChild(pokemonElement)
+    }
+}
+
 setInterval(() => {
     // console.log(host + "/active_bots")
     updateActiveBots()
@@ -224,4 +288,8 @@ setInterval(() => {
 
 setInterval(() => {
     updatePokemonTimestamps()
+}, 1000)
+
+setInterval(() => {
+    phase()
 }, 1000)
