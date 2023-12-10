@@ -1,7 +1,7 @@
 "use strict";
 
 const maximumBotsAllowed = 3
-const pokemonTableLength = 10
+const pokemonTableLength = 5
 
 const host = "http://127.0.0.1:8000"
 
@@ -182,7 +182,7 @@ function addEncounterRowToTable(encounterData) {
     const headerRow = document.getElementById(`encounter-table-column-header-row-${botID}`)
     tbody.insertBefore(row, headerRow.nextSibling)
     
-    while (tbody.rows.length > pokemonTableLength) {
+    while (tbody.rows.length > pokemonTableLength + 1) {
         tbody.deleteRow(pokemonTableLength)
     }
 }
@@ -206,7 +206,7 @@ function addShinyRowToTable(encounterData) {
     const headerRow = document.getElementById(`shiny-table-column-header-row-${botID}`)
     tbody.insertBefore(row, headerRow.nextSibling)
     
-    while (tbody.rows.length > pokemonTableLength) {
+    while (tbody.rows.length > pokemonTableLength + 1) {
         tbody.deleteRow(pokemonTableLength)
     }
 }
@@ -242,9 +242,6 @@ function updateCurrentPhaseInfo(phaseData) {
 
     element = document.getElementById(`current-phase-encounters-${botID}`)
     element.innerText = phaseData["total_encounters"].toLocaleString()
-    
-    element = document.getElementById(`current-phase-mode-${botID}`)
-    element.innerText = phaseData["bot_mode"]
 
     element = document.getElementById(`weak-pokemon-species-${botID}`)
     element.innerText = phaseData["weakest_pokemon"]["species"]
@@ -259,14 +256,48 @@ function updateCurrentPhaseInfo(phaseData) {
     element.innerText = phaseData["strongest_pokemon"]["iv"]
 
     element = document.getElementById(`current-phase-container-pokemon-${botID}`)
+
+    // Remove the existing sprites if they shouldn't be displayed
+    let existingElements = document.getElementsByClassName(`current-phase-pokemon-${botID}`)
+    for (var i = existingElements.length - 1; i >=0; i--) {
+        let existingElement = existingElements[i]
+        if (!(phaseData["pokemon_seen"].map(getPokemonId).includes($(existingElement).data("speciesId")))) {
+            console.debug(`Removing Element ${existingElement.id}`)
+            existingElement.remove()
+        }
+    }
+
+    // Display the sprites of the pokemon_seen
     for (var i = 0; i < phaseData["pokemon_seen"].length; i++) {
-        const species = phaseData["pokemon_seen"][i]
-        let pokemonElement = document.getElementById(`current-phase-pokemon-${botID}-${species}`)
+        const pokemonInfo = phaseData["pokemon_seen"][i]
+        const pokemonId = getPokemonId(pokemonInfo)
+        let pokemonElement = document.getElementById(`current-phase-pokemon-${botID}-${pokemonId}`)
         if (pokemonElement) {
             continue
         }
-        pokemonElement = createPokemonSprite(species, activePokemonBots[botID]["battleIconType"], 32)
-        pokemonElement.id = `current-phase-pokemon-${botID}-${species}`
+        pokemonElement = createPokemonSprite(pokemonInfo, activePokemonBots[botID]["battleIconType"], 48)
+        pokemonElement.id = `current-phase-pokemon-${botID}-${pokemonId}`
+        $(pokemonElement).data("speciesId", pokemonId)
+        element.appendChild(pokemonElement)
+    }
+}
+
+function updatePokemonScrollingTicker(collectionData) {
+    let botID = phaseData["bot_id"]
+    // Remove the existing sprites if they shouldn't be displayed
+    let existingElements = document.getElementsByClassName(`pokemon-ticker-sprite-${botID}`)
+
+    // Display the sprites of the pokemon_seen
+    for (var i = 0; i < phaseData["pokemon_seen"].length; i++) {
+        const pokemonInfo = phaseData["pokemon_seen"][i]
+        const pokemonId = getPokemonId(pokemonInfo)
+        let pokemonElement = document.getElementById(`pokemon-ticker-sprite-${botID}-${pokemonId}`)
+        if (pokemonElement) {
+            continue
+        }
+        pokemonElement = createPokemonSprite(pokemonInfo, activePokemonBots[botID]["battleIconType"], 48)
+        pokemonElement.id = `current-phase-pokemon-${botID}-${pokemonId}`
+        $(pokemonElement).data("speciesId", pokemonId)
         element.appendChild(pokemonElement)
     }
 }

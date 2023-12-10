@@ -1,11 +1,16 @@
 import pprint
-import event_handler
+from event_handler import EventHandler
+import flask
+from flask_cors import CORS
+import http_server
 import json
 import logging
+from payload_aggregator import PayloadAggregator
 import re
 import select
 import socket
 import signal
+import threading
 import argparse
 
 BUF_SIZE = 1024
@@ -19,66 +24,38 @@ args = parser.parse_args()
 HOST = args.host  # Standard loopback interface address (localhost)
 PORT = args.port  # Port to listen on (non-privileged ports are > 1023)
 
-print(HOST, PORT)
+event_handler = EventHandler()
+payload_aggregator = PayloadAggregator(event_handler=event_handler)
 
-def close_script(s):
-    logging.info("No more connections are established, terminating server")
-    s.close()
-    exit()
+app = flask.Flask(__name__)
+CORS(app)
 
-event_handler = event_handler.EventHandler()
+@app.route("/active_bots")
+def provideBotIds() -> dict:
+    return payload_aggregator.get_bot_payload()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
-    server.setblocking(0)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind((HOST, PORT))
-    server.listen()
-    inputs = [server]
+@app.route("/encounters")
+def provideEncounters() -> dict:
+    return payload_aggregator.get_encounter_payload()
 
-    logging.basicConfig(level=logging.DEBUG)
-    while inputs:
-        readable, _, _ = select.select(inputs, [], [])
+@app.route("/shiny_log")
+def provideShinyEncounters() -> list:
+    return payload_aggregator.get_shiny_payload()
 
-        for s in readable:
-            if s == server: # Accept a new connection coming in
-                conn, addr = s.accept()
-                logging.info(f"Accepted new connection from: {addr}")
-                conn.setblocking(0)
-                inputs.append(conn)
-            else: # Read data from one of the connected sockets
-                try:
-                    chunks = []
-                    while True:
-                        chunk = s.recv(BUF_SIZE)
-                        chunks.append(chunk)
-                        if len(chunk) < BUF_SIZE:
-                            break
-                    data = b''.join(chunks)
-                except ConnectionResetError as e:
-                    logging.error("Lost connection to client")
-                    logging.error(e)
-                    inputs.remove(s)
-                    if len(inputs) == 1:
-                        close_script(server)
-                    continue
-     
-                if data:
-                    data_str = data.decode("utf-8")
-                    try:
-                        messages = data_str.split("|||")
-                        for message in messages:
-                            if not message:
-                                continue
-                            # Clean up the received data and send over to the event handler
-                            stripped_data = re.sub("^[\d]+ ", "" , message)
-                            event_json = json.loads(stripped_data)
-                    except json.JSONDecodeError:
-                        logging.error(f"Unable to parse data: {data_str}")
-                    
-                    event_handler.handle_event(event_json)
-                else:
-                    logging.info(f"Removing socket {s.fileno()}")
-                    inputs.remove(s)
-                    if len(inputs) == 1:
-                        close_script(server)
+@app.route("/phase_info")
+def providePhaseInfo() -> dict:
+    return payload_aggregator.get_phase_payload()
 
+@app.route("/collection_info")
+def provideCollectionInfo() -> dict:
+    return {}
+
+@app.route("/bot_data_receive", methods=["POST"])
+def update_bot_data():
+    event = flask.request.form.to_dict()
+    event = json.loads(event["payload"])
+    event_handler.handle_event(event)
+
+    return flask.Response("SUCCESS", status=200)
+
+app.run(host="127.0.0.1", port=8000)

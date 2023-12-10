@@ -1,5 +1,6 @@
 import enum
 import logging
+import time
 
 from collection_manager import CollectionManager
 from encounter_manager import EncounterManager
@@ -28,5 +29,13 @@ class EventHandler:
         self.bot_agents[bot_id] = {
             Event.ENCOUNTER.value: EncounterManager(bot_id=bot_id),
             Event.COLLECTION.value: CollectionManager(bot_id=bot_id)
+        }
+
+    def get_current_bot_payload(self):
+        return {
+            "bots": {
+
+            },
+            "timestamp": time.time()
         }
 

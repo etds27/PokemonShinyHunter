@@ -1,7 +1,8 @@
 import enum
 import logging
 import file_manager
-import pokemon
+import time
+from pokemon import Pokemon
 
 logging.basicConfig(level=logging.INFO)
 class IV(enum.Enum):
@@ -12,15 +13,17 @@ class IV(enum.Enum):
     SPC = "specialIv"
 
 class EncounterManager:
+    encounter_memory = 5
+
     encounter_keys = [
         "species",
         "pokerus",
         "level",
-        "attackIv",
-        "defenseIv",
-        "speedIv",
-        "specialIv",
-        "hpIv",
+        IV.ATK.value,
+        IV.DEF.value,
+        IV.SPD.value,
+        IV.SPC.value,
+        IV.HP.value,
         "caughtData",
         "isShiny",
     ]
@@ -38,12 +41,15 @@ class EncounterManager:
             "last_shiny_timestamp": 0,
             "strongest_pokemon": {},
             "weakest_pokemon": {},
-            "species": {}
+            "species": {},
+            "previous_n_encounters": [],
+            "previous_n_shiny_encounters": [],
+            "current_phase": self.create_phase(time.time()),
         }
         self.initialize_encounter_table()
 
     def initialize_encounter_table(self):
-        self.encounters = file_manager.load_file(self.bot_id, self.filename)
+        self.encounters = self.encounters | file_manager.load_file(self.bot_id, self.filename)
 
     def save_encounter_table(self):
         file_manager.save_file(self.bot_id, filename=self.filename, data=self.encounters)
@@ -59,66 +65,75 @@ class EncounterManager:
         species = str(content_json["species"])
         new_encounter_dict = {k: content_json[k] for k in self.encounter_keys if k in content_json}
         new_encounter_dict["time"] = encounter_json["playTime"]
+        new_encounter_dict["timestamp"] = encounter_json["timestamp"]
         new_encounter_dict["strength"] = self.calculate_encounter_strength(new_encounter_dict)
         new_encounter_dict["shiny_proximity"] = self.calculate_shinines_proximity(new_encounter_dict)
 
         logging.info(self.encounter_string(species, new_encounter_dict))
         
         if species not in self.encounters["species"]:
-            logging.info(f"Found new species: {pokemon.pokemon_names[species]}")
+            logging.info(f"Found new species: {Pokemon.get_pokemon_name(species)}")
             self.create_new_encounter_species(species=species)
 
 
         species_dict = self.encounters["species"][species]
-        species_dict["total_encounters"] += 1
-        self.encounters["total_encounters"] += 1
+        self.update_encounter_dict(species_dict, new_encounter_dict)
+        self.update_encounter_dict(self.encounters, new_encounter_dict)
+        self.update_encounter_dict(self.encounters["current_phase"], new_encounter_dict)
 
+        self.encounters["current_phase"]["species"].setdefault(species, 0)
+        self.encounters["current_phase"]["species"][species] += 1
 
         if content_json["isShiny"]:
-            species_dict["total_shinies_found"] += 1
-            self.encounters["total_shinies_found"] += 1
             species_dict["shiny_encounters"].append(new_encounter_dict)
 
             if "caught" in content_json and content_json["caught"]:
-                species_dict["total_shinies_caught"] += 1
-                self.encounters["total_shinies_caught"] += 1
-
                 # Update the unique shiny encouter list
                 if species not in self.encounters["unique_shinies_caught"]:
                     self.encounters["unique_shinies_caught"].append(species)
 
-            # Update the last time we found a shiny to this encounter
-            self.encounters["last_shiny_encounter"] = self.encounters["total_encounters"]
-            self.encounters["last_shiny_timestamp"] = encounter_json["timestamp"]
-            species_dict["last_shiny_encounter"] = species_dict["total_encounters"]
 
+            # Add the encounter to the top of the previous encounters list
+            self.encounters["previous_n_shiny_encounters"].insert(0, self.create_shiny_encounter_for_payload(new_encounter_dict, self.encounters["current_phase"]))
+            if len(self.encounters["previous_n_shiny_encounters"]) > self.encounter_memory:
+                self.encounters["previous_n_shiny_encounters"].pop()
+            # Update the last time we found a shiny to this encounter
+            self.encounters["current_phase"] = self.create_phase(encounter_json["timestamp"])
 
         # Log pokerus
         if "pokerus" in content_json and content_json["pokerus"]:
-            species_dict["total_pokerus"] += 1
-            self.encounters["total_pokerus"] += 1
             species_dict["pokerus_encounters"].append(new_encounter_dict)
 
-        # Update the strongest pokemon
-        if not species_dict["strongest_pokemon"] or new_encounter_dict["strength"] > species_dict["strongest_pokemon"]["strength"]:
-            logging.debug(str(species_dict))
-            logging.info(f"Found the strongest {pokemon.pokemon_names[str(species)]}: {new_encounter_dict['strength']}")
-            species_dict["strongest_pokemon"] = new_encounter_dict
-        if not self.encounters["strongest_pokemon"] or new_encounter_dict["strength"] > self.encounters["strongest_pokemon"]["strength"]:
-            logging.info(f"Found the strongest overall pokemon: {new_encounter_dict['strength']}")
-            self.encounters["strongest_pokemon"] = new_encounter_dict
-
-        # Update the weakest pokemon
-        if not species_dict["weakest_pokemon"] or new_encounter_dict["strength"] < species_dict["weakest_pokemon"]["strength"]:
-            logging.debug(str(species_dict))
-            logging.info(f"Found the weakest {pokemon.pokemon_names[str(species)]}: {new_encounter_dict['strength']}")
-            species_dict["weakest_pokemon"] = new_encounter_dict
-        if not self.encounters["weakest_pokemon"] or new_encounter_dict["strength"] < self.encounters["weakest_pokemon"]["strength"]:
-            logging.info(f"Found the weakest overall pokemon: {new_encounter_dict['strength']}")
-            self.encounters["weakest_pokemon"] = new_encounter_dict
+        # Add the encounter to the top of the previous encounters list
+        self.encounters["previous_n_encounters"].insert(0, self.create_encounter_for_payload(new_encounter_dict))
+        if len(self.encounters["previous_n_encounters"]) > self.encounter_memory:
+            self.encounters["previous_n_encounters"].pop()
 
         self.save_encounter_table()
 
+    def update_encounter_dict(self, dest, encounter_dict):
+        species = encounter_dict['species']
+        dest["total_encounters"] += 1
+
+        if encounter_dict["isShiny"]:
+            dest["total_shinies_found"] += 1
+            if "caughtData" in encounter_dict and encounter_dict["caughtData"]:
+                dest["total_shinies_caught"] += 1
+
+        if "pokerus" in encounter_dict and encounter_dict["pokerus"]:
+            dest["total_pokerus"] += 1
+
+        # Update the strongest pokemon
+        if not dest["strongest_pokemon"] or encounter_dict["strength"] > dest["strongest_pokemon"]["strength"]:
+            logging.debug(str(encounter_dict))
+            logging.info(f"Found the strongest {Pokemon.get_pokemon_name(species)}: {encounter_dict['strength']}")
+            dest["strongest_pokemon"] = encounter_dict
+
+        # Update the weakest pokemon
+        if not dest["weakest_pokemon"] or encounter_dict["strength"] < dest["weakest_pokemon"]["strength"]:
+            logging.debug(str(encounter_dict))
+            logging.info(f"Found the weakest {Pokemon.get_pokemon_name(species)}: {encounter_dict['strength']}")
+            dest["weakest_pokemon"] = encounter_dict
 
     def create_new_encounter_species(self, species):
         self.encounters["species"][species] = {
@@ -135,7 +150,7 @@ class EncounterManager:
 
     def encounter_string(self, species, encounter_json):
         string = f"BOT#{self.bot_id:<12}: "
-        string += f"{pokemon.pokemon_names[str(species)]:<10} "
+        string += f"{Pokemon.get_pokemon_name(species):<10} "
         string += f"POW: {encounter_json['strength']:02d}, "
         string += f"PROX: {encounter_json['shiny_proximity']:02d}, "
         string += f"SHINY: {encounter_json['isShiny']}, "
@@ -158,6 +173,57 @@ class EncounterManager:
     
     def calculate_encounter_strength(self, encounter_json):
         return sum([encounter_json[key.value] for key in IV])
+    
+    def create_phase(self, timestamp):
+        return {
+            "bot_id": self.bot_id,
+            "pokemon_seen": [],
+            "species": {},  # Track the encounters for each species in the phase
+            "start_timestamp": timestamp,
+            "strongest_pokemon": {},
+            "total_encounters": 0,
+            "total_pokerus": 0,
+            "total_shinies_caught": 0,
+            "total_shinies_found": 0,
+            "weakest_pokemon": {},
+        }
+
+    def create_encounter_for_payload(self, encounter_data):
+        species = encounter_data["species"]
+        return {
+            "bot_id": self.bot_id,
+            "timestamp": encounter_data["timestamp"],
+            "encounter_id": f'{self.encounters["total_encounters"]}_{self.encounters["species"][species]["total_encounters"]}',
+            "pokemon_data": encounter_data | {
+                "id": Pokemon.get_pokemon(species=species),
+                "totalIv": encounter_data["strength"],
+            }
+        }
+    
+    def create_shiny_encounter_for_payload(self, encounter_data, phase_data):
+        species = encounter_data["species"]
+        return {
+            "bot_id": self.bot_id,
+            "timestamp": encounter_data["timestamp"],
+            "encounter_data": {
+                "encounter_id": f'{self.encounters["total_encounters"]}_{self.encounters["species"][species]["total_encounters"]}',
+                "phase_encounters": phase_data["total_encounters"],
+                "phase_species_encounters": phase_data["species"].get(species, 0),
+                "total_species_encounters": self.encounters["species"][species]["total_encounters"]
+            },
+            "pokemon_data": {
+                "id": Pokemon.get_pokemon(species=species)
+            }
+        }
+
+    def get_phase_payload(self):
+        return self.encounters["current_phase"]
+
+    def get_encounter_payload(self):
+        return self.encounters["previous_n_encounters"]
+    
+    def get_shiny_payload(self):
+        return self.encounters["previous_n_shiny_encounters"]
 
         
 

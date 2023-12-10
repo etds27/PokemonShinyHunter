@@ -9,3 +9,4 @@ src/PythonServer/.env
 *.luases
 Test/*
 *.env
+src/Dashboard/resources

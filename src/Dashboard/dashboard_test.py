@@ -10,8 +10,24 @@ import time
 app = flask.Flask(__name__)
 CORS(app)
 
-_bot_ids = ["ETHAN12345", "HALEY12345", "MAX54321"]
-_seen_pokemon = [random.randint(0, 250) for _ in range(6)]
+"""
+Pokemon Structure:
+ {
+ "species": int,
+ "name": str,
+ "variant": str
+ }
+"""
+
+def get_random_pokemon():
+    return get_pokemon(str(random.randint(1, 251)))
+
+def get_pokemon(species):
+    return {
+        "species": species,
+        "name": pokemon_data[species]["name"].lower(),
+        "variant": ""
+    }
 
 @app.route("/active_bots")
 def provideBotIds() -> dict:
@@ -24,15 +40,15 @@ def provideBotIds() -> dict:
     return {
         "bots": {
             "ETHAN12345": {
-                "battle-icon": "battle",
+                "battle-icon": "spr_emerald",
                 "party-icon": "party"
             },
             "HALEY12345": {
-                "battle-icon": "battle",
+                "battle-icon": "spr_silver",
                 "party-icon": "party"
             },
             "MAX54321": {
-                "battle-icon": "battle",
+                "battle-icon": "spr_firered-leafgreen",
                 "party-icon": "party"
             },
         },
@@ -86,8 +102,14 @@ def randomPhasePayload():
             "bot_mode": "WALKING",
             "total_encounters": random.randint(0, 8192),
             "pokemon_seen": _seen_pokemon,
-            "strongest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)},
-            "weakest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)}
+            "strongest_pokemon": {
+                    "id": get_random_pokemon(),
+                    "iv": random.randint(0, 64)
+                },
+            "weakest_pokemon": {
+                    "id": get_random_pokemon(), 
+                    "iv": random.randint(0, 64)
+                }
         },
         {
             "bot_id": _bot_ids[1],
@@ -96,8 +118,14 @@ def randomPhasePayload():
             "bot_mode": "WALKING",
             "total_encounters": random.randint(0, 8192),
             "pokemon_seen": _seen_pokemon,
-            "strongest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)},
-            "weakest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)}
+            "strongest_pokemon": {
+                    "id": get_random_pokemon(), 
+                    "iv": random.randint(0, 64)
+                },
+            "weakest_pokemon": {
+                    "id": get_random_pokemon(), 
+                    "iv": random.randint(0, 64)
+                }
         },
         {
             "bot_id": _bot_ids[2],
@@ -106,8 +134,14 @@ def randomPhasePayload():
             "bot_mode": "WALKING",
             "total_encounters": random.randint(0, 8192),
             "pokemon_seen": _seen_pokemon,
-            "strongest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)},
-            "weakest_pokemon": {"species": random.randint(0, 250), "iv": random.randint(0, 64)}
+            "strongest_pokemon": {
+                    "id": get_random_pokemon(),                
+                    "iv": random.randint(0, 64)
+                },
+            "weakest_pokemon": {
+                    "id": get_random_pokemon(),
+                    "iv": random.randint(0, 64)
+                }
         },
     ]
 
@@ -121,7 +155,7 @@ def randomEncounterPayload():
                     "encounter_id": random.randint(0, 20),
                     "timestamp": time.time(),
                     "pokemon_data": {
-                        "species": 155,
+                        "id": get_random_pokemon(),
                         "level": 40,
                         "healthIv": hp,
                         "attackIv": atk,
@@ -129,14 +163,14 @@ def randomEncounterPayload():
                         "speedIv": spd,
                         "specialIv": spe,
                         "totalIv": sum([hp, atk, defense, spd, spe]),
-                        "isShiny": False,
+                        "isShiny": random.random() > 0.9,
                     }
                 },
                 {
                     "encounter_id": random.randint(0, 20),
                     "timestamp": time.time(),
                     "pokemon_data": {
-                        "species": 155,
+                        "id": get_random_pokemon(),  
                         "level": 40,
                         "healthIv": hp,
                         "attackIv": atk,
@@ -156,7 +190,7 @@ def randomEncounterPayload():
                     "encounter_id": random.randint(0, 20),
                     "timestamp": time.time(),
                     "pokemon_data": {
-                        "species": 155,
+                        "id": get_random_pokemon(), 
                         "level": 40,
                         "healthIv": hp,
                         "attackIv": atk,
@@ -171,7 +205,7 @@ def randomEncounterPayload():
                     "encounter_id": random.randint(0, 20),
                     "timestamp": time.time(),
                     "pokemon_data": {
-                        "species": 155,
+                        "id": get_random_pokemon(),
                         "level": 40,
                         "healthIv": hp,
                         "attackIv": atk,
@@ -200,7 +234,7 @@ def randomShinyPayload():
                             "total_species_encounters": random.randint(0, 10000),
                         },
                         "pokemon_data": {
-                            "species": random.randint(1, 250)
+                            "id": get_random_pokemon()
                         }
                     },
                     {
@@ -212,7 +246,7 @@ def randomShinyPayload():
                             "total_species_encounters": random.randint(0, 10000),
                         },
                         "pokemon_data": {
-                            "species": random.randint(1, 250)
+                            "id": get_random_pokemon()
                         }
                     }     
                 ]
@@ -229,7 +263,7 @@ def randomShinyPayload():
                             "total_species_encounters": random.randint(0, 10000),
                         },
                         "pokemon_data": {
-                            "species": random.randint(1, 250)
+                            "id": get_random_pokemon()
                         }
                     },
                     {
@@ -241,12 +275,19 @@ def randomShinyPayload():
                             "total_species_encounters": random.randint(0, 10000),
                         },
                         "pokemon_data": {
-                            "species": random.randint(1, 250)
+                            "id": get_random_pokemon()
                         }
                     }     
                 ]
             },
         ]
+
+pokemon_data = {}
+with open("..\\..\\GameData\\Pokemon\\pokemon_gen2.json", "r") as f:
+    pokemon_data = json.load(f)
+
+_bot_ids = ["ETHAN12345", "HALEY12345", "MAX54321"]
+_seen_pokemon = [get_random_pokemon() for _ in range(6)]
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000)

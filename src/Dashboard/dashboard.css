@@ -86,11 +86,6 @@ thead {
   justify-content: left;
 }
 
-.scrolling-ticker {
-  flex: 0 0 auto;
-  background-color: cadetblue;
-}
-
 td {
   text-align: center;
   vertical-align: middle;
@@ -99,7 +94,7 @@ td {
 .stream-view-port {
   width: 100%;
   padding-top: 75%; /* 4:3 Aspect ratio */
-  background-color: lightseagreen;
+  background-color: black;
 }
 
 .current-phase-table {
@@ -116,9 +111,13 @@ td {
 }
 
 .pokemon-sprite-64 {
-  transform: scale(1.3);
   height: 64px;
   width: 64px;
+}
+
+.pokemon-sprite-48 {
+  height: 48px;
+  width: 48px;
 }
 
 .pokemon-sprite-32 {
@@ -131,4 +130,38 @@ td {
   transform: scale(1.5);
   height: 16px;
   width: 16px;
+}
+
+.gray-image {
+  filter: grayscale(100%);
+}
+
+.sprite-containter {
+  background-color: white;
+}
+
+.scrolling-ticker {
+  max-width: 100%;
+  overflow: hidden;
+  background-color: cadetblue;
+}
+
+.marquee {
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  animation: marquee 10s linear infinite;
+}
+
+.marquee p {
+  display: inline-block;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
 }

@@ -5,6 +5,7 @@ PokemonSocket = {
     port = 57373,
     timeout = 1000
 }
+local url = comm.httpGetPostUrl()
 
 ---@enum EventType
 EventType = {
@@ -36,7 +37,9 @@ function PokemonSocket:sendTable(tab, eventType)
 
     local jsonString = json.encode(payload)
     -- Data delimiter
-    comm.socketServerSend(jsonString .. "|||")
+    -- comm.socketServerSend(jsonString .. "|||")
+    Log:debug("Sending HTTP request: " .. Bot.botId .. " " .. url .. "/bot_data_receive")
+    comm.httpPost(url .. "/bot_data_receive", jsonString)
     return payload
 end
 

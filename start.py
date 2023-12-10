@@ -25,7 +25,7 @@ SHORTCUTS_DIR = os.path.join(ROOT_DIR, "Shortcuts")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--emu-only", action="store_true")
-parser.add_argument("-p", "--port", nargs=1, default=57375, type=int)
+parser.add_argument("-p", "--port", nargs=1, default=8000, type=int)
 parser.add_argument("--host", nargs=1, default="127.0.0.1", type=str)
 parser.add_argument("-g", "--game", nargs=1, default="C:\Emulators\GBC\Pokemon Crystal.gbc", type=str)
 parser.add_argument("-e", "--emulator", nargs=1, default="C:\Emulators\Bizhawk\EmuHawk.exe", type=str)
@@ -44,7 +44,7 @@ def update_lua_path(lua_files):
 
 print(args)
 if not args.emu_only:
-    server_start_command = ["python3", os.path.join(os.environ["PSH_ROOT"], "src", "Python", "Server", "server.py"), args.host, str(args.port)]
+    server_start_command = [sys.executable, os.path.join(os.environ["PSH_ROOT"], "src", "Python", "Server", "server.py"), args.host, str(args.port)]
     print(server_start_command)
     server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
     time.sleep(1)
@@ -52,10 +52,11 @@ if not args.emu_only:
 if args.emu_only:
     port_arg = ""
     ip_arg = ""
+    url_post_arg = ""
 else:
-    port_arg = f"--socket_port={args.port}"
-    ip_arg = f"--socket_ip={args.host}"
-
+    # port_arg = f"--socket_port={args.port}"
+    # ip_arg = f"--socket_ip={args.host}"
+    url_post_arg = f"--url_post=http://{args.host}:{args.port}"
 lua_files = []
 test_lua_files = []
 
@@ -89,8 +90,9 @@ if args.bot_ids:
     for bot_id in args.bot_ids:
         emulator_start_command = [
                                   args.emulator, 
-                                  ip_arg, 
-                                  port_arg,
+                                  url_post_arg,
+                                  # ip_arg, 
+                                  # port_arg,
                                   f"--load-state={bot_id_save_states[bot_id]}",
                                   args.game]
         print(emulator_start_command)
@@ -99,8 +101,9 @@ if args.bot_ids:
 else:
     emulator_start_command = [
                                 args.emulator, 
-                                ip_arg, 
-                                port_arg,
+                                url_post_arg,
+                                # ip_arg, 
+                                # port_arg,
                                 args.game]
     print(emulator_start_command)
     emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
