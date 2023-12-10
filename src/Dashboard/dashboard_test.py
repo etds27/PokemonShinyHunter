@@ -37,20 +37,14 @@ def provideBotIds() -> dict:
         pass
     sys.stdout.write(str(_bot_ids) + "\n")
     sys.stdout.flush()
+    icons = ["spr_emerald", "spr_silver", "spr_firered-leafgreen"]
     return {
         "bots": {
-            "ETHAN12345": {
-                "battle-icon": "spr_emerald",
+            bot_id: {
+                "battle-icon": random.choice(icons),
                 "party-icon": "party"
-            },
-            "HALEY12345": {
-                "battle-icon": "spr_silver",
-                "party-icon": "party"
-            },
-            "MAX54321": {
-                "battle-icon": "spr_firered-leafgreen",
-                "party-icon": "party"
-            },
+            }
+            for bot_id in _bot_ids
         },
         "timestamp": time.time(),
     }
@@ -96,10 +90,9 @@ def provideCollectionInfo() -> dict:
 def randomPhasePayload():
     return [
         {
-            "bot_id": _bot_ids[0],
+            "bot_id": bot_id,
             "timestamp": time.time(),
             "start_timestamp": time.time() - random.randint(0, 7200),
-            "bot_mode": "WALKING",
             "total_encounters": random.randint(0, 8192),
             "pokemon_seen": _seen_pokemon,
             "strongest_pokemon": {
@@ -110,42 +103,11 @@ def randomPhasePayload():
                     "id": get_random_pokemon(), 
                     "iv": random.randint(0, 64)
                 }
-        },
-        {
-            "bot_id": _bot_ids[1],
-            "start_timestamp": time.time() - random.randint(0, 7200),
-            "timestamp": time.time(),
-            "bot_mode": "WALKING",
-            "total_encounters": random.randint(0, 8192),
-            "pokemon_seen": _seen_pokemon,
-            "strongest_pokemon": {
-                    "id": get_random_pokemon(), 
-                    "iv": random.randint(0, 64)
-                },
-            "weakest_pokemon": {
-                    "id": get_random_pokemon(), 
-                    "iv": random.randint(0, 64)
-                }
-        },
-        {
-            "bot_id": _bot_ids[2],
-            "start_timestamp": time.time() - random.randint(0, 7200),
-            "timestamp": time.time(),
-            "bot_mode": "WALKING",
-            "total_encounters": random.randint(0, 8192),
-            "pokemon_seen": _seen_pokemon,
-            "strongest_pokemon": {
-                    "id": get_random_pokemon(),                
-                    "iv": random.randint(0, 64)
-                },
-            "weakest_pokemon": {
-                    "id": get_random_pokemon(),
-                    "iv": random.randint(0, 64)
-                }
-        },
+        }
+        for bot_id in _bot_ids
     ]
 
-def randomEncounterPayload():
+def randomEncounterPayload(bots = 1, n = 1):
     hp, atk, defense, spd, spe = (random.randint(0, 16)  for _ in range(5))
     return [
         {
@@ -165,62 +127,14 @@ def randomEncounterPayload():
                         "totalIv": sum([hp, atk, defense, spd, spe]),
                         "isShiny": random.random() > 0.9,
                     }
-                },
-                {
-                    "encounter_id": random.randint(0, 20),
-                    "timestamp": time.time(),
-                    "pokemon_data": {
-                        "id": get_random_pokemon(),  
-                        "level": 40,
-                        "healthIv": hp,
-                        "attackIv": atk,
-                        "defenseIv": defense,
-                        "speedIv": spd,
-                        "specialIv": spe,
-                        "totalIv": sum([hp, atk, defense, spd, spe]),
-                        "isShiny": False,
-                    }
                 }
-            ]
-        },
-        {
-            "bot_id": random.choice(_bot_ids),
-            "encounters": [
-                {
-                    "encounter_id": random.randint(0, 20),
-                    "timestamp": time.time(),
-                    "pokemon_data": {
-                        "id": get_random_pokemon(), 
-                        "level": 40,
-                        "healthIv": hp,
-                        "attackIv": atk,
-                        "defenseIv": defense,
-                        "speedIv": spd,
-                        "specialIv": spe,
-                        "totalIv": sum([hp, atk, defense, spd, spe]),
-                        "isShiny": False,
-                    }
-                },
-                {
-                    "encounter_id": random.randint(0, 20),
-                    "timestamp": time.time(),
-                    "pokemon_data": {
-                        "id": get_random_pokemon(),
-                        "level": 40,
-                        "healthIv": hp,
-                        "attackIv": atk,
-                        "defenseIv": defense,
-                        "speedIv": spd,
-                        "specialIv": spe,
-                        "totalIv": sum([hp, atk, defense, spd, spe]),
-                        "isShiny": False,
-                    }
-                }
+                for _ in range(n)
             ]
         }
+        for _ in range(bots)
     ]
 
-def randomShinyPayload():
+def randomShinyPayload(bots = 1, n = 1):
     return [
             {
                 "bot_id": random.choice(_bot_ids),
@@ -236,57 +150,18 @@ def randomShinyPayload():
                         "pokemon_data": {
                             "id": get_random_pokemon()
                         }
-                    },
-                    {
-                        "timestamp": time.time(),
-                        "encounter_data": {
-                            "encounter_id": random.randint(0, 20),
-                            "phase_encounters": random.randint(0, 8192),
-                            "phase_species_encounters": random.randint(0, 8192),
-                            "total_species_encounters": random.randint(0, 10000),
-                        },
-                        "pokemon_data": {
-                            "id": get_random_pokemon()
-                        }
-                    }     
+                    }
+                    for _ in range(n)
                 ]
-            },
-            {
-                "bot_id": random.choice(_bot_ids),
-                "encounters": [
-                    {
-                        "timestamp": time.time(),
-                        "encounter_data": {
-                            "encounter_id": random.randint(0, 20),
-                            "phase_encounters": random.randint(0, 8192),
-                            "phase_species_encounters": random.randint(0, 8192),
-                            "total_species_encounters": random.randint(0, 10000),
-                        },
-                        "pokemon_data": {
-                            "id": get_random_pokemon()
-                        }
-                    },
-                    {
-                        "timestamp": 1701556788.137356,
-                        "encounter_data": {
-                            "encounter_id": random.randint(0, 20),
-                            "phase_encounters": random.randint(0, 8192),
-                            "phase_species_encounters": random.randint(0, 8192),
-                            "total_species_encounters": random.randint(0, 10000),
-                        },
-                        "pokemon_data": {
-                            "id": get_random_pokemon()
-                        }
-                    }     
-                ]
-            },
+            }
+            for _ in range(bots)
         ]
 
 pokemon_data = {}
 with open("..\\..\\GameData\\Pokemon\\pokemon_gen2.json", "r") as f:
     pokemon_data = json.load(f)
 
-_bot_ids = ["ETHAN12345", "HALEY12345", "MAX54321"]
+_bot_ids = ["ETHAN12345", "HALEY12345" , "MAX54321"]
 _seen_pokemon = [get_random_pokemon() for _ in range(6)]
 
 if __name__ == "__main__":

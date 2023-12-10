@@ -2,15 +2,11 @@ import pprint
 from event_handler import EventHandler
 import flask
 from flask_cors import CORS
-import http_server
 import json
 import logging
 from payload_aggregator import PayloadAggregator
 import re
-import select
-import socket
 import signal
-import threading
 import argparse
 
 BUF_SIZE = 1024

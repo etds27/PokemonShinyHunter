@@ -18,11 +18,12 @@ class PayloadAggregator:
         payload = [
             {
                 "bot_id": bot_id, 
-                "encounters": bot_agent[Event.ENCOUNTER.value].get_encounter_payload() 
+                "encounters": bot_agent[Event.ENCOUNTER.value].get_encounter_payload()
             }
             for bot_id, bot_agent in self.event_handler.bot_agents.items()
         ]
-        print(payload)
+        for i, encounter in enumerate(payload[0]["encounters"]):
+            logging.info(f"{i}, {encounter}")
         return payload
 
     def get_bot_payload(self):

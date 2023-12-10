@@ -10,8 +10,10 @@ body {
   font-family: silkScreen;
   font-size: medium;
   margin: 0;
-  min-height: 100vh;
-  min-width: 100vw;
+  height: 100vh;
+  width: 100vw;
+  max-height: 100vh;
+  max-width: 100vw;
   padding: 0;
 }
 
@@ -22,6 +24,8 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  max-height: 100vh;
+  max-width: 100vw;
 }
 
 .pokemon-bot-area {
@@ -45,9 +49,9 @@ thead {
   display: flex;
   align-items: flex-end;
   flex-direction: row;
-  background-color: black;
+  background-color: yellow;
 
-  flex: 1 1 auto;
+  flex: 0 0 auto;
 }
 
 .encounter-table, .shiny-table {
@@ -92,9 +96,12 @@ td {
 }
 
 .stream-view-port {
-  width: 100%;
-  padding-top: 75%; /* 4:3 Aspect ratio */
+  align-self: center;
+  aspect-ratio: 4 / 3; /* Set the desired aspect ratio */
   background-color: black;
+  flex:  1 1 auto;
+  position: relative; /* Positioning context for absolutely positioned children */
+  z-index: -1;
 }
 
 .current-phase-table {

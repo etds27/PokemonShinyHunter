@@ -569,7 +569,7 @@ function createPokemonTickerElement(pokemonData, botId) {
     const pokemonId = getPokemonId(pokemonData)
 
     let area = document.createElement("div")
-    let sprite = createPokemonSprite(pokemonData, )
+    let sprite = createPokemonSprite(pokemonData, activePokemonBots[botId]["battleIconType"], 32, true)
 
 
 }

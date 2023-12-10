@@ -25,7 +25,9 @@ function encounter() {
         success: function(encounters) {
             for (let botPayload of encounters) {
                 let botID = botPayload["bot_id"]
-                for (let encounter of botPayload["encounters"]) {
+                let encounters = botPayload["encounters"]
+                for (let i = encounters.length - 1; i >= 0; i--) {
+                    let encounter = encounters[i]
                     if (!doesBotIDExist(botID)) {
                         return false
                     }
@@ -51,7 +53,9 @@ function shiny() {
         success: function(encounters) {
             for (let botPayload of encounters) {
                 let botID = botPayload["bot_id"]
-                for (let encounter of botPayload["encounters"]) {
+                let encounters = botPayload["encounters"]
+                for (let i = encounters.length - 1; i >= 0; i--) {
+                    let encounter = encounters[i]
                     if (!doesBotIDExist(botID)) {
                         return false
                     }
@@ -183,7 +187,7 @@ function addEncounterRowToTable(encounterData) {
     tbody.insertBefore(row, headerRow.nextSibling)
     
     while (tbody.rows.length > pokemonTableLength + 1) {
-        tbody.deleteRow(pokemonTableLength)
+        tbody.deleteRow(pokemonTableLength + 1)
     }
 }
 
@@ -207,7 +211,7 @@ function addShinyRowToTable(encounterData) {
     tbody.insertBefore(row, headerRow.nextSibling)
     
     while (tbody.rows.length > pokemonTableLength + 1) {
-        tbody.deleteRow(pokemonTableLength)
+        tbody.deleteRow(pokemonTableLength + 1)
     }
 }
 
