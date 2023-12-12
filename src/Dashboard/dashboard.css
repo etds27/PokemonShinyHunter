@@ -3,24 +3,32 @@
   src: url("Silkscreen/Silkscreen-Regular.ttf");
 }
 
+table, th, td {
+  border-top: 1px solid black;
+  background: rgba(0,0,0,0.1);
+}
+
 body {
-  background-color: lightgoldenrodyellow;
   display: flex;
 
   font-family: silkScreen;
   font-size: medium;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+
+  color: azure;
   margin: 0;
   height: 100vh;
   width: 100vw;
   max-height: 100vh;
   max-width: 100vw;
   padding: 0;
+  /* background-image: url('https://moewalls.com/wp-content/uploads/2022/11/may-riding-bicycle-pokemon-emerald-pixel-thumb.jpg'); */
+  
 }
 
 #pokemon-table-container {
   flex: 1 1 auto;
   align-items: flex-end;
-  background-color: gray;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -30,7 +38,6 @@ body {
 
 .pokemon-bot-area {
   align-items: flex-start;
-  background-color: orange;
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -40,16 +47,14 @@ body {
 }
 
 thead {
-  background-color: beige;
   position: relative;
   white-space: nowrap;
 }
 
 .pokemon-table-area {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   flex-direction: row;
-  background-color: yellow;
 
   flex: 0 0 auto;
 }
@@ -61,25 +66,8 @@ thead {
   width: 100%;
 }
 
-.encounter-table {
-  background-color: lightpink;
-}
-
-.shiny-table {
-  background-color: (100, 100, 20, .4);
-}
-
 .encounter-row, .shiny-row, .shiny-table-column-header-row, .encounter-table-column-header-row {
-  background-color: aliceblue;
   white-space: nowrap;
-}
-
-.encounter-row {
-  background-color: lightblue;
-}
-
-.shiny-row {
-  background-color: yellow;
 }
 
 .shiny-table-column-header-row, .encounter-table-column-header-row {
@@ -104,17 +92,45 @@ td {
   z-index: -1;
 }
 
-.current-phase-table {
-  background-color: lightgrey;
+.bot-header {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.game-stats-table, .current-phase-table {
   height: fit-content;
   table-layout: fixed;
-  width: 100%;}
+  width: 100%;
+}
+
+.game-stats-table tbody td:nth-child(1), .current-phase-table tbody td:nth-child(1) {
+  text-align: left;
+}
+
+.game-stats-table td:nth-child(2), .current-phase-table td:nth-child(2) {
+  text-align: right;
+}
+
+.game-stats-table thead td, .current-phase-table thead td {
+  text-align: center;
+}
+
+.game-stats-table td, .current-phase-table td {
+  padding: 5px;
+}
+
+
+.current-phase-table tr {
+  white-space: no-wrap;
+}
 
 .horizontal-phase-box {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
+  flex: 1 1 0;
 }
 
 .pokemon-sprite-64 {
@@ -144,13 +160,11 @@ td {
 }
 
 .sprite-containter {
-  background-color: white;
 }
 
 .scrolling-ticker {
   max-width: 100%;
   overflow: hidden;
-  background-color: cadetblue;
 }
 
 .marquee {

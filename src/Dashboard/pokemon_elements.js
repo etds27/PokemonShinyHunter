@@ -19,6 +19,16 @@ function createPokemonBotArea(botID) {
     const streamViewPort = document.createElement("div")
     streamViewPort.className = "stream-view-port"
 
+    const botHeader = document.createElement("div")
+    botHeader.id = `bot-header-${botID}`
+    botHeader.className = "bot-header"
+    botHeader.innerText = `Pokemon ${activePokemonBots[botID]["gameName"]} ${botID}`
+
+    const botDataArea = document.createElement("div")
+    botDataArea.style.display = "flex"
+    botDataArea.style.flexDirection = "row"
+    botDataArea.style.alignItems = "stretch"
+
     const pokemonTableElement = document.createElement("div")
     pokemonTableElement.classList = "pokemon-table-area"
     
@@ -31,12 +41,15 @@ function createPokemonBotArea(botID) {
     scollingTicker.innerText = "SCROLLING BANNER"
     scollingTicker.class = "scrolling-ticker"
 
+    botDataArea.appendChild(totalGameArea)
+    botDataArea.appendChild(currentPhaseArea)
+
     pokemonTableElement.appendChild(shinyTable)
     pokemonTableElement.appendChild(encounterTable)
 
-    // botAreaElement.appendChild(totalGameArea)
     botAreaElement.appendChild(streamViewPort)
-    botAreaElement.appendChild(currentPhaseArea)
+    botAreaElement.appendChild(botHeader)
+    botAreaElement.appendChild(botDataArea)
     botAreaElement.appendChild(pokemonTableElement)
     botAreaElement.appendChild(scollingTicker)
 
@@ -65,10 +78,7 @@ function createPokemonTicker(botID) {
  * Total Shinies
  * Shiny Rate
  * Longest/Shortest Phase
- * Phase Encounter Total
- * Current Bot Mode
- * Phase IV Extremes
- * Pokemon Seen In Phase
+ * Strongest Weakest
  * 
  * @param {*} botID 
  * @returns 
@@ -77,101 +87,144 @@ function createGameStatsArea(botID) {
     const fragment = document.createDocumentFragment()
 
     const pokemonTable = document.createElement("table")
-    pokemonTable.className = "current-phase-table"
-    pokemonTable.id = `current-phase-table-${botID}`
+    pokemonTable.className = "game-stats-table"
+    pokemonTable.id = `game-stats-table-${botID}`
     const header = document.createElement("thead")
-    header.className = "current-phase-table-header"
-    header.id = `current-phase-table-header-${botID}`
+    header.className = "game-stats-table-header"
+    header.id = `game-stats-table-header-${botID}`
     const headerTr = document.createElement("tr")
     const headerTd = document.createElement("td")
 
-    headerTd.innerText = "Current Phase " + botID
+    headerTd.innerText = `Total Game Stats`
     headerTd.colSpan = 2
     headerTr.appendChild(headerTd)
 
     header.appendChild(headerTr)
 
     const footer = document.createElement("tfoot")
-    footer.className = "current-phase-table-footer"
-    footer.id = `current-phase-table-footer-${botID}`
+    footer.className = "game-stats-table-footer"
+    footer.id = `game-stats-table-footer-${botID}`
 
     const body = document.createElement("tbody")
-    body.className = "current-phase-table-body"
-    body.id = `current-phase-table-body-${botID}`
+    body.className = "game-stats-table-body"
+    body.id = `game-stats-table-body-${botID}`
 
-    // Elapsed Phase Time
+    // Total Playing Time
     let row = body.insertRow()
     let col = document.createElement("td")
-    col.className = "current-phase-header"
-    col.id = `current-phase-header-time-${botID}`
-    col.innerText = "Elapsed Phase Time:"
+    col.className = "game-stats-header"
+    col.id = `game-stats-header-time-${botID}`
+    col.innerText = "Total Time:"
     row.appendChild(col)
 
     col = document.createElement("td")
-    col.className = "current-phase-data"
-    col.id = `current-phase-time-${botID}`
+    col.className = "game-stats-data"
+    col.id = `game-stats-time-${botID}`
     col.innerText = "0s"
     row.appendChild(col)
 
-    // Total Phase Encounters
+    // Total Encounters
     row = body.insertRow()
     col = document.createElement("td")
-    col.className = "current-phase-header"
-    col.id = `current-phase-header-encounters-${botID}`
-    col.innerText = "Total Phase Encounters:"
+    col.className = "game-stats-header"
+    col.id = `game-stats-header-encounters-${botID}`
+    col.innerText = "Encounters:"
     row.appendChild(col)
 
     col = document.createElement("td")
-    col.className = "current-phase-data"
-    col.id = `current-phase-encounters-${botID}`
+    col.className = "game-stats-data"
+    col.id = `game-stats-encounters-${botID}`
     col.innerText = "0"
+    row.appendChild(col)
+
+    // Total Shinies
+    row = body.insertRow()
+    col = document.createElement("td")
+    col.className = "game-stats-data"
+    col.id = `game-stats-header-shinies-${botID}`
+    col.innerText = "Shinies:"
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    col.className = "game-stats-data"
+    col.id = `game-stats-shinies-${botID}`
+    col.innerText = "0"
+    row.appendChild(col)
+
+    // Shiny Rate
+    row = body.insertRow()
+    col = document.createElement("td")
+    col.className = "game-stats-data"
+    col.id = `game-stats-header-shiny-rate-${botID}`
+    col.innerText = "Shiny Rate:"
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    col.className = "game-stats-data"
+    col.id = `game-stats-shiny-rate-${botID}`
+    col.innerText = "0%"
     row.appendChild(col)
 
     // IV Extremes
     row = body.insertRow()
     col = document.createElement("td")
-    col.className = "current-phase-data"
-    col.id = `current-phase-container-weak-${botID}`
+    col.className = "game-stats-data"
+    col.innerText = "IV:"
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    let ivRecordBox = document.createElement("div")
+    ivRecordBox.className = "horizontal-phase-box"
+
     let div = document.createElement("div")
     div.className = "horizontal-phase-box"
-
-    const weakSpecies = document.createElement("div")
-    weakSpecies.className = "weak-pokemon-species"
-    weakSpecies.id = `weak-pokemon-species-${botID}`
+    const weakSpecies = document.createElement("img")
+    weakSpecies.className = "pokemon-sprite-32" 
+    weakSpecies.id = `game-stats-weak-pokemon-species-${botID}`
     const weakValue = document.createElement("div")
     weakValue.classList = "weak-pokemon-value"
-    weakValue.id = `weak-pokemon-value-${botID}`
+    weakValue.id = `game-stats-weak-pokemon-value-${botID}`
     weakValue.style.color = "red"
     div.appendChild(weakSpecies)
     div.appendChild(weakValue)
-    col.appendChild(div)
-    row.appendChild(col)
+    ivRecordBox.append(div)
 
-    col = document.createElement("td")
-    col.className = "current-phase-data"
-    col.id = `current-phase-container-strong-${botID}`
     div = document.createElement("div")
     div.className = "horizontal-phase-box"
-    const strongSpecies = document.createElement("div")
-    strongSpecies.className = "strong-pokemon-species"
-    strongSpecies.id = `strong-pokemon-species-${botID}`
+    const strongSpecies = document.createElement("img")
+    strongSpecies.className = "pokemon-sprite-32" 
+    strongSpecies.id = `game-stats-strong-pokemon-species-${botID}`
     const strongValue = document.createElement("div")
     strongValue.classList = "strong-pokemon-value"
-    strongValue.id = `strong-pokemon-value-${botID}`
+    strongValue.id = `game-stats-strong-pokemon-value-${botID}`
     strongValue.style.color = "green"
     div.appendChild(strongSpecies)
     div.appendChild(strongValue)
-    col.appendChild(div)
-    row.appendChild(col)
+    ivRecordBox.appendChild(div)
+    row.appendChild(ivRecordBox)
 
-    // Phase Pokemon Seen
+    // Phase Extremes
     row = body.insertRow()
     col = document.createElement("td")
-    col.colSpan = 2
-    div = document.createElement("div")
-    div.id = `current-phase-container-pokemon-${botID}`
-    div.className = "horizontal-phase-box sprite-container"
-    col.appendChild(div)
+    col.className = "game-stats-data"
+    col.innerText = "Phase Length:"
+    row.appendChild(col)
+
+
+    col = document.createElement("td")
+    let phaseRecordBox = document.createElement("div")
+    phaseRecordBox.className = "horizontal-phase-box"
+
+    const longestPhase = document.createElement("div")
+    longestPhase.id = `game-stats-longest-phase-${botID}`
+    longestPhase.style.color = "red"
+    longestPhase.style.alignSelf = "bottom"
+    const shortestPhase = document.createElement("div")
+    shortestPhase.id = `game-stats-shortest-phase-${botID}`
+    shortestPhase.style.color = "green"
+    phaseRecordBox.appendChild(longestPhase)
+    phaseRecordBox.appendChild(shortestPhase)
+    col.appendChild(phaseRecordBox)
     row.appendChild(col)
 
     pokemonTable.appendChild(header)
@@ -180,7 +233,6 @@ function createGameStatsArea(botID) {
     fragment.appendChild(pokemonTable)
     return fragment
 }
-
 
 /**
  * Presents the following information
@@ -205,7 +257,7 @@ function createCurrentPhaseArea(botID) {
     const headerTr = document.createElement("tr")
     const headerTd = document.createElement("td")
 
-    headerTd.innerText = "Current Phase " + botID
+    headerTd.innerText = "Current Phase Data"
     headerTd.colSpan = 2
     headerTr.appendChild(headerTd)
 
@@ -224,7 +276,7 @@ function createCurrentPhaseArea(botID) {
     let col = document.createElement("td")
     col.className = "current-phase-header"
     col.id = `current-phase-header-time-${botID}`
-    col.innerText = "Elapsed Phase Time:"
+    col.innerText = "Elapsed Time:"
     row.appendChild(col)
 
     col = document.createElement("td")
@@ -238,7 +290,7 @@ function createCurrentPhaseArea(botID) {
     col = document.createElement("td")
     col.className = "current-phase-header"
     col.id = `current-phase-header-encounters-${botID}`
-    col.innerText = "Total Phase Encounters:"
+    col.innerText = "Encounters:"
     row.appendChild(col)
 
     col = document.createElement("td")
@@ -251,12 +303,17 @@ function createCurrentPhaseArea(botID) {
     row = body.insertRow()
     col = document.createElement("td")
     col.className = "current-phase-data"
-    col.id = `current-phase-container-weak-${botID}`
+    col.innerText = "IV:"
+    row.appendChild(col)
+
+    col = document.createElement("td")
+    let ivRecordBox = document.createElement("div")
+    ivRecordBox.className = "horizontal-phase-box"
+
     let div = document.createElement("div")
     div.className = "horizontal-phase-box"
-
-    const weakSpecies = document.createElement("div")
-    weakSpecies.className = "weak-pokemon-species"
+    const weakSpecies = document.createElement("img")
+    weakSpecies.className = "pokemon-sprite-32" 
     weakSpecies.id = `weak-pokemon-species-${botID}`
     const weakValue = document.createElement("div")
     weakValue.classList = "weak-pokemon-value"
@@ -264,16 +321,12 @@ function createCurrentPhaseArea(botID) {
     weakValue.style.color = "red"
     div.appendChild(weakSpecies)
     div.appendChild(weakValue)
-    col.appendChild(div)
-    row.appendChild(col)
+    ivRecordBox.append(div)
 
-    col = document.createElement("td")
-    col.className = "current-phase-data"
-    col.id = `current-phase-container-strong-${botID}`
     div = document.createElement("div")
     div.className = "horizontal-phase-box"
-    const strongSpecies = document.createElement("div")
-    strongSpecies.className = "strong-pokemon-species"
+    const strongSpecies = document.createElement("img")
+    strongSpecies.className = "pokemon-sprite-32" 
     strongSpecies.id = `strong-pokemon-species-${botID}`
     const strongValue = document.createElement("div")
     strongValue.classList = "strong-pokemon-value"
@@ -281,10 +334,16 @@ function createCurrentPhaseArea(botID) {
     strongValue.style.color = "green"
     div.appendChild(strongSpecies)
     div.appendChild(strongValue)
-    col.appendChild(div)
-    row.appendChild(col)
+    ivRecordBox.appendChild(div)
+    row.appendChild(ivRecordBox)
 
     // Phase Pokemon Seen
+    row = body.insertRow()
+    col = document.createElement("td")
+    col.colSpan = 2
+    col.innerText = "Pokemon Seen"
+    col.style.textAlign = "center"
+    row.appendChild(col)
     row = body.insertRow()
     col = document.createElement("td")
     col.colSpan = 2
@@ -451,9 +510,9 @@ function createEncounterRow(encounterObject) {
     pokemonId.innerText = pokemonObject["level"]
 
     const pokemonHealthIv = document.createElement("td")
-    pokemonHealthIv.id = `encounter-health-iv-${encounterId}-${botId}`
-    pokemonHealthIv.className = "encounter-health-iv"
-    pokemonHealthIv.innerText = pokemonObject["healthIv"]
+    pokemonHealthIv.id = `encounter-hp-iv-${encounterId}-${botId}`
+    pokemonHealthIv.className = "encounter-hp-iv"
+    pokemonHealthIv.innerText = pokemonObject["hpIv"]
 
     const pokemonAttackIv = document.createElement("td")
     pokemonAttackIv.id = `encounter-health-iv-${encounterId}-${botId}`
@@ -564,16 +623,6 @@ function createShinyRow(shinyObject) {
     return fragment
 }
 
-function createPokemonTickerElement(pokemonData, botId) {
-    const fragment = document.createDocumentFragment()
-    const pokemonId = getPokemonId(pokemonData)
-
-    let area = document.createElement("div")
-    let sprite = createPokemonSprite(pokemonData, activePokemonBots[botId]["battleIconType"], 32, true)
-
-
-}
-
 function updateShinyRowTime(id, timestamp) {
     const row = document.getElementById(id)
     const timeElement = row.getElementsByClassName("shiny-time")[0]
@@ -633,7 +682,7 @@ function getElapsedTimeAsString(timestamp) {
     }
 }
 
-function getFullElapsedTimeAsString(timestamp) {
+function getFullElapsedTimeAsString(timestamp, options = ["Y", "D", "H", "M", "S"]) {
     const now = new Date().getTime() / 1000
     let elapsedTime = now - timestamp
     const years = Math.floor(elapsedTime / (365 * 24 * 60 * 60))
@@ -648,22 +697,22 @@ function getFullElapsedTimeAsString(timestamp) {
 
     let string = ""
 
-    if (years > 0) {
+    if (years > 0 && options.includes("Y")) {
         string += `${years}Y `
     }
-    if (string || days > 0) {
+    if ((string || days > 0) && options.includes("D")) {
         string += `${days}D `
     }
     
-    if (string || hours > 0) {
+    if ((string || hours > 0) && options.includes("H")) {
         string += `${hours}h `
     }
 
-    if (string || minutes > 0) {
+    if ((string || minutes > 0) && options.includes("M")) {
         string += `${minutes}m `
     }
 
-    if (string || seconds >0 ) {
+    if ((string || seconds >0) && options.includes("S")) {
         string += `${seconds}s `
     }
 

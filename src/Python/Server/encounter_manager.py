@@ -68,13 +68,18 @@ class EncounterManager:
         new_encounter_dict["timestamp"] = encounter_json["timestamp"]
         new_encounter_dict["strength"] = self.calculate_encounter_strength(new_encounter_dict)
         new_encounter_dict["shiny_proximity"] = self.calculate_shinines_proximity(new_encounter_dict)
+        pokemon_id = Pokemon.get_pokemon(species=species)
+        pokemon_id_string = Pokemon.get_pokemon_id_string(species=species)
+        new_encounter_dict["id"] = pokemon_id
 
         logging.info(self.encounter_string(species, new_encounter_dict))
         
         if species not in self.encounters["species"]:
-            logging.info(f"Found new species: {Pokemon.get_pokemon_name(species)}")
+            logging.info(f"Found new species: {pokemon_id['name']}")
             self.create_new_encounter_species(species=species)
 
+        if pokemon_id_string not in self.encounters["current_phase"]["pokemon_seen"]:
+                self.encounters["current_phase"]["pokemon_seen"].append(pokemon_id)
 
         species_dict = self.encounters["species"][species]
         self.update_encounter_dict(species_dict, new_encounter_dict)
@@ -113,6 +118,7 @@ class EncounterManager:
 
     def update_encounter_dict(self, dest, encounter_dict):
         species = encounter_dict['species']
+        pokemon_id = Pokemon.get_pokemon(species=species)
         dest["total_encounters"] += 1
 
         if encounter_dict["isShiny"]:
@@ -126,13 +132,13 @@ class EncounterManager:
         # Update the strongest pokemon
         if not dest["strongest_pokemon"] or encounter_dict["strength"] > dest["strongest_pokemon"]["strength"]:
             logging.debug(str(encounter_dict))
-            logging.info(f"Found the strongest {Pokemon.get_pokemon_name(species)}: {encounter_dict['strength']}")
+            logging.info(f"Found the strongest {pokemon_id['name']}: {encounter_dict['strength']}")
             dest["strongest_pokemon"] = encounter_dict
 
         # Update the weakest pokemon
         if not dest["weakest_pokemon"] or encounter_dict["strength"] < dest["weakest_pokemon"]["strength"]:
             logging.debug(str(encounter_dict))
-            logging.info(f"Found the weakest {Pokemon.get_pokemon_name(species)}: {encounter_dict['strength']}")
+            logging.info(f"Found the weakest {pokemon_id['name']}: {encounter_dict['strength']}")
             dest["weakest_pokemon"] = encounter_dict
 
     def create_new_encounter_species(self, species):

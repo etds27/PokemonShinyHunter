@@ -22,8 +22,6 @@ class PayloadAggregator:
             }
             for bot_id, bot_agent in self.event_handler.bot_agents.items()
         ]
-        for i, encounter in enumerate(payload[0]["encounters"]):
-            logging.info(f"{i}, {encounter}")
         return payload
 
     def get_bot_payload(self):
@@ -37,13 +35,15 @@ class PayloadAggregator:
         return payload
     
     def get_shiny_payload(self):
-        return [
+        payload =   [
             {
                 "bot_id": bot_id, 
                 "encounters": bot_agent[Event.ENCOUNTER.value].get_shiny_payload() 
             }
             for bot_id, bot_agent in self.event_handler.bot_agents.items()
         ]
+
+        return payload
     
     def get_phase_payload(self):
         payload = [
@@ -54,4 +54,6 @@ class PayloadAggregator:
             }
             for bot_id, bot_agent in self.event_handler.bot_agents.items()
         ]
+
+        logging.info(payload)
         return payload

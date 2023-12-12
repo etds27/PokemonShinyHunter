@@ -37,12 +37,14 @@ def provideBotIds() -> dict:
         pass
     sys.stdout.write(str(_bot_ids) + "\n")
     sys.stdout.flush()
-    icons = ["spr_emerald", "spr_silver", "spr_firered-leafgreen"]
+    icons = ["spr_ruby-sapphire", "spr_emerald", "spr_platinum", "spr_diamond-pearl", "spr_hgss"]
+    games = ["Emerald", "Silver", "Gold", "Crystal", "Ruby", "Sapphire"]
     return {
         "bots": {
             bot_id: {
                 "battle-icon": random.choice(icons),
-                "party-icon": "party"
+                "party-icon": "party",
+                "game_name": random.choice(games)
             }
             for bot_id in _bot_ids
         },
@@ -87,6 +89,32 @@ def providePhaseInfo() -> dict:
 def provideCollectionInfo() -> dict:
     return {}
 
+@app.route("/game_stats")
+def provide_game_stats_info() -> dict:
+    return randomGameStats()
+
+def randomGameStats():
+    return [
+        {
+            "bot_id": bot_id,
+            "total_time": random.randint(1, 15000000),
+            "total_encounters": random.randint(1, 5000000),
+            "total_shinies": random.randint(1, 5000),
+            "shiny_rate": f'1 / {random.randint(1, 5000)}',
+            "longest_phase": random.randint(1, 50000),
+            "shortest_phase": random.randint(1, 50000),
+            "strongest_pokemon": {
+                "id": get_random_pokemon(),
+                "strength": random.randint(1, 64)
+            },
+            "weakest_pokemon": {
+                "id": get_random_pokemon(),
+                "strength": random.randint(1, 64)
+            }
+        }
+        for bot_id in _bot_ids
+    ]
+
 def randomPhasePayload():
     return [
         {
@@ -97,11 +125,11 @@ def randomPhasePayload():
             "pokemon_seen": _seen_pokemon,
             "strongest_pokemon": {
                     "id": get_random_pokemon(),
-                    "iv": random.randint(0, 64)
+                    "strength": random.randint(0, 64)
                 },
             "weakest_pokemon": {
                     "id": get_random_pokemon(), 
-                    "iv": random.randint(0, 64)
+                    "strength": random.randint(0, 64)
                 }
         }
         for bot_id in _bot_ids
@@ -119,7 +147,7 @@ def randomEncounterPayload(bots = 1, n = 1):
                     "pokemon_data": {
                         "id": get_random_pokemon(),
                         "level": 40,
-                        "healthIv": hp,
+                        "hpIv": hp,
                         "attackIv": atk,
                         "defenseIv": defense,
                         "speedIv": spd,

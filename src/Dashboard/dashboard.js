@@ -7,6 +7,7 @@ const host = "http://127.0.0.1:8000"
 
 const DEFAULT_BATTLE_ICONS = ""
 const DEFAULT_PARTY_ICONS = ""
+const DEFAULT_GAME_NAME = "POKEMON"
 
 // mapping of Bot ID to pokemon table
 let activePokemonBots = {}
@@ -91,6 +92,29 @@ function phase() {
 }
 
 /**
+ * Accepts new encounter data and populates the newest encounter row
+ */
+function gameStats() {
+    $.ajax({
+        method: "GET",
+        url: host + "/game_stats",
+        crossDomain: true,
+        dataType: "json",
+        format: "json",
+        timeout: 1000,
+        success: function(gameStats) {
+            for (let botPayload of gameStats) {
+                let botID = botPayload["bot_id"]
+                if (!doesBotIDExist(botID)) {
+                    return false
+                }
+                updateGameStatsInfo(botPayload)
+            }
+        }   
+    })
+}
+
+/**
  * Accepts new request for pokemon table and creates html elements for it
  */
 function updateActiveBots() {
@@ -156,15 +180,18 @@ function addPokemonTable(botID, options) {
         console.log("Bot limit aleady reached")
         return
     }
+
+    activePokemonBots[botID] = {
+        battleIconType: options["battle-icon"] || DEFAULT_BATTLE_ICONS,
+        partyIconType: options["party-icon"] || DEFAULT_PARTY_ICONS,
+        gameName: options["game_name"] || DEFAULT_GAME_NAME
+    }
+
     console.log(`Creating bot area for: ${botID}`)
     const table = createPokemonBotArea(botID)
     const pokemonTableContainer = document.getElementById("pokemon-table-container")
     pokemonTableContainer.appendChild(table)
     console.debug(table)
-    activePokemonBots[botID] = {
-        battleIconType: options["battle-icon"] || DEFAULT_BATTLE_ICONS,
-        partyIconType: options["party-icon"] || DEFAULT_PARTY_ICONS,
-    }
 }
 
 /**
@@ -248,16 +275,16 @@ function updateCurrentPhaseInfo(phaseData) {
     element.innerText = phaseData["total_encounters"].toLocaleString()
 
     element = document.getElementById(`weak-pokemon-species-${botID}`)
-    element.innerText = phaseData["weakest_pokemon"]["species"]
+    element.src = getPokemonSpritePath(phaseData["weakest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
 
     element = document.getElementById(`weak-pokemon-value-${botID}`)
-    element.innerText = phaseData["weakest_pokemon"]["iv"]
+    element.innerText = phaseData["weakest_pokemon"]["strength"]
 
     element = document.getElementById(`strong-pokemon-species-${botID}`)
-    element.innerText = phaseData["strongest_pokemon"]["species"]
+    element.src = getPokemonSpritePath(phaseData["strongest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
 
     element = document.getElementById(`strong-pokemon-value-${botID}`)
-    element.innerText = phaseData["strongest_pokemon"]["iv"]
+    element.innerText = phaseData["strongest_pokemon"]["strength"]
 
     element = document.getElementById(`current-phase-container-pokemon-${botID}`)
 
@@ -281,29 +308,47 @@ function updateCurrentPhaseInfo(phaseData) {
         }
         pokemonElement = createPokemonSprite(pokemonInfo, activePokemonBots[botID]["battleIconType"], 48)
         pokemonElement.id = `current-phase-pokemon-${botID}-${pokemonId}`
+        pokemonElement.classList.add(`current-phase-pokemon-${botID}`)
         $(pokemonElement).data("speciesId", pokemonId)
         element.appendChild(pokemonElement)
     }
 }
 
-function updatePokemonScrollingTicker(collectionData) {
-    let botID = phaseData["bot_id"]
-    // Remove the existing sprites if they shouldn't be displayed
-    let existingElements = document.getElementsByClassName(`pokemon-ticker-sprite-${botID}`)
+function updateGameStatsInfo(gameStats) {
+    let botID = gameStats["bot_id"]
+    let element = document.getElementById(`game-stats-time-${botID}`)
+    
+    // The calculated start time is the current time minues the number of seconds played
+    const elapsedTime = new Date().getTime() / 1000 - gameStats["total_time"]
+    element.innerText = getFullElapsedTimeAsString(elapsedTime, ["Y", "D", "H", "M"])
 
-    // Display the sprites of the pokemon_seen
-    for (var i = 0; i < phaseData["pokemon_seen"].length; i++) {
-        const pokemonInfo = phaseData["pokemon_seen"][i]
-        const pokemonId = getPokemonId(pokemonInfo)
-        let pokemonElement = document.getElementById(`pokemon-ticker-sprite-${botID}-${pokemonId}`)
-        if (pokemonElement) {
-            continue
-        }
-        pokemonElement = createPokemonSprite(pokemonInfo, activePokemonBots[botID]["battleIconType"], 48)
-        pokemonElement.id = `current-phase-pokemon-${botID}-${pokemonId}`
-        $(pokemonElement).data("speciesId", pokemonId)
-        element.appendChild(pokemonElement)
-    }
+    element = document.getElementById(`game-stats-encounters-${botID}`)
+    element.innerText = gameStats["total_encounters"].toLocaleString()
+
+    element = document.getElementById(`game-stats-shinies-${botID}`)
+    element.innerText = gameStats["total_shinies"].toLocaleString()
+
+    element = document.getElementById(`game-stats-shiny-rate-${botID}`)
+    element.innerText = gameStats["shiny_rate"].toLocaleString()
+
+    element = document.getElementById(`game-stats-weak-pokemon-species-${botID}`)
+    element.src = getPokemonSpritePath(gameStats["weakest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
+
+    element = document.getElementById(`game-stats-weak-pokemon-value-${botID}`)
+    element.innerText = gameStats["weakest_pokemon"]["strength"]
+
+    element = document.getElementById(`game-stats-strong-pokemon-species-${botID}`)
+    element.src = getPokemonSpritePath(gameStats["strongest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
+
+    element = document.getElementById(`game-stats-strong-pokemon-value-${botID}`)
+    element.innerText = gameStats["strongest_pokemon"]["strength"]
+
+    element = document.getElementById(`game-stats-longest-phase-${botID}`)
+    element.innerText = gameStats["longest_phase"].toLocaleString()
+
+    element = document.getElementById(`game-stats-shortest-phase-${botID}`)
+    element.innerText = gameStats["shortest_phase"].toLocaleString()
+
 }
 
 setInterval(() => {
@@ -327,4 +372,8 @@ setInterval(() => {
 
 setInterval(() => {
     phase()
-}, 1000)
+}, 2000)
+
+setInterval(() => {
+    gameStats()
+}, 2000)
