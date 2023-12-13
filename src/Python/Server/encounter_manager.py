@@ -44,6 +44,8 @@ class EncounterManager:
             "species": {},
             "previous_n_encounters": [],
             "previous_n_shiny_encounters": [],
+            "longest_phase_length": -1,
+            "shortest_phase_length": -1,
             "current_phase": self.create_phase(time.time()),
         }
         self.initialize_encounter_table()
@@ -102,6 +104,17 @@ class EncounterManager:
             self.encounters["previous_n_shiny_encounters"].insert(0, self.create_shiny_encounter_for_payload(new_encounter_dict, self.encounters["current_phase"]))
             if len(self.encounters["previous_n_shiny_encounters"]) > self.encounter_memory:
                 self.encounters["previous_n_shiny_encounters"].pop()
+
+            longest_phase = self.encounters["longest_phase_length"]
+            shortest_phase = self.encounters["shortest_phase_length"]
+            current_phase = self.encounters["current_phase"]["total_encounters"]
+            if current_phase > longest_phase:
+                logging.info(f"New longest phase length: {current_phase} > {longest_phase}")
+                self.encounters["longest_phase_length"] = current_phase
+            if current_phase < shortest_phase or shortest_phase == -1:
+                logging.info(f"New shortest phase length: {current_phase} > {shortest_phase}")
+                self.encounters["shortest_phase_length"] = current_phase
+            
             # Update the last time we found a shiny to this encounter
             self.encounters["current_phase"] = self.create_phase(encounter_json["timestamp"])
 
@@ -123,6 +136,7 @@ class EncounterManager:
 
         if encounter_dict["isShiny"]:
             dest["total_shinies_found"] += 1
+            dest["total_shinies_caught"] += 1
             if "caughtData" in encounter_dict and encounter_dict["caughtData"]:
                 dest["total_shinies_caught"] += 1
 
@@ -220,6 +234,19 @@ class EncounterManager:
             "pokemon_data": {
                 "id": Pokemon.get_pokemon(species=species)
             }
+        }
+    
+
+    def get_game_encounter_payload(self):
+        return {
+            "bot_id": self.bot_id,
+            "total_encounters": self.encounters["total_encounters"],
+            "total_shinies": self.encounters["total_shinies_caught"],
+            "shiny_rate": f"1 / {int(self.encounters['total_encounters'] / self.encounters['total_shinies_caught'])}" if self.encounters['total_shinies_caught'] else "∞",
+            "longest_phase": self.encounters["longest_phase_length"] if self.encounters["longest_phase_length"] > 0 else "∞",
+            "shortest_phase": self.encounters["shortest_phase_length"] if self.encounters["shortest_phase_length"] > 0 else "∞",
+            "strongest_pokemon": self.encounters["strongest_pokemon"],
+            "weakest_pokemon": self.encounters["weakest_pokemon"],
         }
 
     def get_phase_payload(self):

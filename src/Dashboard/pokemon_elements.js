@@ -120,6 +120,8 @@ function createGameStatsArea(botID) {
     col = document.createElement("td")
     col.className = "game-stats-data"
     col.id = `game-stats-time-${botID}`
+    col.classList.add("time-element")
+    $(col).data("timestampType", "FULL")
     col.innerText = "0s"
     row.appendChild(col)
 
@@ -281,6 +283,8 @@ function createCurrentPhaseArea(botID) {
 
     col = document.createElement("td")
     col.className = "current-phase-data"
+    col.classList.add("time-element")
+    $(col).data("timestampType", "FULL")
     col.id = `current-phase-time-${botID}`
     col.innerText = "0s"
     row.appendChild(col)
@@ -481,7 +485,6 @@ function createEncounterRow(encounterObject) {
     // Check if the element already exists, i.e if the encounter is already being displayed
     const encounterElementId = `encounter-id-${encounterId}-${botId}`
     if (document.getElementById(encounterElementId)) {
-        console.log("Encounter already displayed: " + encounterElementId)
         return false
     }
 
@@ -571,7 +574,6 @@ function createShinyRow(shinyObject) {
     // Check if the element already exists, i.e if the shiny is already being displayed
     const shinyElementId = `shiny-row-${shinyId}-${botId}`
     if (document.getElementById(shinyElementId)) {
-        console.log("Encounter already displayed: " + shinyElementId)
         updateShinyRowTime(shinyElementId, timestamp)
         return false
     }
@@ -586,9 +588,11 @@ function createShinyRow(shinyObject) {
     const shinyTime = document.createElement("td")
     shinyTime.id = `shiny-time-${shinyId}-${botId}`
     shinyTime.className = "shiny-time"
+    shinyTime.classList.add("time-element")
     shinyTime.innerText = getElapsedTimeAsString(timestamp)
     // Store the timestamp to be retrieved later to update
     $(shinyTime).data("timestamp", timestamp)
+    $(shinyTime).data("timestampType", "MIN")
 
 
     const pokemonSpecies = document.createElement("td")

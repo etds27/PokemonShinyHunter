@@ -27,24 +27,28 @@ app = flask.Flask(__name__)
 CORS(app)
 
 @app.route("/active_bots")
-def provideBotIds() -> dict:
+def provide_bot_ids() -> dict:
     return payload_aggregator.get_bot_payload()
 
 @app.route("/encounters")
-def provideEncounters() -> dict:
+def provide_encounters() -> dict:
     return payload_aggregator.get_encounter_payload()
 
 @app.route("/shiny_log")
-def provideShinyEncounters() -> list:
+def provide_shiny_encounters() -> list:
     return payload_aggregator.get_shiny_payload()
 
 @app.route("/phase_info")
-def providePhaseInfo() -> dict:
+def provide_phase_info() -> dict:
     return payload_aggregator.get_phase_payload()
 
 @app.route("/collection_info")
-def provideCollectionInfo() -> dict:
+def provide_collection_info() -> dict:
     return {}
+
+@app.route("/game_stats")
+def provide_game_stats_info():
+    return payload_aggregator.get_game_stats_payload()
 
 @app.route("/bot_data_receive", methods=["POST"])
 def update_bot_data():

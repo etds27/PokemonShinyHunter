@@ -333,6 +333,7 @@ function Bot:initializeBot()
     os.execute("mkdir " .. Bot.SAVESTATE_PATH)
 
     local pokemon = Collection:getAllShinyPokemon()
+    PokemonSocket:logGameStats()
     PokemonSocket:logCollection(pokemon)
 end
 

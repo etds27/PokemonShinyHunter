@@ -4,11 +4,12 @@ import time
 
 from collection_manager import CollectionManager
 from encounter_manager import EncounterManager
+from game_stats_manager import GameStatsManager
 
 class Event(enum.Enum):
     ENCOUNTER = "encounter"
     COLLECTION = "collection"
-    pass
+    GAME = "game"
 
 class EventHandler:
     def __init__(self) -> None:
@@ -23,19 +24,14 @@ class EventHandler:
             self.bot_agents[bot_id][Event.ENCOUNTER.value].manage_new_encounter(event_json)
         if event_json["eventType"] == Event.COLLECTION.value:
             self.bot_agents[bot_id][Event.COLLECTION.value].update_collection(event_json)
+        if event_json["eventType"] == Event.GAME.value:
+            self.bot_agents[bot_id][Event.GAME.value].update(event_json)
         pass
 
     def create_new_bot_agent(self, bot_id):
         self.bot_agents[bot_id] = {
             Event.ENCOUNTER.value: EncounterManager(bot_id=bot_id),
-            Event.COLLECTION.value: CollectionManager(bot_id=bot_id)
-        }
-
-    def get_current_bot_payload(self):
-        return {
-            "bots": {
-
-            },
-            "timestamp": time.time()
+            Event.COLLECTION.value: CollectionManager(bot_id=bot_id),
+            Event.GAME.value: GameStatsManager(bot_id=bot_id)
         }
 

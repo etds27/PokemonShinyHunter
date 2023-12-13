@@ -260,31 +260,57 @@ function removePokemonTable(botID) {
 }
 
 function updatePokemonTimestamps() {
-    for (let element of document.getElementsByClassName("shiny-time")) {
+    for (let element of document.getElementsByClassName("time-element")) {
         const timestamp = $(element).data("timestamp")
-        element.innerHTML = getElapsedTimeAsString(timestamp)
+        const timestampType = $(element).data("timestampType")
+
+        if (timestampType == "FULL") {
+            element.innerHTML = getFullElapsedTimeAsString(timestamp)
+        } else if (timestampType == "MIN") {
+            element.innerHTML = getElapsedTimeAsString(timestamp)
+        }
     }
 }
 
 function updateCurrentPhaseInfo(phaseData) {
     let botID = phaseData["bot_id"]
     let element = document.getElementById(`current-phase-time-${botID}`)
-    element.innerText = getFullElapsedTimeAsString(phaseData["start_timestamp"])
+    $(element).data("timestamp", phaseData["start_timestamp"])
 
     element = document.getElementById(`current-phase-encounters-${botID}`)
     element.innerText = phaseData["total_encounters"].toLocaleString()
 
     element = document.getElementById(`weak-pokemon-species-${botID}`)
-    element.src = getPokemonSpritePath(phaseData["weakest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
+    if ("id" in phaseData["weakest_pokemon"]) {
+        element.style.visibility = "visible"  
+        element.src = getPokemonSpritePath(phaseData["weakest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
+    } else {
+        element.style.visibility = "hidden"
+    }
 
     element = document.getElementById(`weak-pokemon-value-${botID}`)
-    element.innerText = phaseData["weakest_pokemon"]["strength"]
+    if ("strength" in phaseData["weakest_pokemon"]) {
+        element.style.visibility = "visible"  
+        element.innerText = phaseData["weakest_pokemon"]["strength"]
+    } else {
+        element.style.visibility = "hidden"
+    }
 
     element = document.getElementById(`strong-pokemon-species-${botID}`)
-    element.src = getPokemonSpritePath(phaseData["strongest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
+    if ("id" in phaseData["strongest_pokemon"]) {
+        element.style.visibility = "visible"  
+        element.src = getPokemonSpritePath(phaseData["strongest_pokemon"]["id"], activePokemonBots[botID]["battleIconType"], false)
+    } else {
+        element.style.visibility = "hidden"
+    }
 
     element = document.getElementById(`strong-pokemon-value-${botID}`)
-    element.innerText = phaseData["strongest_pokemon"]["strength"]
+    if ("strength" in phaseData["strongest_pokemon"]) {
+        element.style.visibility = "visible"    
+        element.innerText = phaseData["strongest_pokemon"]["strength"]
+    } else {
+        element.style.visibility = "hidden"
+    }
 
     element = document.getElementById(`current-phase-container-pokemon-${botID}`)
 
@@ -319,8 +345,8 @@ function updateGameStatsInfo(gameStats) {
     let element = document.getElementById(`game-stats-time-${botID}`)
     
     // The calculated start time is the current time minues the number of seconds played
-    const elapsedTime = new Date().getTime() / 1000 - gameStats["total_time"]
-    element.innerText = getFullElapsedTimeAsString(elapsedTime, ["Y", "D", "H", "M"])
+    const elapsedTime = new Date().getTime() / 1000 - gameStats["play_time"]
+    $(element).data("timestamp", elapsedTime)
 
     element = document.getElementById(`game-stats-encounters-${botID}`)
     element.innerText = gameStats["total_encounters"].toLocaleString()

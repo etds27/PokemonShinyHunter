@@ -87,9 +87,13 @@ td {
   align-self: center;
   aspect-ratio: 4 / 3; /* Set the desired aspect ratio */
   background-color: black;
-  flex:  1 1 auto;
+  flex: 1 1 auto;
   position: relative; /* Positioning context for absolutely positioned children */
   z-index: -1;
+
+
+
+  max-width: 100%;
 }
 
 .bot-header {
@@ -157,9 +161,6 @@ td {
 
 .gray-image {
   filter: grayscale(100%);
-}
-
-.sprite-containter {
 }
 
 .scrolling-ticker {

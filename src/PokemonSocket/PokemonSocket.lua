@@ -12,6 +12,7 @@ EventType = {
     ENCOUNTER = "encounter",
     TEAM = "team",
     COLLECTION = "collection",
+    GAME = "game"
 }
 
 ---@class Payload
@@ -55,4 +56,19 @@ function PokemonSocket:logCollection(pokemonTable)
     Log:debug("PokemonSocket:logCollection: init")
     PokemonSocket:sendTable(pokemonTable, EventType.COLLECTION)
     Log:debug("PokemonSocket:logCollection: complete")
+end
+
+function PokemonSocket:logGameStats()
+    Log:debug("PokemonSocket:logGameStats: init")
+    local tab = {
+        playTime = Trainer:getPlayTime(),
+        money = Trainer:getTrainerMoney(),
+        id = Trainer:getTrainerID(),
+        name = Trainer:getName(),
+        map = Positioning:getMap(),
+        position = Positioning:getPosition(),
+        gameTime = ""
+    }
+    PokemonSocket:sendTable(tab, EventType.GAME)
+    Log:debug("PokemonSocket:logGameStats: complete")
 end

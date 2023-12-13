@@ -42,7 +42,6 @@ class PayloadAggregator:
             }
             for bot_id, bot_agent in self.event_handler.bot_agents.items()
         ]
-
         return payload
     
     def get_phase_payload(self):
@@ -54,6 +53,16 @@ class PayloadAggregator:
             }
             for bot_id, bot_agent in self.event_handler.bot_agents.items()
         ]
-
+        return payload
+    
+    def get_game_stats_payload(self):
+        payload = [
+            {
+                "bot_id": bot_id,
+                **bot_agent[Event.GAME.value].get_game_stats_payload(),
+                **bot_agent[Event.ENCOUNTER.value].get_game_encounter_payload(),
+            }
+            for bot_id, bot_agent in self.event_handler.bot_agents.items()
+        ]
         logging.info(payload)
         return payload
