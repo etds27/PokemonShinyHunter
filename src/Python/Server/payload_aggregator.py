@@ -8,7 +8,10 @@ bot_server_data = {}
 with open(os.path.join(os.environ["PSH_ROOT"], "BotConfigs", "bot_server_configs.json"), "r") as f:
     bot_server_data = json.load(f)
 
-
+DEFAULT_BOT_DATA = {
+        "battle-icon": "spr_emerald",
+        "party-icon": "party"
+}
 
 class PayloadAggregator:
     def __init__(self, event_handler: EventHandler):
@@ -27,8 +30,9 @@ class PayloadAggregator:
     def get_bot_payload(self):
         payload =  {
             "bots": {
-                bot_id: bot_server_data.get(bot_id, {})
+                bot_id: bot_server_data.get(bot_id, DEFAULT_BOT_DATA)
                 for bot_id in self.event_handler.bot_agents.keys()
+
             },
             "timestamp": time.time()
         }
