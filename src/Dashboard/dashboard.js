@@ -8,6 +8,7 @@ const host = "http://127.0.0.1:8000"
 const DEFAULT_BATTLE_ICONS = ""
 const DEFAULT_PARTY_ICONS = ""
 const DEFAULT_GAME_NAME = "POKEMON"
+const TICKER_POKEMON_PER_SECOND = 5
 
 // mapping of Bot ID to pokemon table
 let activePokemonBots = {}
@@ -151,6 +152,29 @@ function updateActiveBots() {
 }
 
 /**
+ * Accepts new request for pokemon table and creates html elements for it
+ */
+function collection() {
+    $.ajax({
+        method: "GET",
+        url: host + "/collection",
+        crossDomain: true,
+        dataType: "json",
+        format: "json",
+        timeout: 1000,
+        success: function(collections) {
+            for (let collection of collections) {
+                let botID = collection["bot_id"]
+                if (!doesBotIDExist(botID)) {
+                    return false
+                }
+                updateCollection(collection)
+            }
+        }   
+    })
+}
+
+/**
  * Determine if we already have a table for the specified bot
  * @param {string} botID ID of bot to verify
  * @returns {bool} If the bot ID already has a table
@@ -260,17 +284,30 @@ function removePokemonTable(botID) {
 }
 
 function updatePokemonTimestamps() {
-    for (let element of document.getElementsByClassName("time-element")) {
+    for (let element of document.getElementsByClassName("epoch-min-time-element")) {
         const timestamp = $(element).data("timestamp")
-        const timestampType = $(element).data("timestampType")
+        const value = getElapsedDateAsString(timestamp)
+        element.innerHTML = getElapsedDateAsString(timestamp)
+    }
 
-        if (timestampType == "FULL") {
-            element.innerHTML = getFullElapsedTimeAsString(timestamp)
-        } else if (timestampType == "MIN") {
-            element.innerHTML = getElapsedTimeAsString(timestamp)
-        }
+    for (let element of document.getElementsByClassName("epoch-full-time-element")) {
+        const timestamp = $(element).data("timestamp")
+        const formatOptions = $(element).data("formatOptions")
+        element.innerHTML = getFullElapsedDateAsString(timestamp, formatOptions)
+    }
+    
+    for (let element of document.getElementsByClassName("elapsed-min-time-element")) {
+        const timestamp = $(element).data("timestamp")
+        element.innerHTML = getElapsedTimeAsString(timestamp)
+    }
+
+    for (let element of document.getElementsByClassName("elapsed-full-time-element")) {
+        const timestamp = $(element).data("timestamp")
+        const formatOptions = $(element).data("formatOptions")
+        element.innerHTML = getFullElapsedTimeAsString(timestamp, formatOptions)
     }
 }
+
 
 function updateCurrentPhaseInfo(phaseData) {
     let botID = phaseData["bot_id"]
@@ -345,7 +382,7 @@ function updateGameStatsInfo(gameStats) {
     let element = document.getElementById(`game-stats-time-${botID}`)
     
     // The calculated start time is the current time minues the number of seconds played
-    const elapsedTime = new Date().getTime() / 1000 - gameStats["play_time"]
+    const elapsedTime = new Date().getTime() / 1000 - gameStats["total_time"]
     $(element).data("timestamp", elapsedTime)
 
     element = document.getElementById(`game-stats-encounters-${botID}`)
@@ -374,7 +411,30 @@ function updateGameStatsInfo(gameStats) {
 
     element = document.getElementById(`game-stats-shortest-phase-${botID}`)
     element.innerText = gameStats["shortest_phase"].toLocaleString()
+}
 
+function updateCollection(collectionData) {
+    const botId = collectionData["bot_id"]
+    const botTicker = document.getElementById(`ticker-${botId}`)
+
+    const tickerDuration = `${collectionData["collection"].length * TICKER_POKEMON_PER_SECOND}s`
+    document.documentElement.style.setProperty("--ticker-duration", tickerDuration);
+
+    for (let pokemonData of collectionData["collection"]) {
+        const pokemonId = getPokemonId(pokemonData["id"])
+        let element = document.getElementById(`pokemon-ticker-element-${pokemonId}-${botId}`)
+        if (!(element)) {
+            element = createPokemonTickerElement(botId, pokemonData)
+            botTicker.appendChild(element)
+            element = document.getElementById(`pokemon-ticker-element-${pokemonId}-${botId}`)
+        }
+
+        $(element).find(`.pokemon-ticker-element-left-number`).innerText = pokemonData["number_caught"]
+        if (pokemonData["number_caught"] >= pokemonData["number_required"]) {
+            const sprite = $(element).find(".pokemon-ticker-sprite")[0]
+            sprite.classList.remove("gray-image")
+        }
+    }
 }
 
 setInterval(() => {
@@ -402,4 +462,8 @@ setInterval(() => {
 
 setInterval(() => {
     gameStats()
+}, 2000)
+
+setInterval(() => {
+    collection()
 }, 2000)

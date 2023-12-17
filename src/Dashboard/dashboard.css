@@ -42,8 +42,11 @@ body {
   flex-direction: column;
   flex: 1 1 auto;
   height: 100%;
-  width: 100%;
   justify-content: flex-end;
+  overflow: hidden;
+  padding-left: 2px;
+  padding-right: 2px;
+  width: 100%;
 }
 
 thead {
@@ -163,27 +166,23 @@ td {
   filter: grayscale(100%);
 }
 
-.scrolling-ticker {
-  max-width: 100%;
-  overflow: hidden;
+.pokemon-ticker-element {
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+  height: 100%;
+
+  padding-left: 50px;
 }
 
-.marquee {
-  white-space: nowrap;
-  overflow: hidden;
-  display: inline-block;
-  animation: marquee 10s linear infinite;
+.pokemon-ticker-element-left-number {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 0px;
 }
 
-.marquee p {
-  display: inline-block;
-}
-
-@keyframes marquee {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
+.right-number {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 15px;
 }

@@ -1,5 +1,5 @@
 const shinyTableHeaders = ["Time", "", "Phase", "Species", "Total"]
-const encounterTableHeaders = ["ID", "", "Lvl", "HP", "Atk", "Def", "SPE", "SP", "Sum"]
+const encounterTableHeaders = ["", "Lvl", "HP", "Atk", "Def", "SPE", "SP", "Sum"]
 
 
 
@@ -30,16 +30,14 @@ function createPokemonBotArea(botID) {
     botDataArea.style.alignItems = "stretch"
 
     const pokemonTableElement = document.createElement("div")
-    pokemonTableElement.classList = "pokemon-table-area"
+    pokemonTableElement.className = "pokemon-table-area"
     
     const totalGameArea = createGameStatsArea(botID)
     const currentPhaseArea = createCurrentPhaseArea(botID)
     const shinyTable = createShinyTable(botID)
     const encounterTable = createEncounterTable(botID)
 
-    const scollingTicker = document.createElement("div")
-    scollingTicker.innerText = "SCROLLING BANNER"
-    scollingTicker.class = "scrolling-ticker"
+    const scollingTicker = createPokemonTicker(botID)
 
     botDataArea.appendChild(totalGameArea)
     botDataArea.appendChild(currentPhaseArea)
@@ -60,13 +58,16 @@ function createPokemonBotArea(botID) {
 function createPokemonTicker(botID) {
     const fragment = document.createDocumentFragment()
 
-    const scrollingTicker = document.createElement("div")
-    scrollingTicker.className = "scrolling-ticker"
-    scrollingTicker.id = `scrolling-ticker-${botID}`
+    const tickerWrap = document.createElement("div")
+    tickerWrap.className = "ticker-wrap"
+    tickerWrap.id = `ticker-wrap-${botID}`
 
-    const marquee = document.createElement("div")
-    marquee.className = "marquee"
-    marquee.id = `marquee-${botID}`
+    const ticker = document.createElement("div")
+    ticker.className = "ticker"
+    ticker.id = `ticker-${botID}`
+
+    tickerWrap.appendChild(ticker)
+    fragment.appendChild(tickerWrap)
 
     return fragment
 }
@@ -121,7 +122,9 @@ function createGameStatsArea(botID) {
     col.className = "game-stats-data"
     col.id = `game-stats-time-${botID}`
     col.classList.add("time-element")
-    $(col).data("timestampType", "FULL")
+    col.classList.add("elapsed-full-time-element")
+
+    $(col).data("formatOptions", ["Y", "D", "H", "M"])
     col.innerText = "0s"
     row.appendChild(col)
 
@@ -284,7 +287,9 @@ function createCurrentPhaseArea(botID) {
     col = document.createElement("td")
     col.className = "current-phase-data"
     col.classList.add("time-element")
+    col.classList.add("epoch-full-time-element")
     $(col).data("timestampType", "FULL")
+    $(col).data("isEpochTime", true)
     col.id = `current-phase-time-${botID}`
     col.innerText = "0s"
     row.appendChild(col)
@@ -495,10 +500,12 @@ function createEncounterRow(encounterObject) {
     pokemonRow.id = `encounter-row-${encounterId}-${botId}`
     pokemonRow.className = "encounter-row"
 
+    /*
     const encounterIdElement = document.createElement("td")
     encounterIdElement.id = encounterElementId
     encounterIdElement.className = "encounter-id"
     encounterIdElement.innerText = encounterId
+    */
 
     const pokemonSpecies = document.createElement("td")
     pokemonSpecies.id = `encounter-species-${encounterId}-${botId}`
@@ -542,7 +549,7 @@ function createEncounterRow(encounterObject) {
     pokemonSumIv.className = "encounter-sum-iv"
     pokemonSumIv.innerText = pokemonObject["totalIv"]
 
-    pokemonRow.appendChild(encounterIdElement)
+    // pokemonRow.appendChild(encounterIdElement)
     pokemonRow.appendChild(pokemonSpecies)
     pokemonRow.appendChild(pokemonId)
     pokemonRow.appendChild(pokemonHealthIv)
@@ -574,7 +581,6 @@ function createShinyRow(shinyObject) {
     // Check if the element already exists, i.e if the shiny is already being displayed
     const shinyElementId = `shiny-row-${shinyId}-${botId}`
     if (document.getElementById(shinyElementId)) {
-        updateShinyRowTime(shinyElementId, timestamp)
         return false
     }
 
@@ -589,11 +595,10 @@ function createShinyRow(shinyObject) {
     shinyTime.id = `shiny-time-${shinyId}-${botId}`
     shinyTime.className = "shiny-time"
     shinyTime.classList.add("time-element")
-    shinyTime.innerText = getElapsedTimeAsString(timestamp)
+    shinyTime.classList.add("epoch-min-time-element")
+    shinyTime.innerText = getElapsedDateAsString(timestamp)
     // Store the timestamp to be retrieved later to update
     $(shinyTime).data("timestamp", timestamp)
-    $(shinyTime).data("timestampType", "MIN")
-
 
     const pokemonSpecies = document.createElement("td")
     pokemonSpecies.id = `shiny-species-${shinyId}-${botId}`
@@ -627,10 +632,54 @@ function createShinyRow(shinyObject) {
     return fragment
 }
 
-function updateShinyRowTime(id, timestamp) {
-    const row = document.getElementById(id)
-    const timeElement = row.getElementsByClassName("shiny-time")[0]
-    timeElement.innerHTML = getElapsedTimeAsString(timestamp)
+/**
+ * Create the pokemon ticker element that will slide along the bottom of the bot area
+ * 
+ * pokemonData requires the following fields:
+ *      id: {}
+ *      number_caught: <int>
+ *      number_required: <int>
+ * @param {HTMLDivElement} pokemonData
+ */
+function createPokemonTickerElement(botId, pokemonData) {
+    const fragment = document.createDocumentFragment()
+
+    const pokemonId = getPokemonId(pokemonData["id"])
+
+    const tickerItem = document.createElement("div")
+    tickerItem.classList.add("ticker__item")
+
+    const div = document.createElement("div")
+    div.classList.add("pokemon-ticker-element")
+    div.id = `pokemon-ticker-element-${pokemonId}-${botId}`
+
+    const sprite = createPokemonSprite(pokemonData["id"], activePokemonBots[botId]["battleIconType"], 64, true)
+    sprite.classList.add("pokemon-ticker-sprite")
+    sprite.classList.add("gray-image")
+    sprite.id = `pokemon-ticker-sprite-${pokemonId}-${botId}`
+
+    const numberCaught = document.createElement("div")
+    numberCaught.id = `pokemon-ticker-caught-${pokemonId}-${botId}`
+    numberCaught.innerText = pokemonData["number_caught"]
+    numberCaught.className = "pokemon-ticker-element-left-number"
+
+    const slash = document.createElement("div")
+    slash.innerText = "/"
+
+    const numberRequired = document.createElement("div")
+    numberRequired.id = `pokemon-ticker-required-${pokemonId}-${botId}`
+    numberRequired.innerText = pokemonData["number_required"]
+    numberRequired.className = "pokemon-ticker-element-right-number"
+
+    div.appendChild(sprite)
+    div.appendChild(numberCaught)
+    div.appendChild(slash)
+    div.appendChild(numberRequired)
+
+    tickerItem.appendChild(div)
+
+    fragment.appendChild(tickerItem)
+    return fragment
 }
 
 function createPokemonSprite(pokemonData, spriteType = DEFAULT_BATTLE_ICONS, size = 16, shiny = false) {
@@ -671,10 +720,12 @@ function getPokemonId(pokemonData) {
     return pokemonId
 }
 
-
-function getElapsedTimeAsString(timestamp) {
+function getElapsedDateAsString(timestamp) {
     const now = new Date().getTime() / 1000
-    const elapsedTime = now - timestamp
+    return getElapsedTimeAsString(now - timestamp)
+}
+
+function getElapsedTimeAsString(elapsedTime) {
     if (elapsedTime > 24 * 60 * 60) {
         return `${Math.floor(elapsedTime / (24 * 60 * 60))}D`
     } else if (elapsedTime > 60 * 60) {
@@ -686,9 +737,12 @@ function getElapsedTimeAsString(timestamp) {
     }
 }
 
-function getFullElapsedTimeAsString(timestamp, options = ["Y", "D", "H", "M", "S"]) {
+function getFullElapsedDateAsString(timestamp, options = ["Y", "D", "H", "M", "S"]) {
     const now = new Date().getTime() / 1000
-    let elapsedTime = now - timestamp
+    return getFullElapsedTimeAsString(now - timestamp, options)
+}
+
+function getFullElapsedTimeAsString(elapsedTime, options = ["Y", "D", "H", "M", "S"]) {
     const years = Math.floor(elapsedTime / (365 * 24 * 60 * 60))
     elapsedTime = elapsedTime % (365 * 24 * 60 * 60)
     const days = Math.floor(elapsedTime / (24 * 60 * 60))
@@ -707,17 +761,14 @@ function getFullElapsedTimeAsString(timestamp, options = ["Y", "D", "H", "M", "S
     if ((string || days > 0) && options.includes("D")) {
         string += `${days}D `
     }
-    
     if ((string || hours > 0) && options.includes("H")) {
         string += `${hours}h `
     }
-
     if ((string || minutes > 0) && options.includes("M")) {
         string += `${minutes}m `
     }
-
     if ((string || seconds >0) && options.includes("S")) {
-        string += `${seconds}s `
+        string += `${seconds}s`
     }
 
     return string

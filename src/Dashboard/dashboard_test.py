@@ -24,8 +24,8 @@ def get_random_pokemon():
 
 def get_pokemon(species):
     return {
-        "species": species,
-        "name": pokemon_data[species]["name"].lower(),
+        "species": str(species),
+        "name": pokemon_data[str(species)]["name"].lower(),
         "variant": ""
     }
 
@@ -85,9 +85,9 @@ def provideShinyEncounters() -> list:
 def providePhaseInfo() -> dict:
     return randomPhasePayload()
 
-@app.route("/collection_info")
+@app.route("/collection")
 def provideCollectionInfo() -> dict:
-    return {}
+    return collection_payload
 
 @app.route("/game_stats")
 def provide_game_stats_info() -> dict:
@@ -191,6 +191,22 @@ with open("..\\..\\GameData\\Pokemon\\pokemon_gen2.json", "r") as f:
 
 _bot_ids = ["ETHAN12345", "HALEY12345" , "MAX54321"]
 _seen_pokemon = [get_random_pokemon() for _ in range(6)]
+
+collection_payload = [
+    {
+        "bot_id": bot_id,
+        "collection": [
+            {
+                "id": get_pokemon(num),
+                "number_caught": random.randint(1, 3),
+                "number_required": random.randint(2, 4)
+            }
+            for num in sorted(list(set([random.randint(1,250) for i in range(20)])))
+        ]
+    }
+    for bot_id in _bot_ids
+]
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000)
