@@ -1,7 +1,7 @@
 const shinyTableHeaders = ["Time", "", "Phase", "Species", "Total"]
 const encounterTableHeaders = ["", "Lvl", "HP", "Atk", "Def", "SPE", "SP", "Sum"]
 
-
+const dayColors = ['#00202e', '#003f5c', '#2c4875', '#8a508f', '#bc5090', '#ff6361', '#ff8531', '#ffa600', '#ffd380', '#ffe9c0', '#ffd380', '#ebde80', '#d6e980', '#b6e0a0', '#96d6c0', '#8bc1e0', '#86b7f0', '#80acff', '#a0c1ff', '#c0d6ff', '#c0d6ff', '#a0c1ff', '#80acff', '#86b7f0', '#8bc1e0', '#96d6c0', '#b6e0a0', '#d6e980', '#ebde80', '#ffd380', '#ffe9c0', '#ffd380', '#ffa600', '#ff8531', '#ff6361', '#bc5090', '#8a508f', '#2c4875', '#003f5c', '#00202e']
 
 /**
  * Creates the area that will house the shiuny and encounter tables
@@ -63,7 +63,8 @@ function createPokemonTicker(botID) {
     tickerWrap.id = `ticker-wrap-${botID}`
 
     const ticker = document.createElement("div")
-    ticker.className = "ticker"
+    ticker.classList.add("ticker")
+    ticker.classList.add("pokemon-ticker")
     ticker.id = `ticker-${botID}`
 
     tickerWrap.appendChild(ticker)
@@ -772,4 +773,24 @@ function getFullElapsedTimeAsString(elapsedTime, options = ["Y", "D", "H", "M", 
     }
 
     return string
+}
+
+var x = 0
+function getCurrentTimeColors() {
+    const date = new Date()
+    const time = ((date.getHours() + x) % 24) * 3600 + date.getMinutes() * 60 + date.getSeconds()
+    const normalizedTime = time / (24 * 60 * 60)
+    const baseColor = getColorFromGradient(normalizedTime, dayColors)
+    const darkColor = darkenColor(baseColor, 20)
+    const lightColor = brightenColor(baseColor, 20)
+    const veryDarkColor = darkenColor(baseColor, 40)
+    const veryLightColor = brightenColor(baseColor, 40)
+    x = x + 1
+    return {
+        base: baseColor,
+        dark: darkColor,
+        light: lightColor,
+        veryDark: veryDarkColor,
+        veryLight: veryLightColor
+    }
 }

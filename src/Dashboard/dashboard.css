@@ -1,3 +1,11 @@
+:root {
+  --base-color: gray;
+  --base-color-dark: darkgray;
+  --base-color-very-dark: black;
+  --base-color-light: lightgray;
+  --base-color-very-light: white;
+}
+
 @font-face {
   font-family: silkScreen;
   src: url("Silkscreen/Silkscreen-Regular.ttf");
@@ -5,7 +13,7 @@
 
 table, th, td {
   border-top: 1px solid black;
-  background: rgba(0,0,0,0.1);
+  color: black;
 }
 
 body {
@@ -13,16 +21,16 @@ body {
 
   font-family: silkScreen;
   font-size: medium;
-  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  /* text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; */
 
-  color: azure;
+  background-color: var(--base-color-very-dark);
   margin: 0;
   height: 100vh;
   width: 100vw;
   max-height: 100vh;
   max-width: 100vw;
   padding: 0;
-  background-image: url('https://moewalls.com/wp-content/uploads/2022/11/may-riding-bicycle-pokemon-emerald-pixel-thumb.jpg'); 
+  /* background-image: url('https://moewalls.com/wp-content/uploads/2022/11/may-riding-bicycle-pokemon-emerald-pixel-thumb.jpg'); */
   
 }
 
@@ -38,6 +46,7 @@ body {
 
 .pokemon-bot-area {
   align-items: flex-start;
+  background-color: var(--base-color-dark);
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -55,14 +64,15 @@ thead {
 }
 
 .pokemon-table-area {
-  display: flex;
   align-items: flex-start;
+  background-color: var(--base-color);
+  display: flex;
   flex-direction: row;
-
   flex: 0 0 auto;
 }
 
 .encounter-table, .shiny-table {
+  background-color: var(--base-color-light);
   display: table;
   table-layout: fixed;
   height: fit-content;
@@ -106,6 +116,7 @@ td {
 }
 
 .game-stats-table, .current-phase-table {
+  background-color: var(--base-color-light);
   height: fit-content;
   table-layout: fixed;
   width: 100%;
@@ -173,6 +184,10 @@ td {
   height: 100%;
 
   padding-left: 50px;
+}
+
+.pokemon-ticker {
+  background-color: var(--base-color-light);
 }
 
 .pokemon-ticker-element-left-number {

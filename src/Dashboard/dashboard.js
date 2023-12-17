@@ -111,6 +111,7 @@ function gameStats() {
                 }
                 updateGameStatsInfo(botPayload)
             }
+            updateDashboardColors()
         }   
     })
 }
@@ -437,6 +438,15 @@ function updateCollection(collectionData) {
     }
 }
 
+function updateDashboardColors() {
+    const colors = getCurrentTimeColors()
+    document.documentElement.style.setProperty("--base-color", colors.base);
+    document.documentElement.style.setProperty("--base-color-dark", colors.dark);
+    document.documentElement.style.setProperty("--base-color-light", colors.light);
+    document.documentElement.style.setProperty("--base-color-very-dark", colors.veryDark);
+    document.documentElement.style.setProperty("--base-color-very-light", colors.veryLight);
+}
+
 setInterval(() => {
     // console.log(host + "/active_bots")
     updateActiveBots()
@@ -462,8 +472,8 @@ setInterval(() => {
 
 setInterval(() => {
     gameStats()
-}, 2000)
+}, 1000)
 
 setInterval(() => {
     collection()
-}, 2000)
+}, 20000)
