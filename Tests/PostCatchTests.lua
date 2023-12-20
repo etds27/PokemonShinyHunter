@@ -1,4 +1,4 @@
-SAVE_STATE_PATH = "States\\PostCatchTests.State"
+SAVE_STATE_PATH = TestStates.POST_CATCH_TEST
 
 PostCatchTest = {}
 
@@ -7,4 +7,4 @@ function PostCatchTest:testContinueToOverworld()
     return PostCatch:continueUntilOverworld() 
 end
 
-print("PostCatchTest:testContinueToOverworld", PostCatchTest:testContinueToOverworld())
+print("PostCatchTest:testContinueToOverworld()", PostCatchTest:testContinueToOverworld())

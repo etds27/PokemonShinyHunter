@@ -1,18 +1,31 @@
-require "BoxFactory"
 require "Common"
+require "Factory"
+require "Input"
 require "Log"
 require "Memory"
 require "Menu"
 require "Party"
 require "Pokemon"
-require "Input"
+
+---@type FactoryMap
+local boxFactoryMap = {
+    CrystalBox = {Games.CRYSTAL},
+    GSBox = GameGroups.GOLD_SILVER
+}
+
+---@type FactoryMap
+local boxUIFactoryMap = {
+    CrystalBoxUI = {Games.CRYSTAL},
+    GSBoxUI = GameGroups.GOLD_SILVER
+}
+
 Box = {}
 
 -- Abstract tables
 local Model = {}
 Model.CurrentBoxNumber = {}
 Model.LoadedBox = {}
-Model = BoxFactory:loadModel()
+Model = Factory:loadModel(boxFactoryMap)
 
 -- Load in default tables
 
@@ -148,7 +161,7 @@ function BoxUI:performDepositMenuActions(boxActions)
 
     -- Determine how many deposit actions will be taken
     local numActions = 0
-    for i, actionPair in ipairs(boxActions)
+    for _, actionPair in ipairs(boxActions)
     do
         if actionPair.action == BoxUI.Action.DEPOSIT then numActions = numActions + 1 end
     end
@@ -166,9 +179,10 @@ function BoxUI:performDepositMenuActions(boxActions)
         index = actionPair.index - 1 -- Indices start at 0
         local action = actionPair.action
         local numPokemon = Party:numOfPokemonInParty()
+
+        Log:debug("BoxUI:performDepositMenuActions: " .. action .. " " .. tostring(numPokemon))
         -- Move to pokemon at index
-        Menu:navigateMenu(BoxUI:currentPokemonIndex(), index, {duration = 1, waitFrames=20})
-        if BoxUI:currentPokemonIndex() ~= index then
+        if not Menu:activeNavigateScrollableMenuFromTable(BoxUI.CurrentPokemonCursor, index, {duration = 1, waitFrames=20}) then
             return false
         end
 
@@ -225,21 +239,21 @@ end
 ---No verification
 function BoxUI:selectBillsPC()
     Log:debug("BoxUI:selectBillsPC() - init")
-    Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCMainMenu.BILL)
+    Menu:activeNavigateMenuFromTable(Menu.Cursor, BoxUI.PCMainMenu.BILL)
     Input:performButtonSequence(ButtonSequences.PC_MENU_TO_BILLS)
 end
 
 ---Go from Bills PC to Change Box Menu.
 ---No verification
 function BoxUI:selectChangeBox()
-    Menu:navigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.CHANGE_BOX)
+    Menu:activeNavigateMenuFromTable(Menu.Cursor, BoxUI.PCBillsMenu.CHANGE_BOX)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
 ---Go from Box select screen to selecting the desired box.
 ---No verification
 function BoxUI:navigateToBox(boxNumber)
-    Menu:navigateMenuFromTable(BoxUI.PCBoxCursor, boxNumber)
+    Menu:activeNavigateMenuFromTable(BoxUI.PCBoxCursor, boxNumber)
     Input:pressButtons{buttonKeys={Buttons.A}}
 end
 
@@ -275,7 +289,7 @@ Model.PCMainMenu = {}
 Model.PCBillsMenu = {}
 Model.PCBoxCursor = {}
 Model.PCBoxEdit = {}
-Model = BoxUIFactory:loadModel()
+Model = Factory:loadModel(boxUIFactoryMap)
 
 -- Load in default tables
 

@@ -1,14 +1,18 @@
 require "Common"
+require "Input"
 require "Log"
 require "Memory"
-require "Input"
 require "Positioning"
 
 PostCatch = {
     iterations = 100
 }
 
-function PostCatch:continueUntilOverworld() 
+---Continue from after the pokemon is confirmed to be caught to the overworld
+---
+---This will skip the pokedex and new name screens
+---@return boolean true if the player is returned to the overworld
+function PostCatch:continueUntilOverworld()
     local i = 0
     Log:debug("PostCatch:continueUntilOverworld - init")
     while not Positioning:inOverworld() and i < PostCatch.iterations

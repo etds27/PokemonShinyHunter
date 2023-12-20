@@ -32,6 +32,7 @@ Games = {
 -- Convenience groups to associate similar games
 GameGroups = {
 	GEN_2 = {Games.CRYSTAL, Games.GOLD, Games.SILVER},
+	GOLD_SILVER = {Games.GOLD, Games.SILVER},
 }
 
 GameSettings = {
@@ -86,18 +87,7 @@ end
 function GameSettings.initialize()
 
 	local gamecode = memory.read_u32_be(0x013A, "ROM")
-	local pstats = {0x3004360, 0x20244EC, 0x2024284, 0x3004290, 0x2024190, 0x20241E4} -- Player stats
-	local estats = {0x30045C0, 0x2024744, 0x202402C, 0x30044F0, 0x20243E8, 0x2023F8C} -- Enemy stats
-	local rng    = {0x3004818, 0x3005D80, 0x3005000, 0x3004748, 0x3005AE0, 0x3005040} -- RNG address
-	local coords = {0x30048B0, 0x2037360, 0x2036E48, 0x30047E0, 0x2037000, 0x2036D7C} -- X/Y coords
-	local rng2   = {0x0000000, 0x0000000, 0x20386D0, 0x0000000, 0x0000000, 0x203861C} -- RNG encounter (FRLG only)
-	local wram	 = {0x0000000, 0x2020000, 0x2020000, 0x0000000, 0x0000000, 0x201FF4C} -- WRAM address
-	local mapbank = {0x20392FC, 0x203BC80, 0x203F3A8, 0x2038FF4, 0x203B94C, 0x203F31C} -- Map Bank
-	local mapid = {0x202E83C, 0x203732C, 0x2036E10, 0x202E59C, 0x2036FCC, 0x2036D44} -- Map ID
-	local trainerpointer = {0xDCDF, 0xDD0F, 0xDD3F, 0xDD6F, 0xDD9F, 0xDDCF} -- Trainer Data Pointer
-	local roamerpokemonoffset = {0x39D4, 0x4188, 0x4074, 0x39D4, 0x4188, 0x4074}
-	
-	for name, game in pairs(Games)
+	for _, game in pairs(Games)
 	do
 		if determineIfGame(game) then
 			GameSettings.game = game
@@ -105,20 +95,9 @@ function GameSettings.initialize()
 	end
 
 	if gamecode == 0x4E5F474C then -- N_GL
-		GameSettings.game = 1
-		GameSettings.gamename = "Pokemon Gold (U)"
-		GameSettings.gamecolor = 0xFFF01810
-		GameSettings.encountertable = 0x839D454
-		GameSettings.version = GameSettings.VERSIONS.G
-		GameSettings.language = GameSettings.LANGUAGES.U
+		GameSettings.wildpokemon = 0xD0EF
 	elseif gamecode == 0x4E5F534C then -- N_SL
-		GameSettings.game = 2
-		GameSettings.gamename = "Pokemon Silver (U)"
-		GameSettings.gamecolor = 0xFF123AE5
-		GameSettings.encountertable = 0x839D29C
-		GameSettings.version = GameSettings.VERSIONS.S
-		GameSettings.language = GameSettings.LANGUAGES.U
-
+		GameSettings.wildpokemon = 0xD0EF
 	-- https://archives.glitchcity.info/forums/board-76/thread-1342/page-0.html
 	elseif gamecode == 0x5354414C then -- STAL
 		GameSettings.wildpokemon = 0xD206

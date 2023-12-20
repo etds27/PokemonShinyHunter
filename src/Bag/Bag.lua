@@ -1,11 +1,17 @@
-require "BagFactory"
 require "Common"
-require "Log"
-require "StartMenu"
-require "Memory"
-require "Menu"
+require "Factory"
 require "Input"
 require "Items"
+require "Log"
+require "Memory"
+require "Menu"
+require "StartMenu"
+
+---@type FactoryMap
+local factoryMap = {
+    CrystalBag = {Games.CRYSTAL},
+    GSBag = GameGroups.GOLD_SILVER
+}
 
 -- Abstract tables
 local Model = {}
@@ -15,7 +21,7 @@ Model.KeyPocket = {}
 Model.TMHMPocket = {}
 Model.BallPocket = {}
 Model.ItemPocket = {}
-Model = BagFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Load in default tables
 local BallPriority = {
@@ -122,7 +128,7 @@ end
 ---@return table
 ---| 0: Location of item in the bag, 0 if not found
 ---| 1: Quantity of item, 0 if not found or same as location addr if key item
-function Bag:doesPocketContain(pocket, item) 
+function Bag:doesPocketContain(pocket, item)
     local pocketTable = {}
     local numOfItemsInPocket = 0
     local itemAddr = 0x0

@@ -1,6 +1,6 @@
 BattleTest = {
-    AUTO_CATCH_SAVE_STATE = "States\\AutoCatch.State",
-    START_OF_BATTLE_SAVE_STATE = "States\\StartOfBattle.State"
+    AUTO_CATCH_SAVE_STATE = TestStates.AUTO_CATCH_SAVE_STATE,
+    START_OF_BATTLE_SAVE_STATE = TestStates.START_OF_BATTLE_SAVE_STATE
 }
 
 function BattleTest:testGetCatchStatus() 

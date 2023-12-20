@@ -1,43 +1,49 @@
 require "Common"
+require "Factory"
 require "Log"
 require "Memory"
-require "PokemonFactory"
+
+---@type FactoryMap
+local factoryMap = {
+    GSCPokemon = GameGroups.GEN_2,
+    GSPokemon = GameGroups.GOLD_SILVER
+}
 
 ---@class Pokemon
 ---@field address number 
----@field species number
+---@field attackEv number 
+---@field attackStat number 
+---@field caught boolean
+---@field caughtData number 
+---@field currentHp number 
+---@field defenseEv number 
+---@field defenseStat number 
+---@field expPoints number 
+---@field friendship number 
 ---@field heldItem number 
+---@field hpEv number 
+---@field hpStat number 
+---@field isEgg function
+---@field isShiny boolean
+---@field ivData number 
+---@field level number 
 ---@field move1 number 
 ---@field move2 number 
 ---@field move3 number 
 ---@field move4 number 
----@field trainerId number 
----@field expPoints number 
----@field hpEv number 
----@field attackEv number 
----@field defenseEv number 
----@field speedEv number 
----@field specialEv number 
----@field ivData number 
 ---@field movePp1 number 
 ---@field movePp2 number 
 ---@field movePp3 number 
 ---@field movePp4 number 
----@field friendship number 
 ---@field pokerus number 
----@field caughtData number 
----@field level number 
----@field status number 
----@field currentHp number 
----@field hpStat number 
----@field attackStat number 
----@field defenseStat number 
----@field speedStat number 
 ---@field spAttackStat number 
 ---@field spDefenseStat number 
----@field isShiny boolean
----@field caught boolean
----@field isEgg function
+---@field specialEv number 
+---@field species number
+---@field speedEv number 
+---@field speedStat number 
+---@field status number 
+---@field trainerId number 
 
 Pokemon = {
     address = -1,
@@ -100,7 +106,7 @@ function Pokemon:update()
         local size = value[2]
 
         ---@type string|number
-        local key = key
+        key = key
         ---@type string|number
         local memValue = Memory:read(self.addr + offset, size, self.memdomain)
 
@@ -158,7 +164,7 @@ local Model = {}
 Model.TrainerPokemonOffsets = {}
 Model.BoxPokemonOffsets = {}
 Model.WildPokemonOffsets = {}
-local Model = PokemonFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Pokemon = Common:tableMerge(Pokemon, Model)

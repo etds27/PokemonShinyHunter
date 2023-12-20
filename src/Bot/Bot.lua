@@ -161,18 +161,20 @@ function Bot:runModeHatchEggs()
         -- Determine what eggs were hatched after the egg cycle
         if not Positioning:inOverworld() then
             -- About 30 frames to update the hatched pokemon after movement is disabled
-            Common:waitFrames(30)
+            Common:waitFrames(60)
             eggSlots = Party:getEggMask()
             hatchedEggs = Breeding:determineHatchedPokemon(previousEggSlots, eggSlots)
-            for i, index in ipairs(hatchedEggs) do
+            for _, index in ipairs(hatchedEggs) do
                 Breeding:hatchEgg()
                 local hatchedPokemon = Pokemon:new(Pokemon.PokemonType.TRAINER, Party:getPokemonAddress(index), Memory.WRAM)
-                Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species))
+                Log:info("Hatched pokemon " .. tostring(hatchedPokemon.species) .. " at " .. tostring(index))
                 hatchedPokemon.caught = true
                 Bot:reportEncounter(hatchedPokemon)
                 if hatchedPokemon.isShiny then
+                    Log:debug("Added deposit action for index " .. tostring(index))
                     table.insert(pcActionList, {index = index, action = BoxUI.Action.DEPOSIT})
                 else
+                    Log:debug("Added release action for index " .. tostring(index))
                     table.insert(pcActionList, {index = index, action = BoxUI.Action.RELEASE})
                 end
             end
@@ -191,7 +193,12 @@ function Bot:runModeHatchEggs()
         end
 
         -- Determine if room in party
-        if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then 
+        if Breeding:eggReadyForPickup() and Party:numOfPokemonInParty() < Party.maxPokemon then
+            for _, actionPair in pairs(pcActionList)
+            do
+                print(actionPair.index)
+                print(actionPair.action)
+            end
             if not Breeding:walkToDayCareManFromReset() then return false end
             -- Pick up new eggs
             if not Breeding:pickUpEggs() then return false end
@@ -230,18 +237,19 @@ function Bot:fishForWildPokemon() -- Does not work if we cant escape battle
     end
 end
 
-function Bot:searchForWildPokemon() 
+function Bot:searchForWildPokemon()
     local i = 0
     while Positioning:inOverworld() and i < Bot.SEARCH_SPIN_MAXIMUM
     do
         local direction = Positioning:getDirection()
         -- If we are facing north, spin in a circle starting from the south
         -- If we are facing not north, spin in a circle starting from the north
-        Log:debug("Searching for pokemon " .. i .. " Dir: " .. direction)
-        if direction == Positioning.Direction.NORTH then
-            Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_S)
+        if Common:contains({Positioning.Direction.NORTH, Positioning.Direction.SOUTH}, direction) then
+            Log:debug("Searching E/W for pokemon " .. i .. " Dir: " .. direction)
+            Input:performButtonSequence(ButtonSequences.SEARCH_HORIZONTAL)
         else
-            Input:performButtonSequence(ButtonSequences.SEARCH_ALL_DIR_N)
+            Log:debug("Searching N/S for pokemon " .. i .. " Dir: " .. direction)
+            Input:performButtonSequence(ButtonSequences.SEARCH_VERTICAL)
         end
 
         i = i + 1

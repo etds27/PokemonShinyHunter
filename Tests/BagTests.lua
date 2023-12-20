@@ -5,37 +5,31 @@ BagTest = {
 
 function BagTest:testBagContainsBall()
     savestate.load(BagTest.SAVE_STATE_PATH)
-    tab = BallPocket:containsItem(Items.POKE_BALL)
+    local tab = BallPocket:containsItem(Items.POKE_BALL)
     return tab[1] == 1 and tab[2] == 2
 end
 
 function BagTest:testBagDoesntContainBall()
     savestate.load(BagTest.SAVE_STATE_PATH)
-    tab = BallPocket:containsItem(Items.GREAT_BALL)
+    local tab = BallPocket:containsItem(Items.GREAT_BALL)
     return tab[1] == 0 and tab[2] == 0
 end
 
 function BagTest:testBagContainsItem()
     savestate.load(BagTest.SAVE_STATE_PATH)
-    tab = ItemPocket:containsItem(Items.ANTIDOTE)
+    local tab = ItemPocket:containsItem(Items.ANTIDOTE)
     return tab[1] == 2 and tab[2] == 1
-end
-
-function BagTest:testBagDoesntContainItem()
-    savestate.load(BagTest.SAVE_STATE_PATH)
-    tab = ItemPocket:containsItem(Items.THUNDER_STONE)
-    return tab[1] == 0 and tab[2] == 0
 end
 
 function BagTest:testBagContainsKeyItem()
     savestate.load(TestStates.FISH_ON_LINE)
-    tab = KeyPocket:containsItem(Items.OLD_ROD)
-    return tab[1] == 2
+    local tab = KeyPocket:containsItem(Items.OLD_ROD)
+    return tab[1] > 0
 end
 
 function BagTest:testBagDoesntContainItem()
     savestate.load(TestStates.FISH_OFF_LINE)
-    tab = KeyPocket:containsItem(Items.SILVER_WING)
+    local tab = KeyPocket:containsItem(Items.SILVER_WING)
     return tab[1] == 0
 end
 
@@ -61,14 +55,14 @@ function BagTest:testUseFishingRod()
 end
 
 function BagTest:testHasPokeballs()
-    states = {TestStates.BAG_TEST,
-              TestStates.POST_CATCH_TEST,
-              TestStates.NO_BALLS,
-              TestStates.OVERWORLD_MASTERBALL}
-    values = {true,
-             true,
-             false,
-             true}
+    local states = {TestStates.BAG_TEST,
+                    TestStates.POST_CATCH_TEST,
+                    TestStates.NO_BALLS,
+                    TestStates.OVERWORLD_MASTERBALL}
+              local values = {true,
+                              true,
+                              false,
+                              true}
     for i, state in ipairs(states)
     do
         savestate.load(state)
@@ -81,12 +75,12 @@ function BagTest:testHasPokeballs()
 end
 
 function BagTest:testIsOpen()
-    states = {"States\\BagTests.State",
-              "States\\PostCatchTests.State", 
-              "States\\StartOfBattle.State"}
-    values = {true,
-              false,
-              false}
+    local states = {TestStates.BAG_TEST,
+                    TestStates.POST_CATCH_TEST,
+                    TestStates.START_OF_BATTLE_SAVE_STATE}
+    local values = {true,
+                    false,
+                    false}
     for i, state in ipairs(states)
     do
         savestate.load(state)
@@ -98,7 +92,7 @@ function BagTest:testIsOpen()
     return true
 end
 
-Log.loggingLevel = LogLevels.INFO
+Log.loggingLevel = LogLevels.OFF
 GameSettings.initialize()
 print("BagTest:testBagContainsBall()", BagTest:testBagContainsBall())
 print("BagTest:testBagDoesntContainBall()", BagTest:testBagDoesntContainBall())

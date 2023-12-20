@@ -12,4 +12,6 @@ function PokedexTest:testPokemonNavigate()
     return true
 end
 
+Log.loggingLevel = LogLevels.DEBUG
+
 print("PokedexTest:testPokemonNavigate()", PokedexTest:testPokemonNavigate())

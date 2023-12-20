@@ -1,15 +1,25 @@
 require "Common"
-require "FishingFactory"
+require "Factory"
+require "Input"
 require "Log"
 require "Memory"
-require "Input"
+
+---@type FactoryMap
+local factoryMap = {
+    GSFishing = GameGroups.GOLD_SILVER,
+    CrystalFishing = {Games.CRYSTAL}
+}
 
 Fishing = {}
 
 -- Abstract tables
 local Model = {}
-Model.Rods = {}
-local Model = FishingFactory:loadModel()
+Model.Rods = {
+    Items.OLD_ROD,
+    Items.GOOD_ROD,
+    Items.SUPER_ROD
+}
+Model = Factory:loadModel(factoryMap)
 
 -- Load in default tables
 

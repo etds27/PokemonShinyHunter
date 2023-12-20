@@ -1,15 +1,22 @@
 require "Common"
+require "Factory"
 require "Log"
-require "StartMenu"
 require "Memory"
 require "Menu"
-require "PartyFactory"
 require "Pokemon"
+require "StartMenu"
+
+---@type FactoryMap
+local factoryMap = {
+    GSParty = GameGroups.GOLD_SILVER,
+    CrystalParty = {Games.CRYSTAL}
+}
 
 Party = {
     numEggs = 0
 }
-local Model = PartyFactory:loadModel()
+
+local Model = Factory:loadModel(factoryMap)
 
 -- Merge model into class
 Party = Common:tableMerge(Party, Model)
@@ -64,11 +71,13 @@ end
 ---@return table
 function Party:getEggMask()
     local tab = {}
-    for i, pokemon in pairs(Party:getAllPokemonInParty())
+    local numPokemon = Party:numOfPokemonInParty()
+    for i = 1, numPokemon
     do
-        if pokemon:isEgg() then
+        local pokemonNum = Memory:readFromTable({addr=Party.addr + i, size=1})
+        if pokemonNum == Party.EGG_POKEMON then
             table.insert(tab, true)
-        else
+        elseif pokemonNum ~= Party.NO_POKEMON then
             table.insert(tab, false)
         end
     end
@@ -100,4 +109,3 @@ function Party:navigateToPokemon(num)
     Common:waitFrames(30)
     return true
 end
-

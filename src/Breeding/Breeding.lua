@@ -1,9 +1,15 @@
-require "BreedingFactory"
 require "Common"
+require "Factory"
+require "Input"
 require "Log"
 require "Memory"
-require "Input"
 require "Positioning"
+
+---@type FactoryMap
+local factoryMap = {
+    GSBreeding = GameGroups.GOLD_SILVER,
+    CrystalBreeding = {Games.CRYSTAL}
+}
 
 Breeding = {}
 
@@ -34,7 +40,7 @@ function Breeding:completeEggCycle()
             Log:debug("Breeding:completeEggCycle - cycle reset found")
             return true
         end
-        
+
         if eggSteps >= Breeding.EggCycleCounter.RESET then
             remainingSteps = 0xFF - eggSteps
             eggSteps = 0
@@ -48,7 +54,7 @@ function Breeding:completeEggCycle()
         else
             newPos = Breeding:calculateAdjustedMovementPoint(remainingSteps, Breeding.MovementResetPoint)
         end
-        
+
         Log:debug("Adjusted egg point: " .. Common:coordinateToString(newPos))
         local tab = Positioning:moveToPoint(newPos.x, newPos.y, 100, false)
         if not tab.ret then
@@ -198,12 +204,11 @@ function Breeding:walkToResetFromDayCareMan()
     return false
 end
 
--- Abstract tables
 local Model = {}
 Model.EggCycleCounter = {}
 Model.MovementResetPoint = {}
 Model.MovementTurnAroundPoint = {}
 Model.EggAvailable = {}
-local Model = BreedingFactory:loadModel()
+Model = Factory:loadModel(factoryMap)
 
 Breeding = Common:tableMerge(Breeding, Model)

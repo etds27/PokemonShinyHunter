@@ -1,0 +1,5 @@
+SystemID GB
+1C73	b	u	0	WRAM	Egg Cycle Counter
+1EF5	b	u	0	WRAM	Egg Available
+1434	b	u	0	WRAM	Movement Enabled
+

@@ -1,9 +1,14 @@
 require "Memory"
-require "TextFactory"
+require "Factory"
 
-Text = {}    
+---@type FactoryMap
+local factoryMap = {
+    GSCText = GameGroups.GEN_2,
+}
 
-local Model = TextFactory:loadModel()
+Text = {}
+
+local Model = Factory:loadModel(factoryMap)
 -- Merge model into class
 Text = Common:tableMerge(Text, Model)
 
