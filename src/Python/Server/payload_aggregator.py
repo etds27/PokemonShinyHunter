@@ -5,13 +5,23 @@ import os
 import time
 
 bot_server_data = {}
-with open(os.path.join(os.environ["PSH_ROOT"], "BotConfigs", "bot_server_configs.json"), "r") as f:
-    bot_server_data = json.load(f)
+BOT_CONFIG_PATH = os.path.join(os.environ["PSH_ROOT"], "BotConfigs")
+for config_file in os.listdir(BOT_CONFIG_PATH):
+    if not config_file.endswith(".json"):
+        continue
 
-DEFAULT_BOT_DATA = {
+    with open(os.path.join(BOT_CONFIG_PATH, config_file), "r") as f:
+        data = json.load(f)
+    
+    bot_server_data[config_file.replace(".json", "").upper()] = data.get("Dashboard", {})
+
+bot_server_data["DEFAULT"] = {
         "battle-icon": "spr_emerald",
         "party-icon": "party"
-}
+} | bot_server_data["DEFAULT"]
+
+print(bot_server_data)
+
 
 class PayloadAggregator:
     def __init__(self, event_handler: EventHandler):
@@ -30,7 +40,7 @@ class PayloadAggregator:
     def get_bot_payload(self):
         payload =  {
             "bots": {
-                bot_id: bot_server_data.get(bot_id, DEFAULT_BOT_DATA)
+                bot_id: bot_server_data["DEFAULT"] | bot_server_data.get(bot_id.upper(), {})
                 for bot_id in self.event_handler.bot_agents.keys()
 
             },
