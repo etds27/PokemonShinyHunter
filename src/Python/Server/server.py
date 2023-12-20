@@ -44,7 +44,7 @@ def provide_phase_info() -> dict:
 
 @app.route("/collection_info")
 def provide_collection_info() -> dict:
-    return {}
+    return payload_aggregator.get_collection_payload()
 
 @app.route("/game_stats")
 def provide_game_stats_info():

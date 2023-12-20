@@ -104,6 +104,7 @@ function gameStats() {
         format: "json",
         timeout: 1000,
         success: function(gameStats) {
+            updateDashboardColors()
             for (let botPayload of gameStats) {
                 let botID = botPayload["bot_id"]
                 if (!doesBotIDExist(botID)) {
@@ -111,7 +112,6 @@ function gameStats() {
                 }
                 updateGameStatsInfo(botPayload)
             }
-            updateDashboardColors()
         }   
     })
 }

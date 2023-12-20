@@ -26,9 +26,10 @@ SHORTCUTS_DIR = os.path.join(ROOT_DIR, "Shortcuts")
 parser = argparse.ArgumentParser()
 parser.add_argument("--emu-only", action="store_true")
 parser.add_argument("-n", "--no-server", action="store_true")
+parser.add_argument("-s", "--server-only", action="store_true")
 parser.add_argument("-p", "--port", nargs=1, default=8000, type=int)
 parser.add_argument("--host", nargs=1, default="127.0.0.1", type=str)
-parser.add_argument("-g", "--game", nargs=1, default="C:\Emulators\GBC\Pokemon Crystal.gbc", type=str)
+parser.add_argument("-g", "--game", default="C:\Emulators\GBC\Pokemon Crystal.gbc", type=str)
 parser.add_argument("-e", "--emulator", nargs=1, default="C:\Emulators\Bizhawk\EmuHawk.exe", type=str)
 parser.add_argument("--bot-ids", nargs="+")
 args = parser.parse_args()
@@ -50,7 +51,7 @@ if not args.emu_only and not args.no_server:
     server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
     time.sleep(1)
 
-if args.no_server:
+if not args.no_server:    
     port_arg = ""
     ip_arg = ""
     url_post_arg = ""
@@ -87,8 +88,7 @@ create_luases(lua_files, os.path.join(ROOT_DIR, "session.luases"))
 create_luases(test_lua_files, os.path.join(ROOT_DIR, "test_session.luases"))
 create_luases(lua_files, os.path.join(ROOT_DIR, "main_session.luases"), auto_start=["Main.lua"])
 
-# lua_args = ["--lua=C:\\Users\\etds2\\Programming\\PokemonLua\\src\\Positioning\\Positioning.lua,C:\\Users\\etds2\\Programming\\PokemonLua\\src\\Memory\\Memory.lua"]       
-if args.bot_ids:
+if args.bot_ids and not args.server_only:
     for bot_id in args.bot_ids:
         emulator_start_command = [
                                   args.emulator, 
@@ -98,7 +98,7 @@ if args.bot_ids:
         print(emulator_start_command)
         emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True)
 
-else:
+elif not args.server_only:
     emulator_start_command = [
                                 args.emulator, 
                                 url_post_arg,
@@ -106,7 +106,7 @@ else:
     print(emulator_start_command)
     emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-if not args.emu_only:
+if not args.emu_only and not args.no_server:
     for line in iter(server_p.stdout.readline, ""):
         sys.stdout.write(line)
         sys.stdout.flush()

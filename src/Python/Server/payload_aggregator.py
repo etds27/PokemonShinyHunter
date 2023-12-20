@@ -78,5 +78,15 @@ class PayloadAggregator:
             }
             for bot_id, bot_agent in self.event_handler.bot_agents.items()
         ]
-        logging.info(payload)
+        # logging.info(payload)
+        return payload
+    
+    def get_collection_payload(self):
+        payload = [
+            {
+                "bot_id": bot_id,
+                "collection": bot_agent[Event.COLLECTION.value].get_collection_payload(),
+            }
+            for bot_id, bot_agent in self.event_handler.bot_agents.items()
+        ]
         return payload

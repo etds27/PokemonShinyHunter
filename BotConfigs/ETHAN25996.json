@@ -1,5 +1,5 @@
 {
-"BotMode": 2,
+"BotMode": 1,
 "SaveState": "BotStates\\Default.State",
-"LogLevel": 0
+"LogLevel": 4
 }
