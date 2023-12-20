@@ -191,7 +191,7 @@ with open("..\\..\\GameData\\Pokemon\\pokemon_gen2.json", "r") as f:
 
 _bot_ids = ["ETHAN12345", "HALEY12345" , "MAX54321"]
 _seen_pokemon = [get_random_pokemon() for _ in range(6)]
-
+_seen_pokemon = [get_pokemon("29"), get_pokemon("32"), get_pokemon("250"), get_pokemon("122")]
 collection_payload = [
     {
         "bot_id": bot_id,

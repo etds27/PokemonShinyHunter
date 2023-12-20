@@ -5,7 +5,7 @@
  * @param {Array} colors List of RGB colors that define the gradient
  * @returns 
  */
-function getColorFromGradient(percentage, colors = baseColors) {
+function getColorFromGradient(percentage, colors) {
     percentage = Math.min(Math.max(percentage, 0), 1)
     if (percentage == 0) {return colors[0]}
     if (percentage == 1) {return colors[colors.length - 1]}
@@ -36,9 +36,9 @@ function interpColors(percentage, color1, color2) {
     const g2 = ret.g
     const b2 = ret.b
 
-    const newR = Math.floor(r1 + (r2 - r1) * percentage).toString(16)
-    const newG = Math.floor(g1 + (g2 - g1) * percentage).toString(16)
-    const newB = Math.floor(b1 + (b2 - b1) * percentage).toString(16)
+    const newR = Math.floor(r1 + (r2 - r1) * percentage).toString(16).padStart(2, "0")
+    const newG = Math.floor(g1 + (g2 - g1) * percentage).toString(16).padStart(2, "0")
+    const newB = Math.floor(b1 + (b2 - b1) * percentage).toString(16).padStart(2, "0")
     const newColor = `#${newR}${newG}${newB}`
     return newColor
 }

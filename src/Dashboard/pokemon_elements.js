@@ -2,6 +2,8 @@ const shinyTableHeaders = ["Time", "", "Phase", "Species", "Total"]
 const encounterTableHeaders = ["", "Lvl", "HP", "Atk", "Def", "SPE", "SP", "Sum"]
 
 const dayColors = ['#00202e', '#003f5c', '#2c4875', '#8a508f', '#bc5090', '#ff6361', '#ff8531', '#ffa600', '#ffd380', '#ffe9c0', '#ffd380', '#ebde80', '#d6e980', '#b6e0a0', '#96d6c0', '#8bc1e0', '#86b7f0', '#80acff', '#a0c1ff', '#c0d6ff', '#c0d6ff', '#a0c1ff', '#80acff', '#86b7f0', '#8bc1e0', '#96d6c0', '#b6e0a0', '#d6e980', '#ebde80', '#ffd380', '#ffe9c0', '#ffd380', '#ffa600', '#ff8531', '#ff6361', '#bc5090', '#8a508f', '#2c4875', '#003f5c', '#00202e']
+const stoplightColors = ['#FF5C5C', '#FFFF5C', '#5CFF5C']
+
 
 /**
  * Creates the area that will house the shiuny and encounter tables
@@ -25,9 +27,7 @@ function createPokemonBotArea(botID) {
     botHeader.innerText = `Pokemon ${activePokemonBots[botID]["gameName"]} ${botID}`
 
     const botDataArea = document.createElement("div")
-    botDataArea.style.display = "flex"
-    botDataArea.style.flexDirection = "row"
-    botDataArea.style.alignItems = "stretch"
+    botDataArea.className = "pokemon-table-area"
 
     const pokemonTableElement = document.createElement("div")
     pokemonTableElement.className = "pokemon-table-area"
@@ -59,7 +59,8 @@ function createPokemonTicker(botID) {
     const fragment = document.createDocumentFragment()
 
     const tickerWrap = document.createElement("div")
-    tickerWrap.className = "ticker-wrap"
+    tickerWrap.classList.add("ticker-wrap")
+    tickerWrap.classList.add("pokemon-ticker-wrap")
     tickerWrap.id = `ticker-wrap-${botID}`
 
     const ticker = document.createElement("div")
@@ -388,7 +389,7 @@ function createShinyTable(botID) {
     const headerTd = document.createElement("td")
 
     headerTd.colSpan = shinyTableHeaders.length
-    headerTd.innerText = "SHINY " + botID
+    headerTd.innerText = "RECENT SHINIES CAUGHT"
 
     headerTr.appendChild(headerTd)
     header.appendChild(headerTr)
@@ -441,7 +442,7 @@ function createEncounterTable(botID) {
     const headerTd = document.createElement("td")
 
     headerTd.colSpan = encounterTableHeaders.length
-    headerTd.innerText = "ENCOUNTER " + botID
+    headerTd.innerText = "RECENT ENCOUNTERS"
 
     headerTr.appendChild(headerTd)
     header.appendChild(headerTr)
@@ -524,32 +525,37 @@ function createEncounterRow(encounterObject) {
     pokemonHealthIv.id = `encounter-hp-iv-${encounterId}-${botId}`
     pokemonHealthIv.className = "encounter-hp-iv"
     pokemonHealthIv.innerText = pokemonObject["hpIv"]
+    pokemonHealthIv.style.color = getPokemonStatColor(pokemonObject["hpIv"])
 
     const pokemonAttackIv = document.createElement("td")
     pokemonAttackIv.id = `encounter-health-iv-${encounterId}-${botId}`
     pokemonAttackIv.className = "encounter-health-iv"
     pokemonAttackIv.innerText = pokemonObject["attackIv"]
+    pokemonAttackIv.style.color = getPokemonStatColor(pokemonObject["attackIv"])
 
     const pokemonDefenseIv = document.createElement("td")
     pokemonDefenseIv.id = `encounter-health-iv-${encounterId}-${botId}`
     pokemonDefenseIv.className = "encounter-health-iv"
     pokemonDefenseIv.innerText = pokemonObject["defenseIv"]
+    pokemonDefenseIv.style.color = getPokemonStatColor(pokemonObject["defenseIv"])
 
     const pokemonSpeedIv = document.createElement("td")
     pokemonSpeedIv.id = `encounter-health-iv-${encounterId}-${botId}`
     pokemonSpeedIv.className = "encounter-health-iv"
     pokemonSpeedIv.innerText = pokemonObject["speedIv"]
+    pokemonSpeedIv.style.color = getPokemonStatColor(pokemonObject["speedIv"])
 
     const pokemonSpecialIv = document.createElement("td")
     pokemonSpecialIv.id = `encounter-health-iv-${encounterId}-${botId}`
     pokemonSpecialIv.className = "encounter-health-iv"
     pokemonSpecialIv.innerText = pokemonObject["specialIv"]
+    pokemonSpecialIv.style.color = getPokemonStatColor(pokemonObject["specialIv"])
 
     const pokemonSumIv = document.createElement("td")
     pokemonSumIv.id = `encounter-sum-iv-${encounterId}-${botId}`
     pokemonSumIv.className = "encounter-sum-iv"
     pokemonSumIv.innerText = pokemonObject["totalIv"]
-
+    pokemonSumIv.style.color = getPokemonStatColor(pokemonObject["totalIv"], 80)
     // pokemonRow.appendChild(encounterIdElement)
     pokemonRow.appendChild(pokemonSpecies)
     pokemonRow.appendChild(pokemonId)
@@ -775,17 +781,15 @@ function getFullElapsedTimeAsString(elapsedTime, options = ["Y", "D", "H", "M", 
     return string
 }
 
-var x = 0
 function getCurrentTimeColors() {
     const date = new Date()
-    const time = ((date.getHours() + x) % 24) * 3600 + date.getMinutes() * 60 + date.getSeconds()
+    const time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()
     const normalizedTime = time / (24 * 60 * 60)
     const baseColor = getColorFromGradient(normalizedTime, dayColors)
     const darkColor = darkenColor(baseColor, 20)
     const lightColor = brightenColor(baseColor, 20)
     const veryDarkColor = darkenColor(baseColor, 40)
     const veryLightColor = brightenColor(baseColor, 40)
-    x = x + 1
     return {
         base: baseColor,
         dark: darkColor,
@@ -793,4 +797,8 @@ function getCurrentTimeColors() {
         veryDark: veryDarkColor,
         veryLight: veryLightColor
     }
+}
+
+function getPokemonStatColor(stat, limit = 16) {
+    return getColorFromGradient(stat / limit, stoplightColors)
 }
