@@ -2,7 +2,7 @@ import json
 import logging
 import os
 
-DATA_PATH = os.path.join(os.environ.get("PSH_ROOT", "..\\..\\"), "DATA")
+DATA_PATH = os.path.join(os.environ.get("PSH_ROOT", "..\\..\\"), "BotData")
 if not os.path.exists(DATA_PATH):
     logging.info(f"Data path did not exist. Created dir: {DATA_PATH}")
     os.mkdir(DATA_PATH, mode=0o777)
