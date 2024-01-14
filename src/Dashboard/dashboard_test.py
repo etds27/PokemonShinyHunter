@@ -7,7 +7,7 @@ import requests
 import sys
 import time
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, template_folder='templates', static_folder='static')
 CORS(app)
 
 """
@@ -28,6 +28,10 @@ def get_pokemon(species):
         "name": pokemon_data[str(species)]["name"].lower(),
         "variant": ""
     }
+
+@app.route("/")
+def render_template() -> str:
+    return flask.render_template(os.path.join("dashboard.html")) 
 
 @app.route("/active_bots")
 def provideBotIds() -> dict:

@@ -21,7 +21,10 @@ ROOT_DIR = os.environ["PSH_ROOT"]
 SRC_DIR = os.path.join(ROOT_DIR, "src")
 TEST_DIR = os.path.join(ROOT_DIR, "Tests")
 SHORTCUTS_DIR = os.path.join(ROOT_DIR, "Shortcuts")
+DASHBOARD_DIR = os.path.join(SRC_DIR, "Dashboard")
 
+os.environ["PSH_DASHBOARD_DIR"] = DASHBOARD_DIR
+os.environ["PSH_SHORTCUTS_DIR"] = SHORTCUTS_DIR
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--emu-only", action="store_true")

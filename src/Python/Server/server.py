@@ -1,16 +1,17 @@
-import pprint
 from event_handler import EventHandler
-import flask
 from flask_cors import CORS
+from payload_aggregator import PayloadAggregator
+import argparse
+import flask
 import json
 import logging
-from payload_aggregator import PayloadAggregator
+import os
+import pprint
 import re
 import signal
-import argparse
 
 BUF_SIZE = 1024
-
+DASHBOARD_DIR = os.environ.get("PSH_DASHBOARD_DIR", os.path.join("..", "..", "Dashboard"))
 parser = argparse.ArgumentParser()
 
 parser.add_argument("host", type=str, help="Enter host IP (usually 127.0.0.1)")
@@ -23,8 +24,14 @@ PORT = args.port  # Port to listen on (non-privileged ports are > 1023)
 event_handler = EventHandler()
 payload_aggregator = PayloadAggregator(event_handler=event_handler)
 
-app = flask.Flask(__name__)
+template_dir = os.path.join(DASHBOARD_DIR, 'templates')
+static_dir = os.path.join(DASHBOARD_DIR, "static")
+app = flask.Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 CORS(app)
+
+@app.route("/")
+def render_template() -> str:
+    return flask.render_template("dashboard.html")
 
 @app.route("/active_bots")
 def provide_bot_ids() -> dict:
