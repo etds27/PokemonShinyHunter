@@ -158,7 +158,7 @@ function updateActiveBots() {
 function collection() {
     $.ajax({
         method: "GET",
-        url: host + "/collection",
+        url: host + "/collection_info",
         crossDomain: true,
         dataType: "json",
         format: "json",
@@ -281,7 +281,7 @@ function removePokemonTable(botID) {
     let tableID = `bot-area-${botID}`
     let table = document.getElementById(tableID)
     table.remove()
-    activePokemonBots.delete(botID)
+    delete activePokemonBots[botID]
 }
 
 function updatePokemonTimestamps() {
@@ -476,4 +476,4 @@ setInterval(() => {
 
 setInterval(() => {
     collection()
-}, 20000)
+}, 1000)

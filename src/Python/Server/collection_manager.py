@@ -23,17 +23,17 @@ class CollectionManager:
     def get_collection_payload(self):
         require_dict = {
             species: {
-                "id": Pokemon.get_pokemon(Pokemon.pokemon_data[species]["id"]),
+                "id": Pokemon.get_pokemon(species=species),
                 "number_caught": 0,
-                "number_required": Pokemon.get_pokemon(Pokemon.pokemon_data[species]["required"])
+                "number_required": Pokemon.get_pokemon_data(species=species)["required"]
             }
             for species in Pokemon.pokemon_data.keys()
         }
 
         for pokemon in self.collection:
             if pokemon["species"] in require_dict:
-                require_dict["number_caught"] += 1
+                require_dict[pokemon["species"]]["number_caught"] += 1
         
-        return [require_dict[species] for species in sorted(require_dict.keys())]
+        return [require_dict[str(species)] for species in sorted([int(x) for x in require_dict.keys()])]
         
 

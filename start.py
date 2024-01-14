@@ -1,9 +1,12 @@
 import argparse
+import logging
 import os
 import shutil
 import subprocess
 import sys
 import time
+
+logging.basicConfig(level=logging.DEBUG)
 
 bot_id_save_states = {
     "CHRIS51032": "BotStates\\CHRIS51032\\StartUp.State",
@@ -27,8 +30,8 @@ os.environ["PSH_DASHBOARD_DIR"] = DASHBOARD_DIR
 os.environ["PSH_SHORTCUTS_DIR"] = SHORTCUTS_DIR
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--emu-only", action="store_true")
-parser.add_argument("-n", "--no-server", action="store_true")
+parser.add_argument("--emu-only", action="store_true", help="Start only the emu while connecting it to an already running server")
+parser.add_argument("-n", "--no-server", action="store_true", help="Start only the emu without the intention of connecting to a server")
 parser.add_argument("-s", "--server-only", action="store_true")
 parser.add_argument("-p", "--port", nargs=1, default=8000, type=int)
 parser.add_argument("--host", nargs=1, default="127.0.0.1", type=str)
@@ -37,6 +40,7 @@ parser.add_argument("-e", "--emulator", nargs=1, default="C:\Emulators\Bizhawk\E
 parser.add_argument("--bot-ids", nargs="+")
 args = parser.parse_args()
 
+logging.debug(f"start.py args {args}")
 def create_luases(lua_files, path, auto_start: [str] = []):
     print(f"Creating .luases for {path}")
     with open(path, "w") as f:
@@ -47,21 +51,21 @@ def update_lua_path(lua_files):
     for lua_file in lua_files:
         os.environ["LUA_PATH"] = f"{os.environ['LUA_PATH']};{os.path.dirname(lua_file)}\\?.lua"
 
-print(args)
+# Start up the server if we are not running in emu only mode or in no server mode
 if not args.emu_only and not args.no_server:
     server_start_command = [sys.executable, os.path.join(os.environ["PSH_ROOT"], "src", "Python", "Server", "server.py"), args.host, str(args.port)]
-    print(server_start_command)
+    logging.info(f"Server start command: {server_start_command}")
     server_p = subprocess.Popen(server_start_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
     time.sleep(1)
 
-if not args.no_server:    
-    port_arg = ""
-    ip_arg = ""
+# Omit the emu url argument if we are running in no server modde 
+if args.no_server:    
+    logging.info("Not connecting emu to server")
     url_post_arg = ""
 else:
-    # port_arg = f"--socket_port={args.port}"
-    # ip_arg = f"--socket_ip={args.host}"
-    url_post_arg = f"--url_post=http://{args.host}:{args.port}"
+    url = f"http://{args.host}:{args.port}"
+    logging.info(f"Setting emu url to {url}")
+    url_post_arg = f"--url_post={url}"
 
 lua_files = []
 test_lua_files = []
