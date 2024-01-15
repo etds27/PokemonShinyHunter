@@ -8,7 +8,7 @@ const host = "http://127.0.0.1:8000"
 const DEFAULT_BATTLE_ICONS = ""
 const DEFAULT_PARTY_ICONS = ""
 const DEFAULT_GAME_NAME = "POKEMON"
-const TICKER_POKEMON_PER_SECOND = 5
+const TICKER_SECONDS_PER_POKEMON = 1
 
 // mapping of Bot ID to pokemon table
 let activePokemonBots = {}
@@ -383,7 +383,7 @@ function updateGameStatsInfo(gameStats) {
     let element = document.getElementById(`game-stats-time-${botID}`)
     
     // The calculated start time is the current time minues the number of seconds played
-    const elapsedTime = new Date().getTime() / 1000 - gameStats["total_time"]
+    const elapsedTime = gameStats["total_elapsed_time"]
     $(element).data("timestamp", elapsedTime)
 
     element = document.getElementById(`game-stats-encounters-${botID}`)
@@ -418,7 +418,7 @@ function updateCollection(collectionData) {
     const botId = collectionData["bot_id"]
     const botTicker = document.getElementById(`ticker-${botId}`)
 
-    const tickerDuration = `${collectionData["collection"].length * TICKER_POKEMON_PER_SECOND}s`
+    const tickerDuration = `${collectionData["collection"].length * TICKER_SECONDS_PER_POKEMON}s`
     document.documentElement.style.setProperty("--ticker-duration", tickerDuration);
 
     for (let pokemonData of collectionData["collection"]) {

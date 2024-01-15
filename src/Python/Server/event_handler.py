@@ -20,6 +20,8 @@ class EventHandler:
         if bot_id not in self.bot_agents:
             self.create_new_bot_agent(bot_id)
 
+        # Update the total elapsed time for each payload
+        self.bot_agents[bot_id][Event.GAME.value].update_bot_time(event_json["timestamp"])
         if event_json["eventType"] == Event.ENCOUNTER.value:
             self.bot_agents[bot_id][Event.ENCOUNTER.value].manage_new_encounter(event_json)
         if event_json["eventType"] == Event.COLLECTION.value:

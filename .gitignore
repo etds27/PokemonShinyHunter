@@ -3,6 +3,7 @@ test.py
 Data/*
 WorkingStates/*
 BotStates/*
+BotData/*
 Shortcuts/*
 .venv/*
 src/PythonServer/.env
