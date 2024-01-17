@@ -31,14 +31,12 @@ class GameStatsManager:
         """
         Updates the current total_elapsed_time and sets the last timestamp recieved to the payloads timestamp
         """
-        logging.info(f"{payload_timestamp} {self.game_stats['total_elapsed_time']}")
         self.game_stats["total_elapsed_time"] += payload_timestamp - self.previous_time
         self.previous_time = payload_timestamp
         self.save_game_stats()
 
     def update(self, payload):
         content = payload["content"]
-        logging.info(str(content))
         self.game_stats["play_time"] = content["playTime"]["hour"] * 3600 + content["playTime"]["minute"] * 60 + content["playTime"]["second"]
         self.game_stats["money"] = content["money"]
         self.game_stats["id"] = content["id"]

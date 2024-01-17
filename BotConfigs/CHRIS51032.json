@@ -1,9 +1,0 @@
-{
-    "BotMode": 2,
-    "SaveState": "BotStates\\CHRIS51032\\StartUp.State",
-    "LogLevel": 0,
-    "Dashboard": {
-        "battle-icon": "spr_silver",
-        "party-icon": "party"        
-    }
-}

@@ -27,6 +27,7 @@ EventType = {
 ---@param eventType EventType What event was sent to the server 
 ---@return Payload payload Payload that was sent to the server
 function PokemonSocket:sendTable(tab, eventType)
+
     local time = Trainer:getPlayTime()
 
     -- Add meta data to the package before sending over
@@ -35,6 +36,10 @@ function PokemonSocket:sendTable(tab, eventType)
                      timestamp = os.time(),
                      eventType = eventType,
                      content = tab}
+
+    if url == nil then
+        return payload
+    end
 
     local jsonString = json.encode(payload)
     -- Data delimiter

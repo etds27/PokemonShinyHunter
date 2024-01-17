@@ -1,7 +1,9 @@
 test.py
+temp_config.sh
 *.pyc
 Data/*
 WorkingStates/*
+BotConfigs/*
 BotStates/*
 BotData/*
 Shortcuts/*
