@@ -154,4 +154,7 @@ server_thread.start()
 emulator_thread.start()
 
 server_thread.join()
+logging.info("Server thread ended")
 emulator_thread.join()
+logging.info("Emulator thread ended")
+logging.info("Script finished")

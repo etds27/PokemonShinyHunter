@@ -24,7 +24,7 @@ function createPokemonBotArea(botID) {
     const botHeader = document.createElement("div")
     botHeader.id = `bot-header-${botID}`
     botHeader.className = "bot-header"
-    botHeader.innerText = `Pokemon ${activePokemonBots[botID]["gameName"]} ${botID}`
+    botHeader.innerText = `${activePokemonBots[botID]["gameName"]} ${botID}`
 
     const botDataArea = document.createElement("div")
     botDataArea.className = "pokemon-table-area"
@@ -784,7 +784,9 @@ function getFullElapsedTimeAsString(elapsedTime, options = ["Y", "D", "H", "M", 
 function getCurrentTimeColors() {
     const date = new Date()
     const time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()
-    const normalizedTime = time / (24 * 60 * 60)
+    // const normalizedTime = time / (24 * 60 * 60)
+    // const normalizedTime = ((date.getMinutes() % 2) * 60 + date.getSeconds()) / 120
+    const normalizedTime = (time % (4 * 60 * 60)) / (4 * 60 * 60)
     const baseColor = getColorFromGradient(normalizedTime, dayColors)
     const darkColor = darkenColor(baseColor, 20)
     const lightColor = brightenColor(baseColor, 20)

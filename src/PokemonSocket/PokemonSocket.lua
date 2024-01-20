@@ -1,10 +1,6 @@
 local json = require "json"
 
-PokemonSocket = {
-    host = "127.0.0.1",
-    port = 57373,
-    timeout = 1000
-}
+PokemonSocket = {}
 local url = comm.httpGetPostUrl()
 
 ---@enum EventType
@@ -32,6 +28,7 @@ function PokemonSocket:sendTable(tab, eventType)
 
     -- Add meta data to the package before sending over
     local payload = {botId = Bot.botId,
+                     romHash = gameinfo.getromhash(),
                      playTime = time,
                      timestamp = os.time(),
                      eventType = eventType,

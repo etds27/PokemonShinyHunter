@@ -8,7 +8,7 @@ const host = "http://127.0.0.1:8000"
 const DEFAULT_BATTLE_ICONS = ""
 const DEFAULT_PARTY_ICONS = ""
 const DEFAULT_GAME_NAME = "POKEMON"
-const TICKER_SECONDS_PER_POKEMON = 1
+const TICKER_SECONDS_PER_POKEMON = 2.5
 
 // mapping of Bot ID to pokemon table
 let activePokemonBots = {}
@@ -214,6 +214,8 @@ function addPokemonTable(botID, options) {
 
     console.log(`Creating bot area for: ${botID}`)
     const table = createPokemonBotArea(botID)
+    
+
     const pokemonTableContainer = document.getElementById("pokemon-table-container")
     pokemonTableContainer.appendChild(table)
     console.debug(table)
@@ -430,7 +432,7 @@ function updateCollection(collectionData) {
             element = document.getElementById(`pokemon-ticker-element-${pokemonId}-${botId}`)
         }
 
-        $(element).find(`.pokemon-ticker-element-left-number`).innerText = pokemonData["number_caught"]
+        $(element).find(`.pokemon-ticker-element-left-number`).text(pokemonData["number_caught"])
         if (pokemonData["number_caught"] >= pokemonData["number_required"]) {
             const sprite = $(element).find(".pokemon-ticker-sprite")[0]
             sprite.classList.remove("gray-image")

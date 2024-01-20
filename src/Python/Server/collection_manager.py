@@ -33,7 +33,6 @@ class CollectionManager:
         for pokemon in self.collection:
             if pokemon["species"] in require_dict:
                 require_dict[pokemon["species"]]["number_caught"] += 1
-        
         return [require_dict[str(species)] for species in sorted([int(x) for x in require_dict.keys()])]
         
 

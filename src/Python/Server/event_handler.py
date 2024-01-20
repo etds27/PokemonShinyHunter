@@ -1,6 +1,7 @@
 import enum
 import logging
 import time
+import rom_info
 
 from collection_manager import CollectionManager
 from encounter_manager import EncounterManager
@@ -19,6 +20,7 @@ class EventHandler:
         bot_id = event_json["botId"]
         if bot_id not in self.bot_agents:
             self.create_new_bot_agent(bot_id)
+            self.bot_agents[bot_id]["rom_data"] = rom_info.get_rom_data(event_json["romHash"])
 
         # Update the total elapsed time for each payload
         self.bot_agents[bot_id][Event.GAME.value].update_bot_time(event_json["timestamp"])

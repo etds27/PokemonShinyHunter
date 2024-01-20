@@ -42,10 +42,12 @@ class PayloadAggregator:
             "bots": {
                 bot_id: bot_server_data["DEFAULT"] | bot_server_data.get(bot_id.upper(), {})
                 for bot_id in self.event_handler.bot_agents.keys()
-
             },
             "timestamp": time.time()
         }
+
+        for bot_id in payload["bots"].keys():
+            payload["bots"][bot_id]["game_name"] = self.event_handler.bot_agents [bot_id]["rom_data"]["rom_display_name"]
         return payload
     
     def get_shiny_payload(self):
