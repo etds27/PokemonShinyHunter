@@ -15,6 +15,16 @@ class IV(enum.Enum):
 class EncounterManager:
     encounter_memory = 5
 
+    csv_exclusion_keys = [
+        "addr",
+        "friendship",
+        "movePp1",
+        "movePp2",
+        "movePp3",
+        "movePp4",
+        "memoryType"
+    ]
+
     encounter_keys = [
         "species",
         "pokerus",
@@ -76,6 +86,20 @@ class EncounterManager:
 
         logging.info(self.encounter_string(species, new_encounter_dict))
         
+        for key in self.csv_exclusion_keys:
+            if key in content_json:
+                content_json.pop(key)
+        if self.encounters["current_phase"]["total_encounters"] == 0:
+            keys = sorted(filter(lambda x: x not in self.csv_exclusion_keys , content_json.keys()))
+            file_manager.append_row_to_csv_filepath(filepath=self.encounters["current_phase"].get("phase_encounter_file", 
+                                                                                              file_manager.get_phase_encounter_file(bot_id=self.bot_id,
+                                                                                                                                    phase_number=1)), 
+                                                    data=keys)
+        file_manager.append_row_to_csv_filepath(filepath=self.encounters["current_phase"].get("phase_encounter_file", 
+                                                                                              file_manager.get_phase_encounter_file(bot_id=self.bot_id,
+                                                                                                                                    phase_number=1)), 
+                                                data=self.encounter_list_for_csv(content_json))
+
         if species not in self.encounters["species"]:
             logging.info(f"Found new species: {pokemon_id['name']}")
             self.create_new_encounter_species(species=species)
@@ -168,6 +192,10 @@ class EncounterManager:
             "weakest_pokemon": {}
         }
 
+    def encounter_list_for_csv(self, data):
+        keys = sorted(data.keys())
+        return [data[key] for key in keys]
+
     def encounter_string(self, species, encounter_json):
         string = f"BOT#{self.bot_id:<12}: "
         string += f"{Pokemon.get_pokemon_name(species):<10} "
@@ -206,6 +234,8 @@ class EncounterManager:
             "total_shinies_caught": 0,
             "total_shinies_found": 0,
             "weakest_pokemon": {},
+            "phase_encounter_file": file_manager.get_phase_encounter_file(bot_id=self.bot_id,
+                                                                          phase_number=self.encounters["total_shinies_found"] + 1 if hasattr(self, "encounters") else 1)
         }
 
     def create_encounter_for_payload(self, encounter_data):
