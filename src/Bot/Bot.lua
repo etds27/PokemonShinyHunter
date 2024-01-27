@@ -26,7 +26,8 @@ Bot = {
     SEARCH_SPIN_MAXIMUM = 100,
     FISH_MAXIMUM = 50,
     POKEMON_SEARCH_MAX = 100,
-    botId = "NONE0000"
+    botId = "NONE0000",
+    autoSavePath = "",
 }
 
 function Bot:run() 
@@ -74,8 +75,9 @@ function Bot:runModeStaticEncounter(staticEncounter)
     --[[
         Assumes that we are standing in front of a pokemon that is given to player and not caught
     ]]
-    local staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter1.State"
+    local staticEncounterSave = Bot.BOT_STATE_PATH .. "StaticEncounter.State"
     savestate.save(staticEncounterSave)
+    savestate.save(Bot.autoSavePath)
     local newPokemonSlot = Party:numOfPokemonInParty() + 1
     if newPokemonSlot == Party.maxPokemon + 1 then 
         Log:error("Already at max pokemon") 
@@ -86,14 +88,15 @@ function Bot:runModeStaticEncounter(staticEncounter)
     do
         Log:info("Reset number: " .. tostring(resets))
         Common:waitFrames(40)
-        savestate.load(Bot.BOT_STATE_PATH .. "StaticEncounter" .. tostring(resets) .. ".State")
+        savestate.load(staticEncounterSave)
         Log:debug("Bot:runModeStaticEncounter loaded static encounter state")
         -- Need to advance the game one frame each reset so that 
         -- the random seed can update and Pokemon values will be 
         -- different
         Common:waitFrames(1)
         Log:debug("Bot:runModeStaticEncounter saved new static encounter state")
-        savestate.save(Bot.BOT_STATE_PATH .. "StaticEncounter" .. tostring(resets + 1) .. ".State")
+        savestate.save(staticEncounterSave)
+        savestate.save(Bot.autoSavePath)
         Log:debug("Bot:runModeStaticEncounter running static encounter")
         StaticEncounters[staticEncounter]()
         Party:navigateToPokemon(newPokemonSlot)
@@ -320,10 +323,11 @@ function Bot:handleShiny(pokemonTable)
         Responsible for handling whatever needs to be done after catching a shiny
     ]]
     Log:debug("Caught: " .. tostring(pokemonTable.caught))
-    local timestamp = os.date("%Y%m_T%H%M%S")
-    local savestatePath = Bot.SAVESTATE_PATH  .. timestamp .."_shiny_save" .. ".State"
+    local timestamp = os.date("%Y%m%d_T%H%M%S")
+    local savestatePath = Bot.SHINY_SAVESTATE_PATH  .. timestamp .."_shiny_save" .. ".State"
     Log:debug("Bot:handleShiny: savestatePath: " .. savestatePath)
     savestate.save(savestatePath)
+    savestate.save(Bot.autoSavePath)
     Log:debug("Bot:handleShiny: saved game")
 
     local pokemon = Collection:getAllShinyPokemon()
@@ -336,9 +340,15 @@ function Bot:initializeBot()
     ]]
     Bot.botId = Bot:getBotId()
     Bot.BOT_STATE_PATH = os.getenv("PSH_ROOT") .. "\\BotStates\\" .. Bot.botId .. "\\"
-    Bot.SAVESTATE_PATH = Bot.BOT_STATE_PATH .. "ShinyStates\\"
+    Bot.SHINY_SAVESTATE_PATH = Bot.BOT_STATE_PATH .. "ShinyStates\\"
+    Bot.autoSavePath = Bot.BOT_STATE_PATH .. "Autosave.State"
     os.execute("mkdir " .. Bot.BOT_STATE_PATH)
-    os.execute("mkdir " .. Bot.SAVESTATE_PATH)
+    os.execute("mkdir " .. Bot.SHINY_SAVESTATE_PATH)
+
+    if not Common:file_exists(Bot.autoSavePath) then
+        Log:info("Creating auto save file for " .. Bot.botId)
+        savestate.save(Bot.autoSavePath)
+    end
 
     local pokemon = Collection:getAllShinyPokemon()
     PokemonSocket:logGameStats()

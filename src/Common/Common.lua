@@ -1,8 +1,12 @@
 require "Log"
 require "Memory"
--- require "Input"
 
 Common = {}
+
+function Common:file_exists(name)
+    local f = io.open(name, "r")
+    return f ~= nil and io.close(f)
+ end
 
 ---Advance the emulator a specified amount of frames
 ---@param number integer Number of frames to advance

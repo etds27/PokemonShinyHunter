@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import os
 import subprocess
@@ -7,11 +8,6 @@ import time
 import threading
 
 logging.basicConfig(level=logging.DEBUG)
-
-bot_id_save_states = {
-    "CHRIS51032": "BotStates\\CHRIS51032\\StartUp.State",
-    "ETHAN25996": "BotStates\\ETHAN25996\\StartUp.State"
-}
 
 os.environ["LUA_PATH"] = ""
 # os.environ["PSH_ROOT"] = "C:\\Users\\etds2\\Programming\\PokemonLua"
@@ -26,6 +22,7 @@ PYTHON_DIR = os.path.join(SRC_DIR, "Python")
 TEST_DIR = os.path.join(ROOT_DIR, "Tests")
 SHORTCUTS_DIR = os.path.join(ROOT_DIR, "Shortcuts")
 DASHBOARD_DIR = os.path.join(SRC_DIR, "Dashboard")
+BOT_CONFIG_PATH = os.path.join(ROOT_DIR, "BotConfigs")
 
 os.environ["PSH_DASHBOARD_DIR"] = DASHBOARD_DIR
 os.environ["PSH_SHORTCUTS_DIR"] = SHORTCUTS_DIR
@@ -118,29 +115,58 @@ def run_emulator(event: threading.Event, timeout: int = 10):
         logging.error("Timed out waiting for HTTP server to start")
         exit(1)
 
+    # Load specific bots
     if args.bot_ids and not args.server_only:
         for bot_id in args.bot_ids:
+            bot_data = {}
+            bot_config_path = os.path.join(BOT_CONFIG_PATH, f"{bot_id.upper()}.json")
+            logging.info(bot_config_path)
+            logging.info(os.path.exists(bot_config_path))
+            default_config_path = os.path.join(BOT_CONFIG_PATH, "default.json")
+            # Load in the bot config if it exists
+            if os.path.exists(bot_config_path):
+                with open(bot_config_path, "r") as f:
+                    bot_data = json.load(f)
+
+            default_data = {}
+            if os.path.exists(default_config_path):
+                with open(default_config_path, "r") as f:
+                    default_data = json.load(f)
+            
+            bot_data = default_data | bot_data
+            logging.info(bot_data)
+            # Look for specified save state and rom in bot config
+            rom_arg = bot_data["ROM"] if "ROM" in bot_data else args.game
+            savestate_arg = f"--load-state={bot_data['SaveState']}" if "SaveState" in bot_data else ""
+            if bot_data.get("AutoStart", False):
+                lua_arg = f"--lua={os.path.join(ROOT_DIR, 'main_session.luases')}"
+            else:
+                lua_arg = f"--lua={os.path.join(ROOT_DIR, 'session.luases')}"
+
             emulator_start_command = [
-                                    args.emulator, 
-                                    url_post_arg,
-                                    f"--load-state={bot_id_save_states[bot_id]}",
-                                    args.game]
-            print(emulator_start_command)
-            emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+                                     args.emulator, 
+                                     url_post_arg,
+                                     savestate_arg,
+                                     lua_arg,
+                                     rom_arg]
+            logging.info(f"Emulator start command: {emulator_start_command}")
+            emulator_p = subprocess.Popen(emulator_start_command, stdout=None, stderr=None, bufsize=1, universal_newlines=True)
 
     elif not args.server_only:
         emulator_start_command = [
                                     args.emulator, 
                                     url_post_arg,
                                     args.game]
-        print(emulator_start_command)
-        emulator_p = subprocess.Popen(emulator_start_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+        logging.info(f"Emulator start command: {emulator_start_command}")
+        emulator_p = subprocess.Popen(emulator_start_command, stdout=None, stderr=None, bufsize=1, universal_newlines=True)
 
+    # Uncomment if piping stdout/stderr
+    """   
     if not args.server_only:
         for line in iter(emulator_p.stdout.readline, ""):
             sys.stdout.write(line)
             sys.stdout.flush()
-
+    """
 
 # The python HTTP server initially starts
 # The emulator thread is then immediately started
