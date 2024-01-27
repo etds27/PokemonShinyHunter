@@ -1,4 +1,4 @@
-import ../discord_client
+import discord_client
 import enum
 import rom_info
 
@@ -64,7 +64,7 @@ def on_new_shiny(bot_id, shiny_payload):
     }
     """
     message = discord_client.create_shiny_message(bot_id=bot_id, shiny_payload=shiny_payload)
-    discord_client.send_discord_message(bot_id, message=message)
+    discord_client.send_discord_message(message=message)
 
 if __name__ == "__main__":
     bot_id = "ETHAN12345"
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         "timestamp": 1000,
         "pokemon": {
             "species": "TEST",
-            "name": "Victrebel",
+            "name": "Victreebel",
             "variant": "TEST"
         },
         "phase_length": 20034,

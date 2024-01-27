@@ -1,4 +1,5 @@
 import enum
+import event_handler
 import logging
 import file_manager
 import time
@@ -112,6 +113,12 @@ class EncounterManager:
         self.update_encounter_dict(self.encounters, new_encounter_dict)
         self.update_encounter_dict(self.encounters["current_phase"], new_encounter_dict)
 
+        # Update the number of specific species found since last shiny of that species
+        # Spans across phases
+        species_dict.setdefault("species_phase_length", 0)
+        species_dict["species_phase_length"] += 1
+
+        # Update the number of specific species found within the current phase
         self.encounters["current_phase"]["species"].setdefault(species, 0)
         self.encounters["current_phase"]["species"][species] += 1
 
@@ -139,6 +146,7 @@ class EncounterManager:
                 logging.info(f"New shortest phase length: {current_phase} > {shortest_phase}")
                 self.encounters["shortest_phase_length"] = current_phase
             
+            event_handler.on_new_shiny(self.bot_id, self.create_discord_shiny_encounter_payload(new_encounter_dict, self.encounters["current_phase"]))
             # Update the last time we found a shiny to this encounter
             self.encounters["current_phase"] = self.create_phase(encounter_json["timestamp"])
 
@@ -188,6 +196,7 @@ class EncounterManager:
             "shiny_encounters": [],
             "pokerus_encounters": [],
             "last_shiny_encounter": 0,  
+            "species_phase_length": 0, # Number of specific species encounters since last shiny
             "strongest_pokemon": {},
             "weakest_pokemon": {}
         }
@@ -252,19 +261,41 @@ class EncounterManager:
     
     def create_shiny_encounter_for_payload(self, encounter_data, phase_data):
         species = encounter_data["species"]
+        species_dict = self.encounters["species"][species]
         return {
             "bot_id": self.bot_id,
             "timestamp": encounter_data["timestamp"],
             "encounter_data": {
                 "encounter_id": f'{self.encounters["total_encounters"]}_{self.encounters["species"][species]["total_encounters"]}',
                 "phase_encounters": phase_data["total_encounters"],
-                "phase_species_encounters": phase_data["species"].get(species, 0),
-                "total_species_encounters": self.encounters["species"][species]["total_encounters"]
+                "phase_species_encounters": species_dict["species_phase_length"],
+                "total_species_encounters": species_dict["total_encounters"]
             },
             "pokemon_data": {
                 "id": Pokemon.get_pokemon(species=species)
             }
         }
+    
+    def create_discord_shiny_encounter_payload(self, encounter_data, phase_data):
+        species = encounter_data["species"]
+        species_dict = self.encounters["species"][species]
+        shiny_payload = {
+            # General Info
+            "timestamp": encounter_data["timestamp"],
+            "pokemon": Pokemon.get_pokemon(species=species),
+
+            # Phase Info
+            "phase_length": phase_data["total_encounters"],
+            "species_phase_length": species_dict["species_phase_length"],
+
+            # Global Info
+            "total_encounters": self.encounters["total_encounters"],
+            "total_species_seen": species_dict["total_encounters"],
+            "total_shinies_found": self.encounters["total_shinies_found"],
+            "total_shiny_species_seen": species_dict["total_shinies_found"],
+            "shinies_needed": Pokemon.get_pokemon_data(species=species)["required"]
+        }
+        return shiny_payload
     
 
     def get_game_encounter_payload(self):
@@ -287,6 +318,3 @@ class EncounterManager:
     
     def get_shiny_payload(self):
         return self.encounters["previous_n_shiny_encounters"]
-
-        
-
