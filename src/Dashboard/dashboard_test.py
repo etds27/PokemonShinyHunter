@@ -1,11 +1,16 @@
 import flask
 from flask_cors import CORS
 import json
+import logging
 import os
 import random
 import requests
+import re
 import sys
 import time
+
+logging.basicConfig(level=logging.INFO)
+DASHBOARD_DIR = os.environ.get("PSH_DASHBOARD_DIR", os.path.join("..", "..", "Dashboard"))
 
 app = flask.Flask(__name__, template_folder='templates', static_folder='static')
 CORS(app)
@@ -18,6 +23,8 @@ Pokemon Structure:
  "variant": str
  }
 """
+
+current_song = {}
 
 def get_random_pokemon():
     return get_pokemon(str(random.randint(1, 251)))
@@ -96,6 +103,21 @@ def provideCollectionInfo() -> dict:
 @app.route("/game_stats")
 def provide_game_stats_info() -> dict:
     return randomGameStats()
+
+@app.route("/get_current_song", methods=["GET"])
+def update_current_song():
+    return current_song
+
+
+@app.route("/current_song", methods=["POST"])
+def receive_current_song():
+        global current_song
+        current_song = flask.request.json
+        if current_song: 
+            current_song["album_cover_path"] = re.sub(re.escape(DASHBOARD_DIR), "", current_song["album_cover_path"])
+
+        logging.info(current_song)
+        return flask.Response("SUCCESS", status=200)
 
 def randomGameStats():
     return [

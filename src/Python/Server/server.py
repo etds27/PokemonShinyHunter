@@ -29,6 +29,8 @@ static_dir = os.path.join(DASHBOARD_DIR, "static")
 app = flask.Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 CORS(app)
 
+current_song = {}
+
 @app.route("/")
 def render_template() -> str:
     return flask.render_template("dashboard.html")
@@ -64,5 +66,19 @@ def update_bot_data():
     event_handler.handle_event(event)
 
     return flask.Response("SUCCESS", status=200)
+
+@app.route("/get_current_song", methods=["GET"])
+def update_current_song():
+    return current_song
+
+
+@app.route("/current_song", methods=["POST"])
+def receive_current_song():
+        global current_song
+        current_song = flask.request.json
+        current_song["album_cover_path"] = re.sub(re.escape(DASHBOARD_DIR), "", current_song["album_cover_path"])
+        print(current_song)
+        return flask.Response("SUCCESS", status=200)
+
 
 app.run(host="127.0.0.1", port=8000)

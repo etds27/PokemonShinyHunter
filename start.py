@@ -26,7 +26,7 @@ BOT_CONFIG_PATH = os.path.join(ROOT_DIR, "BotConfigs")
 
 os.environ["PSH_DASHBOARD_DIR"] = DASHBOARD_DIR
 os.environ["PSH_SHORTCUTS_DIR"] = SHORTCUTS_DIR
-os.environ["PYTHONPATH"] = f"{os.environ['PYTHONPATH']}{os.pathsep}{PYTHON_DIR}"
+os.environ["PYTHONPATH"] = f"{os.environ.get('PYTHONPATH', '')}{os.pathsep}{PYTHON_DIR}"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--emu-only", action="store_true", help="Start only the emu while connecting it to an already running server")
@@ -36,6 +36,7 @@ parser.add_argument("--env-only", action="store_true")
 parser.add_argument("-p", "--port", nargs=1, default=8000, type=int)
 parser.add_argument("--host", nargs=1, default="127.0.0.1", type=str)
 parser.add_argument("-g", "--game", default="C:\Emulators\GBC\Pokemon Crystal.gbc", type=str)
+parser.add_argument("-m", "--music", action="store_true")
 parser.add_argument("-e", "--emulator", nargs=1, default="C:\Emulators\Bizhawk\EmuHawk.exe", type=str)
 parser.add_argument("--bot-ids", nargs="+")
 args = parser.parse_args()
@@ -168,6 +169,16 @@ def run_emulator(event: threading.Event, timeout: int = 10):
             sys.stdout.flush()
     """
 
+def start_music(event: threading.Event, timeout: int = 10):
+    if args.music:
+        if not event.wait(timeout):
+            logging.error("Timed out waiting for HTTP server to start")
+            exit(2)        
+        logging.info("Starting Music")
+        cmd = [sys.executable, os.path.join(ROOT_DIR, "Audio", "audio_player.py")]
+        subprocess.Popen(cmd, stdout=None, stderr=None, bufsize=1, universal_newlines=True)
+
+
 # The python HTTP server initially starts
 # The emulator thread is then immediately started
 # The emulator thread is then immediately held until the event is fulfilled
@@ -176,13 +187,17 @@ def run_emulator(event: threading.Event, timeout: int = 10):
 # Wait for both threads to finish
 python_server_start_event = threading.Event()
 server_thread = threading.Thread(target=run_server, args=[python_server_start_event])
+music_thread = threading.Thread(target=start_music, args=[python_server_start_event])
 emulator_thread = threading.Thread(target=run_emulator, args=[python_server_start_event])
 
 server_thread.start()
+music_thread.start()
 emulator_thread.start()
 
 server_thread.join()
 logging.info("Server thread ended")
+music_thread.join()
+logging.info("Music thread ended")
 emulator_thread.join()
 logging.info("Emulator thread ended")
 logging.info("Script finished")

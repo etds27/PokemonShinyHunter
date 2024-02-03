@@ -13,3 +13,5 @@ src/PythonServer/.env
 Test/*
 *.env
 src/Dashboard/resources
+Audio/*.zip
+*.flac

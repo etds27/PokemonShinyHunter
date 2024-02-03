@@ -13,6 +13,9 @@ const TICKER_SECONDS_PER_POKEMON = 2.5
 // mapping of Bot ID to pokemon table
 let activePokemonBots = {}
 
+let activeSongUUID = {}
+const CURRENT_SONG_ANIMATION_DURATION = 10000
+
 /**
  * Accepts new encounter data and populates the newest encounter row
  */
@@ -171,6 +174,24 @@ function collection() {
                 }
                 updateCollection(collection)
             }
+        }   
+    })
+}
+
+/**
+ * Accepts new request for pokemon table and creates html elements for it
+ */
+function updateDashboard() {
+    updatePokemonTimestamps()
+    $.ajax({
+        method: "GET",
+        url: host + "/get_current_song",
+        crossDomain: true,
+        dataType: "json",
+        format: "json",
+        timeout: 1000,
+        success: function(currentSong) {
+            updateCurrentSong(currentSong)
         }   
     })
 }
@@ -449,6 +470,33 @@ function updateDashboardColors() {
     document.documentElement.style.setProperty("--base-color-very-light", colors.veryLight);
 }
 
+function updateCurrentSong(currentSong) {
+    if (Object.keys(currentSong).length === 0) {
+        return
+    }
+    if (currentSong["uuid"] == activeSongUUID) {
+        return
+    }
+
+    let topRowText = `${currentSong["title"]} - ${currentSong["album"]}`
+    let bottomRowText = `${currentSong["artist"]} - ${currentSong["date"]}`
+
+    document.getElementById("current_song_top_row").innerText = topRowText
+    document.getElementById("current_song_bottom_row").innerText = bottomRowText
+    const albumCoverElement = $("#current_song_album_cover")
+    albumCoverElement.attr("src", `${currentSong["album_cover_path"]}?${currentSong["uuid"]}`)
+    albumCoverElement.hide()
+    albumCoverElement.show()
+
+    let songFrame = document.getElementById("current_song_frame")
+    songFrame.classList.add("current_song_animation")
+
+    setTimeout(function() {
+      songFrame.classList.remove('current_song_animation');
+    }, CURRENT_SONG_ANIMATION_DURATION);
+    activeSongUUID = currentSong["uuid"]
+}
+
 setInterval(() => {
     // console.log(host + "/active_bots")
     updateActiveBots()
@@ -465,8 +513,8 @@ setInterval(() => {
 }, 1000);
 
 setInterval(() => {
-    updatePokemonTimestamps()
-}, 1000)
+    updateDashboard()
+}, 500)
 
 setInterval(() => {
     phase()
@@ -478,4 +526,4 @@ setInterval(() => {
 
 setInterval(() => {
     collection()
-}, 1000)
+}, 5000)
