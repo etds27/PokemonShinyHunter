@@ -1,93 +1,93 @@
 :root {
-    --current-song-animation-duration: 10000ms;
-  }
+  --current-song-animation-duration: 10000ms;
+}
+
+html {
+  background-color: orange;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.body {
+  background-color: yellow;
+  width: 50%;
+  height: 50%;
+  position: relative;
+}
+
+#current_song_frame {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   
-  html {
-    background-color: orange;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-  }
+  height: 128px;
+  width: 600px;
+  background-color: black;
+  position: absolute;
+  z-index: 2;
+  left: 100%;
+  top: 30px;
+}
+
+.current_song_animation {
+  animation-duration: var(--current-song-animation-duration);
+  animation-name: slidein;
+  transition: all 1s cubic-bezier(0.61, 0.06, 0.98, 0.47);
+}
+
+#current_song_album_cover {
+  max-height: 128px;
+  max-width: 128px;
+  min-height: 128px;
+  min-width: 128px;
+}
+
+#current_song_details_frame {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: stretch;
+  padding-right: 15px;
+  padding-left: 15px;
   
-  .body {
-    background-color: yellow;
-    width: 50%;
-    height: 50%;
-    position: relative;
-  }
-  
-  #current_song_frame {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    
-    width: 500px;
-    background-color: black;
-    position: absolute;
-    z-index: 2;
+  overflow: hidden;
+}
+
+.current_song_main_row {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  text-align: left;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.current_song_sub_row {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: gray;
+  text-align: left;
+   
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@keyframes slidein {
+  0%, 100% {
     left: 100%;
-    top: 30px;
+  }
+
+  25% {
+    transform: translateX(-100%);
   }
   
-  .current_song_animation {
-    animation-duration: var(--current-song-animation-duration);
-    animation-name: slidein;
-    transition: all 1s cubic-bezier(0.61, 0.06, 0.98, 0.47);
+  75% {
+    transform: translateX(-100%);
   }
-  
-  #current_song_album_cover {
-    max-height: 96px;
-    max-width: 96px;
-    min-height: 96px;
-    min-width: 96px;
-  }
-  
-  #current_song_details_frame {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    padding-right: 15px;
-    padding-left: 15px;
-    
-    overflow: hidden;
-  }
-  
-  #current_song_top_row {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    text-align: right;
-  
-    text-overflow: ellipsis;
-    white-space: nowrap;
-      overflow: hidden;
-  }
-  
-  #current_song_bottom_row {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    color: gray;
-    text-align: right;
-     
-    text-overflow: ellipsis;
-    white-space: nowrap;
-      overflow: hidden;
-  }
-  
-  @keyframes slidein {
-    0%, 100% {
-      left: 100%;
-    }
-  
-    25% {
-      transform: translateX(-100%);
-    }
-    
-    75% {
-      transform: translateX(-100%);
-    }
-  }
-  
+}

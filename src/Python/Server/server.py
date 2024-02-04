@@ -76,8 +76,10 @@ def update_current_song():
 def receive_current_song():
         global current_song
         current_song = flask.request.json
-        current_song["album_cover_path"] = re.sub(re.escape(DASHBOARD_DIR), "", current_song["album_cover_path"])
-        print(current_song)
+        if current_song: 
+            current_song["album_cover_path"] = re.sub(re.escape(DASHBOARD_DIR), "", current_song["album_cover_path"])
+
+        logging.debug(current_song)
         return flask.Response("SUCCESS", status=200)
 
 

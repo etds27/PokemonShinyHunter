@@ -477,16 +477,14 @@ function updateCurrentSong(currentSong) {
     if (currentSong["uuid"] == activeSongUUID) {
         return
     }
+    
+    document.getElementById("current_song_title").innerText = currentSong["title"]
+    document.getElementById("current_song_album").innerText = `Album: ${currentSong["album"]}`
+    document.getElementById("current_song_artist").innerText = `Artist: ${currentSong["artist"]}`
+    document.getElementById("current_song_date").innerText = `Date: ${currentSong["date"]}`
 
-    let topRowText = `${currentSong["title"]} - ${currentSong["album"]}`
-    let bottomRowText = `${currentSong["artist"]} - ${currentSong["date"]}`
-
-    document.getElementById("current_song_top_row").innerText = topRowText
-    document.getElementById("current_song_bottom_row").innerText = bottomRowText
     const albumCoverElement = $("#current_song_album_cover")
     albumCoverElement.attr("src", `${currentSong["album_cover_path"]}?${currentSong["uuid"]}`)
-    albumCoverElement.hide()
-    albumCoverElement.show()
 
     let songFrame = document.getElementById("current_song_frame")
     songFrame.classList.add("current_song_animation")
