@@ -45,13 +45,14 @@ body {
 
 #pokemon-table-container {
   align-items: flex-end;
-  background-color: var(--base-color-very-dark);
+  background-color: black;
   display: flex;
   flex-direction: row;
   flex: 1 1 auto;
   justify-content: space-evenly;
   max-height: 100vh;
   max-width: 100vw;
+  column-gap: 2px;
 }
 
 .pokemon-bot-area {
@@ -63,8 +64,6 @@ body {
   height: 100%;
   justify-content: flex-end;
   overflow: hidden;
-  padding-left: 2px;
-  padding-right: 2px;
   width: 100%;
 }
 
